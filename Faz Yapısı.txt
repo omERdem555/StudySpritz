@@ -1,0 +1,406 @@
+STUDYSPRITZ V1 GELİŞTİRME YOL HARİTASI
+FAZ 0 — Gereksinim Dondurma
+
+Amaç:
+Ürünün kapsamını sabitlemek.
+
+Çıktı:
+V1 özellik listesi kesinleşir
+V2 özellikleri ayrı listeye alınır
+Veri saklama kararları kesinleşir
+Desteklenecek dosya tipleri kesinleşir
+
+Tamamlanma Kriteri:
+Artık yeni özellik eklenmez.
+
+
+
+
+
+FAZ 1 — Domain Tasarımı
+
+Amaç:
+Uygulamanın veri omurgasını oluşturmak.
+
+Tanımlanacak yapılar:
+Book - Kitap
+ReadingProgress - Kaldığı yer
+Bookmark - Yer imi
+Favorite- Favori
+AppSettings - Ayarlar
+ReadingStatistics - İstatistikler
+RecentBook - Son Liste
+
+Tamamlanma Kriteri:
+Tüm veri modelleri kesinleşir.
+Henüz ekran yok.
+Henüz Hive yok.
+Henüz UI yok.
+
+
+
+FAZ 2 — Yerel Veri Katmanı
+
+Amaç:
+Hive altyapısını kurmak.
+
+İşler:
+Hive Kurulumu
+Adapter Oluşturma
+Repository Katmanı
+CRUD İşlemleri
+
+Book
+Bookmark
+Settings
+Progress
+Statistics
+Recent
+Favorite
+
+Tamamlanma Kriteri:
+Veriler uygulama kapansa bile korunur.
+Henüz ekran yok.
+
+
+
+
+FAZ 3 — Dosya Yönetim Sistemi
+
+Amaç:
+Cihazdan dosya seçebilmek.
+
+İşler:
+Dosya Seçici
+PDF
+DOCX
+TXT
+
+Dosya Doğrulama
+Dosya mevcut mu?
+Dosya silinmiş mi?
+Dosya taşınmış mı?
+Kitap Kaydı
+
+Yalnızca:
+dosya yolu
+dosya adı
+metadata
+saklanır.
+Dosya kopyalanmaz.
+
+Tamamlanma Kriteri:
+Kitap eklenebilir.
+Açılabilir.
+Yol üzerinden bulunabilir.
+
+
+
+
+FAZ 4 — Metin Çıkarma Motoru
+
+Amaç:
+Desteklenen dosyaları okunabilir metne çevirmek.
+
+Modüller:
+PDF Parser
+DOCX Parser
+TXT Parser
+
+Çıktı:
+Tek tip metin.
+
+Örnek:
+Lorem ipsum dolor sit amet...
+
+Tamamlanma Kriteri:
+Üç dosya türü de aynı metin çıktısını üretebilir.
+
+
+
+
+FAZ 5 — Okuma Motoru
+
+Amaç:
+Normal kitap okuma sistemini oluşturmak.
+
+İşler:
+Sayfa Yapısı
+Bölümleme
+Sayfa Hesaplama
+Kaldığı Yerden Devam
+Okuma Yüzdesi
+Sayfa Geçişleri
+
+Tamamlanma Kriteri:
+Kitap okunabilir hale gelir.
+RSVP henüz yok.
+
+
+
+
+
+FAZ 6 — Ana Navigasyon
+
+Amaç:
+Sayfalar arası geçişleri kurmak.
+
+Ekranlar:
+Ana Sayfa
+Son Liste
+Favoriler
+Yer İmleri
+Seçenekler
+Kitap Okuma
+Sol Bar
+
+Tamamlanma Kriteri:
+Tüm ekranlara erişilebilir.
+İçeriklerin çoğu sahte veri olabilir.
+
+
+
+
+FAZ 7 — Ana Sayfa
+
+Amaç:
+Gerçek verilerle çalışan dashboard oluşturmak.
+
+İşler:
+Header
++
+Son Liste Alanı
+Favoriler Alanı
+Yer İmleri Alanı
+İstatistiklerim
+
+Tamamlanma Kriteri:
+Ana sayfa canlı veri gösterir.
+
+
+
+
+
+FAZ 8 — Son Liste Sistemi
+
+Amaç:
+Okuma sırasını takip etmek.
+
+Kurallar:
+
+Kitap açılırsa:
+→ Listenin başına gelir.
+
+Kitap okunursa:
+→ Güncellenir.
+
+Tamamlanma Kriteri:
+Netflix tarzı son kullanılan mantığı çalışır.
+
+
+
+
+
+FAZ 9 — Favoriler Sistemi
+
+Amaç:
+Favori kitapları yönetmek.
+
+İşler:
+Favori Ekle
+Favori Kaldır
+Favoriler Sayfası
+
+Tamamlanma Kriteri:
+Tam çalışır.
+
+
+
+
+
+FAZ 10 — Yer İmleri Sistemi
+
+Amaç:
+Sayfa işaretleme.
+
+İşler:
+Yer İmi Ekle
+Yer İmi Sil
+Not Ekle
+Yer İmlerine Git
+
+Tamamlanma Kriteri:
+Belirli sayfalara geri dönülebilir.
+
+
+
+
+
+FAZ 11 — Ayarlar Sistemi
+
+Amaç:
+Kullanıcı tercihleri.
+
+İşler:
+Tema
+Dil
+Varsayılan WPM
+Varsayılan Font Boyutu
+
+Tamamlanma Kriteri:
+Kalıcılık sağlanır.
+
+
+
+
+
+FAZ 12 — İstatistik Motoru
+
+Amaç:
+Okuma verilerini toplamak.
+
+Veriler:
+Toplam Kitap
+Okunan Kitap
+Toplam Sayfa
+Toplam Kelime
+Toplam Süre
+Ortalama Hız
+
+
+
+
+Tamamlanma Kriteri:
+Gerçek kullanım verileri hesaplanır.
+
+
+
+
+
+
+FAZ 13 — RSVP Hazırlık Katmanı
+
+Amaç:
+Metni hızlı okumaya hazırlamak.
+
+
+
+
+Pipeline:
+Metin
+ ↓
+Temizleme
+ ↓
+Tokenizasyon
+ ↓
+Kelime Dizisi
+ ↓
+Noktalama Analizi
+ ↓
+RSVP Verisi
+
+Tamamlanma Kriteri:
+Metin RSVP motoruna aktarılabilir.
+
+
+
+
+
+FAZ 14 — RSVP Motoru
+
+Amaç:
+Projenin çekirdeğini oluşturmak.
+
+İşler:
+WPM Hesabı
+Timer Sistemi
+Kelime Gösterimi
+Noktalama Duraklamaları
+Başlat
+Duraklat
+Devam Et
+Hız Değiştirme
+
+Tamamlanma Kriteri:
+Motor çalışır.
+
+
+
+
+
+FAZ 15 — ORP (Odak Harfi) Sistemi
+
+Amaç:
+Kelimenin odak noktasını belirlemek.
+
+Örnek:
+MateMATik
+BilgiSAyar
+AlgorITma
+
+İşler:
+Harf Hesaplama
+Renklendirme
+Tema Uyumu
+
+Tamamlanma Kriteri:
+RSVP görünümü tamamlanır.
+
+
+
+
+
+FAZ 16 — RSVP Arayüzü
+
+Amaç:
+Hızlı okuma ekranını tamamlamak.
+
+İşler:
+Başlat
+Duraklat
+Devam
+Hız Arttır
+Hız Azalt
+Renk Değiştir
+Normal Okumaya Dön
+
+Tamamlanma Kriteri:
+Kullanıcı RSVP modunu kullanabilir.
+
+
+
+
+
+
+FAZ 17 — Tema Sistemi
+
+Amaç:
+Tüm ekranları tema ile uyumlu hale getirmek.
+
+İşler:
+Light Theme
+Dark Theme
+RSVP Theme
+ORP Color Theme
+
+Tamamlanma Kriteri:
+Tema sistemi tamamlanır.
+
+
+
+
+
+FAZ 18 — Stabilizasyon
+
+Amaç:
+Yayın öncesi hazırlık.
+
+İşler:
+Performans Testleri
+Büyük PDF Testleri
+Bellek Testleri
+Hata Düzeltmeleri
+UI Tutarlılığı
+
+Tamamlanma Kriteri:
+V1 yayınlanabilir hale gelir.

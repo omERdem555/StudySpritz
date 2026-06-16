@@ -1,0 +1,273 @@
+StudySpritz - Proje Tasarım ve Geliştirme Dokümanı (V1)
+
+
+
+## Proje Amacı
+
+StudySpritz, kullanıcıların cihazlarında bulunan ders notları, kitaplar, sunumlar ve diğer metin tabanlı dosyaları okuyabilmelerini sağlayan bir mobil uygulamadır.
+
+Uygulamanın temel amacı, klasik okuma deneyiminin yanında RSVP (Rapid Serial Visual Presentation) tabanlı Hızlı Okuma Modu sunarak kullanıcıların daha hızlı ve odaklı okuyabilmelerini sağlamaktır.
+
+Desteklenmesi planlanan dosya türleri:
+
+.pdf
+.txt
+.docx
+
+İlerleyen sürümlerde desteklenmesi planlanan dosya türleri:
+
+.doc
+.odt
+.csv
+.xlsx
+.xls
+.pptx
+.ppt
+
+## İlk Sürüm (MVP) Hedefleri
+
+Bu projenin ilk sürümünde aşağıdaki özelliklerin tamamlanması hedeflenmektedir:
+
+* PDF desteği
+* TXT desteği
+* DOCX desteği
+* Kitap ekleme
+* Son Liste sistemi
+* Kaldığı yerden devam etme
+* RSVP Hızlı Okuma Modu
+* Gece/Gündüz teması
+* Yer İmleri sistemi
+* Favoriler sistemi
+* Temel istatistik sistemi
+
+İlk sürümde yapılmayacak özellikler:
+
+* Kullanıcı hesabı
+* Bulut senkronizasyonu
+* Sunucu altyapısı
+* Yapay zekâ destekli özetleme
+* XLS/XLSX/PPT/PPTX gelişmiş görüntüleme
+* Kitapların uygulama içine kopyalanması
+
+## Teknik Notlar
+
+* Proje Flutter (Dart) ile geliştirilecektir.
+* Kitaplar uygulama içine yüklenmeyecektir.
+* Kullanıcının cihazında bulunan dosyanın yolu saklanacaktır.
+* Uygulama yalnızca dosyanın bulunduğu konumu referans alacaktır.
+* Kitaplar ikinci kez depolanmayacaktır.
+* Kullanıcı verileri yerel veritabanında saklanacaktır.
+* İlk aşamada Hive veya SQLite kullanılabilir.
+* Tüm mimari mümkün olduğunca çevrimdışı (offline) çalışacak şekilde tasarlanacaktır.
+
+
+Şimdilik projenin yapısal tasarımı şu şekilde olacak:
+
+*Ana sayfa*
+
+Bu sayfa kullanıcıların genel kullanımlarını gerçekleştirdikleri yer olacak.
+
+-Bir header alanı. Burada "Sol Bar"a açılan bir hamburger butonu, Ortada uygulamanın ismi "StudySpritz" ve en sağda "Seçenekler"e açılan bir üç nokta bulunuyor.
+
+-Okumak için kitap ekleme işlemi "+"
+
+-Eklenen kitaplar üzerinde bir "Son Liste" menüsü olmalı. Bu menü kullanıcının yapmış olduğu okumaların sırasını gösterecek. Örn ben A kitabını okumaya başladım. A'nın yarısındayken B'ye geçtim. B, A'nın önüne geçti. Fakat B bitmeden A'ya devam ettim. Bu sefer A, B'nin önüne geçti. Ve bu öne geçme sırası menünün solundan sağına doğru kaydırılabilir özellikte olmalı.
+
+-Bu sefer statik olarak sıralanan bir "Favorilerim" menüsü olmalı.
+
+-Yine statik sıralanan ve normal okumalar için kullanıcının beğendiği sayfaları not alması için "Yer İmleri" menüsü olmalı.
+
+-Son olarak ana sayfanın en altında bazı "İstatistiklerim" yer almasını istiyorum. Bunlar kabaca şu şekilde:
+
+Toplam Kitap
+Okunan Kitap
+Toplam Sayfa
+Toplam Kelime
+Toplam Süre
+Ortalama Hız
+
+Buradaki her bir değer için de minik bölmelere ayrılmış bir menü şeklinde olmalı.
+
+Aynı zamanda kitaplar için ayrılan Son Liste, Favorilerim ve Yer İmleri menülerinde tıklanabilir bir şekilde kitap kapakları bulunmalı. Bu okumak için eklenen kitabın dosya yolunu takip edip seçilen kitabı ekleyecek. Yani herhangi bir ek depolama olmaması lazım. Eklenen kitaplar aynı zamanda cihazın içinde olan kitaplar olmalı. Kitapları başka bir yere yedeklemek yerine kitabın cihaz üzerindeki konumundan açılması lazım.
+
+Ana sayfada bulunan header alanı, +, Son Liste, Favorilerim, Yer İmleri ve İstatistiklerim menülerinin her biri alta alta dikdörtgen bir yapıda olmalı. Birbirlerinden belli bir mesafe uzak olmalı ve bir background üzerine yerleştirilmeli.
+
+
+
+
+*Sol Bar*
+
+Burası minik bir yardımcı menü olmalı.
+
+Demin bahsettiğimiz +, Kitaplığım, Son Liste, Favorilerim, Yer İmleri, Seçenekler, Gece/Gündüz burada ekranın en üstünden %30 boşluk bıraktıktan sonra alt alta dizilip basılabilir olmalı. Basıldığı zaman yine istenen sayfaya göndermesi lazım. Burası Ana Sayfa üzerine açılacak ve ekrana sol taraftan yaklaşarak %70'ini kapsadıktan sonra kalan kısmı az miktar blurlayacak. Blurlu bölgeye tıklandığı zaman Sol Bar açıldığı şekilde kapanıp Ana Sayfa normal görünümünü alacak.
+
+*Seçenekler*
+
+En üstte Header alanı için soldan sağa doğru şu şekilde:
+
+* En solda Ana Sayfa'ya geri döndüren bir ok
+* Hemen yanında Seçenekler yazısı
+
+Burası kullanıcının genel olarak uygulama ayarlarını yaptığı sayfa olacak.
+
+Tema Renkleri
+Dil
+Varsayılan Okuma Hızı
+Varsayılan Yazı Boyutu
+
+gibi ayarlar buradan yapılacak.
+
+Burası direkt gidilen bir sayfa olacak. Ekranın tamamını kapsayacak.
+
+
+
+
+*Son Liste*
+
+En üstte Header alanı için soldan sağa doğru şu şekilde:
+
+* En solda Ana Sayfa'ya geri döndüren bir ok
+* Hemen yanında Son Liste yazısı
+
+Burası bir kitaplık arkaplanına sahip olmalı.
+
+Burada kitaplar üzerinde değişiklik yapıldığı sıraya göre ekrandan taşmayacak şekilde 4 sütun halinde aşağıya doğru sayısı artacak biçimde aralarında belirli miktar boşluk olarak sıralanacaklar.
+
+En son okunan kitap en önde olacak şekilde sıralanmalı.
+
+4 sütun x X satır yapısı kullanılmalı.
+
+Buradaki kitaplar tıklanılabilir olmalı.
+
+
+
+
+
+*Favorilerim*
+
+En üstte Header alanı için soldan sağa doğru şu şekilde:
+
+* En solda Ana Sayfa'ya geri döndüren bir ok
+* Hemen yanında Favorilerim yazısı
+
+Seçilen kitapları okuma menüsünden favorilenmiş kitapları bir kuyruk yapısı şeklinde 4 sütun x X satır olacak şekilde sıralanmalı.
+
+En çok favorilenen veya en son favorilenen kitap en başta gözükecek şekilde sıralanmalı.
+
+Buradaki kitaplar da yine tıklanılabilir olmalı.
+
+
+
+
+
+*Yer İmleri*
+
+En üstte Header alanı için soldan sağa doğru şu şekilde:
+
+* En solda Ana Sayfa'ya geri döndüren bir ok
+* Hemen yanında Yer İmleri yazısı
+
+Okuma menüsünden imlenen sayfaları statik olarak kuyruk yapısı şeklinde sıralayan bir alan.
+
+Buradaki kitaplar da yine tıklanılabilir olmalı.
+
+Burası da 4 sütun x X satır olmalı.
+yapısı şuna benzer:
+{
+ "book":"A",
+ "page":153,
+ "note":"Önemli formül"
+}
+
+
+
+
+
+*Kitap Okuma Menüsü*
+
+Bu menüye herhangi bir kitaba tıklayarak istenilen kitabı cihaz üzerinden uygulamamız ile açmasına yarıyor.
+
+Kişi önceden eklemiş olduğu kitabı uygulama üzerinden açmaya yarıyor.
+
+Açılan kitaplar uygulama üzerinden seçilen Gece/Gündüz temasına uygun şekilde gözükecek.
+
+En üstte Header alanı için:
+
+* Ana Sayfa'ya geri döndüren bir ok
+* Kitabın Adı
+
+En alt kısımda:
+
+* Sayfa ilerleme çubuğu
+* Sayfalar arasında hızlı geçiş
+* Okuma yüzdesi göstergesi
+
+Onun altında soldan sağa doğru minik bölmeler içinde:
+
+-Yatay/Dikey
+
+-Gece/Gündüz
+
+-Zoom Aç/Kapa
+
+-Hızlı Okuma
+
+kısımları sembolik olarak belirmeli.
+
+Yatay/Dikey sadece Kitap Okuma moduna özel olmalı.
+
+Gece/Gündüz teması uygulamanın genel temasına bağlı olarak değişmeli.
+
+Zoom özelliği kapalı olduğu zaman ekran sadece kaydırma özelliğine sahip olmalı.
+
+Zoom açık olduğu zaman ekran kaymak yerine yakınlaştırma işlemi yapmalı.
+
+
+-Geldik en önemli ve uygulamanın kırılma noktası olan Hızlı Okuma moduna.
+
+Kullanıcı bu modu seçtiği zaman mevcut olduğu sayfanın bulunduğu konumdan başlayarak metin kelimelere ayrılmalı.
+
+Kelimeler ekranın ortasında gösterilmeli. Kelimenin gözün odak noktası olması için kelimenin içinden kelime uzunluğuna göre bazı harfler büyük olmalı. Örn Matematik yerinde MateMATik ve bu sonradan büyütülen harfler farklı bir renkle gözükmeli
+
+Header alanının hemen altında yalnızca Hızlı Okuma Moduna özel bir kontrol alanı bulunmalı.
+
+Bu alanda:
+
+* Başlat
+* Duraklat
+* Devam Et
+* Hız Arttır
+* Hız Azalt
+* Normal Okumaya Dön
+* Renk değiştir. Bu sonradan eklenen harflerin rengini değiştirecek.
+
+butonları yer almalı.
+
+Hızlı Okuma Modu kullanıcı tarafından seçilen WPM (Words Per Minute) değerine göre çalışmalıdır.
+
+İlk sürümde önerilen hız aralığı:
+
+100 WPM
+200 WPM
+300 WPM
+400 WPM
+500 WPM
+700 WPM
+1000 WPM
+
+olarak belirlenebilir.
+
+Nokta, virgül, soru işareti ve ünlem gibi noktalama işaretlerinde sistem kısa süreli duraklama yaparak daha doğal bir okuma deneyimi sunmalıdır.
+
+Okuma Motoru Tasarımı
+Dosya
+ ↓
+Metin Çıkarma
+ ↓
+Sayfa Analizi
+ ↓
+Kelime Dizisi
+ ↓
+RSVP Motoru
+ ↓
+Ekran
