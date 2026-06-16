@@ -14,7 +14,8 @@ Bookmark
 {
   id
   bookId
-  page
+  pageNumber
+  textPosition
   note
   createdAt
 }
@@ -112,3 +113,16 @@ Book
 Bookmark
 AppSettings
 ReadingStatistics
+
+
+
+
+| Model             | Durum      | Gerekçe                                |
+| ----------------- | ---------- | -------------------------------------- |
+| Book              | Kalacak    | Ana varlık                             |
+| Bookmark          | Kalacak    | 1:N ilişki                             |
+| AppSettings       | Kalacak    | Uygulama geneli ayarlar                |
+| ReadingStatistics | Kalacak    | Global istatistikler                   |
+| ReadingProgress   | Kaldırıldı | Book içine gömülecek                   |
+| Favorite          | Kaldırıldı | Book içine gömülecek                   |
+| RecentBook        | Kaldırıldı | Book içindeki tarih alanıyla çözülecek |

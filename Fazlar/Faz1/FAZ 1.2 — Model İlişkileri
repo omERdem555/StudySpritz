@@ -1,0 +1,26 @@
+Şu anki yapı mantıksal diyagramı şöyle olmalı:
+
+AppSettings
+     │
+     └── (uygulama geneli)
+
+ReadingStatistics
+     │
+     └── (uygulama geneli)
+
+Book
+ ├── Book #1
+ ├── Book #2
+ ├── Book #3
+ └── ...
+
+Book
+ └── Bookmark (0..N)
+
+
+
+ yani
+ AppSettings (1)
+ ReadingStatistics (1)
+ Book (N)
+ Book (1) -------- (N) Bookmark
