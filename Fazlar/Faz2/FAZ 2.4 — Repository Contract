@@ -1,0 +1,4 @@
+FAZ 2.4 — Repository Contract
+Şu aşamada sadece repository sözleşmesi 
+(interface benzeri yapı) oluşturuz, ihtiyacımız
+olan tek import ilgili modeldir.
