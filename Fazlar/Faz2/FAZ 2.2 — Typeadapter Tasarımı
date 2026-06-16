@@ -1,0 +1,326 @@
+FAZ 2.2 — TYPEADAPTER TASARIMI (KESİN IMPLEMENTASYON)
+🎯 Amaç
+
+Hive’ın diske yazacağı veri formatını sabitlemek:
+
+Book → binary schema
+Bookmark → snapshot schema
+Settings → config schema
+Statistics → append-only schema
+
+
+
+2.2.0 KRİTİK KURAL (DEĞİŞTİRİLEMEZ)
+
+Bunu baştan sabitle:
+
+✔ field index asla değişmez
+✔ alan silinmez, sadece eklenir
+✔ sıralama önemli değildir ama index önemlidir
+
+
+
+2.2.1 BOOK ADAPTER
+📌 Model (referans)
+class Book {
+  String bookId;
+  String bookName;
+
+  String filePath;
+  String fileType;
+
+  int pageCount;
+  int wordCount;
+
+  int pageNumber;
+  int wordIndex;
+
+  bool isFavorite;
+  bool isCompleted;
+
+  DateTime addedAt;
+  DateTime lastOpenedAt;
+  DateTime? completedAt;
+}
+
+📦 Adapter
+
+📍 dosya:
+lib/data/adapters/book_adapter.dart
+
+import '../core/extensions/hive_date_extensions.dart';
+import 'package:hive/hive.dart';
+import '../models/book.dart';
+
+class BookAdapter extends TypeAdapter<Book> {
+  @override
+  final int typeId = 1;
+
+  @override
+  Book read(BinaryReader reader) {
+    return Book(
+      bookId: reader.readString(),
+      bookName: reader.readString(),
+      filePath: reader.readString(),
+      fileType: reader.readString(),
+      pageCount: reader.readInt(),
+      wordCount: reader.readInt(),
+      pageNumber: reader.readInt(),
+      wordIndex: reader.readInt(),
+      isFavorite: reader.readBool(),
+      isCompleted: reader.readBool(),
+      addedAt: reader.readDateTimeSafe(),
+      lastOpenedAt: reader.readDateTimeSafe(),
+      completedAt: reader.readNullableDateTime(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Book obj) {
+    writer.writeString(obj.bookId);
+    writer.writeString(obj.bookName);
+    writer.writeString(obj.filePath);
+    writer.writeString(obj.fileType);
+    writer.writeInt(obj.pageCount);
+    writer.writeInt(obj.wordCount);
+    writer.writeInt(obj.pageNumber);
+    writer.writeInt(obj.wordIndex);
+    writer.writeBool(obj.isFavorite);
+    writer.writeBool(obj.isCompleted);
+    writer.writeDateTimeSafe(obj.addedAt);
+    writer.writeDateTimeSafe(obj.lastOpenedAt);
+    writer.writeNullableDateTime(obj.completedAt);
+  }
+}
+
+⚠️ KRİTİK NOT (BURADA DUR)
+
+Hive normalde readNullableDateTime() vermez.
+
+Bunu sen yazacaksın:
+
+import 'package:hive/hive.dart';
+
+extension HiveDateRead on BinaryReader {
+  DateTime readDateTimeSafe() {
+    return readInt() == 1
+        ? DateTime.fromMillisecondsSinceEpoch(readInt())
+        : DateTime(0);
+  }
+
+  DateTime? readNullableDateTime() {
+    final isNotNull = readBool();
+    if (!isNotNull) return null;
+    return DateTime.fromMillisecondsSinceEpoch(readInt());
+  }
+}
+
+extension HiveDateWrite on BinaryWriter {
+  void writeDateTimeSafe(DateTime value) {
+    writeInt(1);
+    writeInt(value.millisecondsSinceEpoch);
+  }
+
+  void writeNullableDateTime(DateTime? value) {
+    writeBool(value != null);
+    if (value != null) {
+      writeInt(value.millisecondsSinceEpoch);
+    }
+  }
+}
+
+
+
+2.2.2 BOOKMARK ADAPTER
+class Bookmark {
+  String markId;
+  String bookId;
+
+  int pageNumber;
+  int wordIndex;
+
+  String markNote;
+  DateTime createdAt;
+}
+import '../core/extensions/hive_date_extensions.dart';
+import 'package:hive/hive.dart';
+import '../models/book.dart';
+
+class BookAdapter extends TypeAdapter<Book> {
+  @override
+  final int typeId = 1;
+
+  @override
+  Book read(BinaryReader reader) {
+    return Book(
+      bookId: reader.readString(),
+      bookName: reader.readString(),
+      filePath: reader.readString(),
+      fileType: reader.readString(),
+      pageCount: reader.readInt(),
+      wordCount: reader.readInt(),
+      pageNumber: reader.readInt(),
+      wordIndex: reader.readInt(),
+      isFavorite: reader.readBool(),
+      isCompleted: reader.readBool(),
+      addedAt: reader.readDateTimeSafe(),
+      lastOpenedAt: reader.readDateTimeSafe(),
+      completedAt: reader.readNullableDateTime(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Book obj) {
+    writer.writeString(obj.bookId);
+    writer.writeString(obj.bookName);
+    writer.writeString(obj.filePath);
+    writer.writeString(obj.fileType);
+    writer.writeInt(obj.pageCount);
+    writer.writeInt(obj.wordCount);
+    writer.writeInt(obj.pageNumber);
+    writer.writeInt(obj.wordIndex);
+    writer.writeBool(obj.isFavorite);
+    writer.writeBool(obj.isCompleted);
+    writer.writeDateTimeSafe(obj.addedAt);
+    writer.writeDateTimeSafe(obj.lastOpenedAt);
+    writer.writeNullableDateTime(obj.completedAt);
+  }
+}
+
+
+
+2.2.3 APP SETTINGS ADAPTER
+class AppSettings {
+  String themeMode;
+  String language;
+
+  int wpmSpeed;
+  int animationSpeed;
+  int fontSize;
+
+  String rsvpHighlightColor;
+}
+import '../models/app_settings.dart';
+import 'package:hive/hive.dart';
+class AppSettingsAdapter extends TypeAdapter<AppSettings> {
+  @override
+  final int typeId = 3;
+
+  @override
+  AppSettings read(BinaryReader reader) {
+    return AppSettings(
+      themeMode: reader.readString(),
+      language: reader.readString(),
+      wpmSpeed: reader.readInt(),
+      animationSpeed: reader.readInt(),
+      fontSize: reader.readInt(),
+      rsvpHighlightColor: reader.readString(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, AppSettings obj) {
+    writer.writeString(obj.themeMode);
+    writer.writeString(obj.language);
+    writer.writeInt(obj.wpmSpeed);
+    writer.writeInt(obj.animationSpeed);
+    writer.writeInt(obj.fontSize);
+    writer.writeString(obj.rsvpHighlightColor);
+  }
+}
+
+
+
+2.2.4 READING STATISTICS ADAPTER
+class ReadingStatistics {
+  String bookId;
+
+  int totalReadingTime;
+  int sessionCount;
+  int lastSessionDuration;
+
+  double averageWpm;
+  double peakWpm;
+
+  int totalWordsRead;
+  int totalPagesRead;
+
+  DateTime firstReadAt;
+  DateTime lastReadAt;
+}
+import '../core/extensions/hive_date_extensions.dart';
+import '../models/reading_statistics.dart';
+import 'package:hive/hive.dart';
+
+class ReadingStatisticsAdapter extends TypeAdapter<ReadingStatistics> {
+  @override
+  final int typeId = 4;
+
+  @override
+  ReadingStatistics read(BinaryReader reader) {
+    return ReadingStatistics(
+      bookId: reader.readString(),
+      totalReadingTime: reader.readInt(),
+      sessionCount: reader.readInt(),
+      lastSessionDuration: reader.readInt(),
+      averageWpm: reader.readDouble(),
+      peakWpm: reader.readDouble(),
+      totalWordsRead: reader.readInt(),
+      totalPagesRead: reader.readInt(),
+      firstReadAt: reader.readDateTimeSafe(),
+      lastReadAt: reader.readDateTimeSafe(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, ReadingStatistics obj) {
+    writer.writeString(obj.bookId);
+    writer.writeInt(obj.totalReadingTime);
+    writer.writeInt(obj.sessionCount);
+    writer.writeInt(obj.lastSessionDuration);
+    writer.writeDouble(obj.averageWpm);
+    writer.writeDouble(obj.peakWpm);
+    writer.writeInt(obj.totalWordsRead);
+    writer.writeInt(obj.totalPagesRead);
+    writer.writeDateTimeSafe(obj.firstReadAt);
+    writer.writeDateTimeSafe(obj.lastReadAt);
+  }
+}
+
+
+
+2.2.5 KRİTİK ADIM — REGISTER
+
+📍 HiveService içine EKLE:
+
+Hive.registerAdapter(BookAdapter());
+Hive.registerAdapter(BookmarkAdapter());
+Hive.registerAdapter(AppSettingsAdapter());
+Hive.registerAdapter(ReadingStatisticsAdapter());
+
+
+
+2.2.6 FAZ 2.2 ÇIKTI
+
+Şu 3 şey olmalı:
+
+✔ modeller diske yazılabilir
+✔ restart sonrası okunabilir
+✔ typeId conflict yok
+
+
+
+2.2 RİSK ANALİZİ
+❌ Risk 1: typeId çakışması
+→ veri bozulur
+
+❌ Risk 2: field order değişimi
+→ decode kırılır
+
+❌ Risk 3: nullable tarih hatası
+→ runtime crash
+
+SONRAKİ ADIM
+Eğer bunu kurarsan FAZ 2.3’e geçiyoruz:
+🔵 Box Architecture + Repository Layer
+Orada gerçek “clean architecture” başlıyor.

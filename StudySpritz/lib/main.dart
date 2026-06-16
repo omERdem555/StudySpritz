@@ -10,6 +10,10 @@ void main() async {
   await HiveService.openBooksBox();
   await HiveService.openSettingsBox();
 
+  final box = await HiveService.openBooksBox();
+  await box.put("test", "StudySpritz");
+  print(box.get("test"));
+
   runApp(const MyApp());
 }
 
