@@ -1,0 +1,213 @@
+2.1 — HIVE CORE SETUP (KESİN IMPLEMENTASYON SIRASI)
+2.1.1 Dependency kurulumu
+
+Flutter projesinde pubspec.yaml:
+name: StudySpritz
+description: A new Flutter project
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.6
+
+
+
+
+2.1.2 Hive initialize (bootstrap layer)
+
+📌 En kritik nokta: main() entry point
+
+import 'package:flutter/material.dart';
+import 'core/services/hive_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await HiveService.init();
+
+  // opsiyonel preload
+  await HiveService.openBooksBox();
+  await HiveService.openSettingsBox();
+
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(child: Text("StudySpritz Ready")),
+      ),
+    );
+  }
+}
+
+
+
+
+2.1.3 Box isim standardı (şimdiden sabitlenir)
+
+Bunu değiştirmeyeceğiz:
+
+booksBox
+bookmarksBox
+appSettingsBox
+readingStatisticsBox
+
+📌 Bu isimler string literal değil, constant olmalı.
+
+
+
+
+
+2.1.4 Box registration (erken açma değil, erişim stratejisi)
+
+Hive’da 2 yaklaşım var:
+
+❌ Yanlış (erken open)
+main içinde tüm box’ları açmak
+✔ Doğru (lazy open + service layer)
+
+
+
+
+2.1.5 HiveService (önerilen yapı)
+
+Bu katman FAZ 2’nin omurgasıdır.
+
+import 'package:hive_flutter/hive_flutter.dart';
+import '../constants/box_names.dart';
+
+class HiveService {
+  static Future<void> init() async {
+    await Hive.initFlutter();
+  }
+
+  static Future<Box> openBooksBox() =>
+      Hive.openBox(BoxNames.booksBox);
+
+  static Future<Box> openBookmarksBox() =>
+      Hive.openBox(BoxNames.bookmarksBox);
+
+  static Future<Box> openSettingsBox() =>
+      Hive.openBox(BoxNames.appSettingsBox);
+
+  static Future<Box> openStatisticsBox() =>
+      Hive.openBox(BoxNames.readingStatisticsBox);
+}
+
+
+
+
+
+2.1.6 Application bootstrap refactor
+import 'package:flutter/material.dart';
+import 'core/services/hive_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await HiveService.init();
+
+  // opsiyonel preload
+  await HiveService.openBooksBox();
+  await HiveService.openSettingsBox();
+
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(child: Text("StudySpritz Ready")),
+      ),
+    );
+  }
+}
+
+
+
+
+2.1.7 Box erişim stratejisi (kritik karar)
+
+Şu modeli KULLANMAYACAKSIN:
+
+❌ global Hive.box()
+
+Bunun yerine:
+
+✔ repository → HiveService üzerinden erişecek
+
+
+
+
+
+2.1.8 FAZ 2.1 ÇIKTI KONTROLÜ
+
+Şu 3 şey doğruysa tamam:
+
+✔ 1. App açılıyor
+crash yok
+async init düzgün
+✔ 2. Hive aktif
+box açma hatası yok
+✔ 3. Box erişimi mümkün
+await Hive.openBox('booksBox');
+KRİTİK TASARIM NOTU (önemli)
+
+Burada bir “erken mimari tuzağı” var:
+
+❌ şu an model yazmıyoruz
+Book yok
+Adapter yok
+Repository yok
+
+Sadece:
+
+“storage runtime hazır mı?”
+
+
+
+
+FAZ 2.1 TAMAMLANDI SAYILMASI KRİTERİ
+
+Şu minimal test:
+
+App launch → no crash
+Hive init → success
+Box open → success
+SONRAKİ ADIM (2.2’ye hazırlık)
+
+Bir sonraki faz:
+
+TypeAdapter design
+
+Ama oraya geçmeden önce şunu netleştireceğiz:
+
+⚠️ Kritik karar
+Book içinde enum var mı?
+date format standardı ne?
+wordIndex int mi, long mu?
+
+Bunlar adapter kırılmalarını belirler.
