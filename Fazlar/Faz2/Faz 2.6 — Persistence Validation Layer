@@ -1,0 +1,127 @@
+Faz 2.6 — Persistence Validation Layer (KRİTİK)
+
+Bu aşama “feature” değil, doğrulama katmanıdır.
+Ama senin projede doğru yapmazsan tüm offline mimari çöker.
+
+2.6 AMACI
+
+Şunu garanti etmek:
+
+Uygulama kapanır → tekrar açılır → veri aynen geri gelir
+
+2.6 TEST MİMARİSİ (3 senaryo)
+
+SENARYO 1 — Book persistence
+Yapılacak:
+Book ekle
+app kill
+restart
+tekrar oku
+Beklenen:
+book list length = önceki değer
+
+SENARYO 2 — Bookmark persistence
+Yapılacak:
+1 kitap seç
+2 bookmark ekle
+restart
+Beklenen:
+bookmark list aynı kalmalı
+bookId ilişkisi bozulmamalı
+
+SENARYO 3 — Statistics accumulation
+Yapılacak:
+session start
+words increment
+session end
+restart
+Beklenen:
+totalWordsRead artmış olmalı
+sessionCount artmış olmalı
+peakWpm korunmalı
+
+
+
+
+2.6 IMPLEMENTASYON YAKLAŞIMI
+
+Bu aşamada kod yazma değil, test harness kuracağız.
+
+2.6.1 test runner (main içine geçici)
+Future<void> runPersistenceTests(BookRepository repo) async {
+  print("=== PERSISTENCE TEST START ===");
+
+  final before = await repo.getAllBooks();
+  print("BEFORE: ${before.length}");
+
+  final book = Book(
+    bookId: "persist-test",
+    bookName: "Persistence Test",
+    filePath: "",
+    fileType: "txt",
+    pageCount: 10,
+    wordCount: 100,
+    pageNumber: 0,
+    wordIndex: 0,
+    isFavorite: false,
+    isCompleted: false,
+    addedAt: DateTime.now(),
+    lastOpenedAt: DateTime.now(),
+    completedAt: null,
+  );
+
+  await repo.addBook(book);
+
+  final mid = await repo.getAllBooks();
+  print("AFTER ADD: ${mid.length}");
+
+  print("=== RESTART APP NOW ===");
+}
+
+
+2.6.2 ASIL TEST (manuel restart)
+
+Uygulamayı:
+
+kapat
+tekrar aç
+
+sonra:
+
+final repo = BookRepository();
+final books = await repo.getAllBooks();
+print("AFTER RESTART: ${books.length}");
+
+
+2.6 BAŞARILI SAYILMA KRİTERİ
+PASS conditions:
+Book restart sonrası kaybolmuyor
+Bookmark list stabil
+Settings tek kayıt olarak duruyor
+Statistics veri “sıfırlanmıyor”
+
+
+
+
+3. KRİTİK MİMARİ KONTROL (önemli uyarı)
+
+Senin mevcut sistemin şu riski taşıyor:
+
+❌ Risk 1 — implicit state corruption
+Hive veri var ama model değişirse silent bozulur
+
+❌ Risk 2 — statistics “append-only” değil
+şu an override edilebilir
+
+❌ Risk 3 — key-based storage
+bookId değişirse veri kaybolur
+
+
+4. SONRAKİ FAZ (2.7 öneri)
+
+Eğer 2.6 başarılı olursa bir sonraki mantıklı adım:
+👉 Reading Engine State Layer
+currentBookSession
+live word index tracking
+real-time WPM calculation
+auto statistics sync

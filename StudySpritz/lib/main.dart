@@ -9,19 +9,44 @@ void main() async {
   await HiveService.init();
 
   final repo = BookRepository();
+  final books = await repo.getAllBooks();
 
-  // 🔹 CLEAN START (önemli)
-  final allBefore = await repo.getAllBooks();
-  print("START COUNT: ${allBefore.length}");
-
-  // 🔹 DELETE
-  await repo.deleteBook("test");
-
-  // 🔹 READ AGAIN
-  final afterDelete = await repo.getAllBooks();
-  print("AFTER DELETE: ${afterDelete.length}");
+  print("AFTER RESTART: ${books.length}");
+  print("BOOK: ${books.first.bookName}");
 
   runApp(const MyApp());
+}
+
+Future<void> runPersistenceTests(BookRepository repo) async {
+  print("=== PERSISTENCE TEST START ===");
+
+  await repo.deleteBook("persist-test");
+
+  final before = await repo.getAllBooks();
+  print("BEFORE: ${before.length}");
+
+  final book = Book(
+    bookId: "persist-test",
+    bookName: "Persistence Test",
+    filePath: "",
+    fileType: "txt",
+    pageCount: 10,
+    wordCount: 100,
+    pageNumber: 0,
+    wordIndex: 0,
+    isFavorite: false,
+    isCompleted: false,
+    addedAt: DateTime.now(),
+    lastOpenedAt: DateTime.now(),
+    completedAt: null,
+  );
+
+  await repo.addBook(book);
+
+  final mid = await repo.getAllBooks();
+  print("AFTER ADD: ${mid.length}");
+
+  print("=== RESTART APP NOW ===");
 }
 
 class MyApp extends StatelessWidget {

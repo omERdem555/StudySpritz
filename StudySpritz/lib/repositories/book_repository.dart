@@ -2,7 +2,6 @@ import 'package:hive/hive.dart';
 
 import '../models/book.dart';
 import '../core/services/hive_service.dart';
-import '../core/constants/box_names.dart';
 
 class BookRepository {
   Box<Book> get _box => HiveService.booksBox;
