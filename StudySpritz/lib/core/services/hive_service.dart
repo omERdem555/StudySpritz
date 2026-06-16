@@ -1,5 +1,9 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../constants/box_names.dart';
+import '../../models/book.dart';
+import '../../models/bookmark.dart';
+import '../../models/app_settings.dart';
+import '../../models/reading_statistics.dart';
 
 // ADAPTER IMPORTLARI (BUNU EKLEMEZSEN KIRMIZI OLUR)
 import 'package:studyspritz/adapters/book_adapter.dart';
@@ -8,27 +12,24 @@ import 'package:studyspritz/adapters/app_settings_adapter.dart';
 import 'package:studyspritz/adapters/reading_statistics_adapter.dart';
 
 class HiveService {
-static Future<void> init() async {
-  await Hive.initFlutter();
+  static late Box<Book> booksBox;
+  static late Box<Bookmark> bookmarksBox;
+  static late Box<AppSettings> settingsBox;
+  static late Box<ReadingStatistics> statisticsBox;
 
-  Hive.registerAdapter(BookAdapter());
-  Hive.registerAdapter(BookmarkAdapter());
-  Hive.registerAdapter(AppSettingsAdapter());
-  Hive.registerAdapter(ReadingStatisticsAdapter());
+  static Future<void> init() async {
+    await Hive.initFlutter();
 
-  print("Hive initialized");
-  print("Adapters registered");
-}
+    Hive.registerAdapter(BookAdapter());
+    Hive.registerAdapter(BookmarkAdapter());
+    Hive.registerAdapter(AppSettingsAdapter());
+    Hive.registerAdapter(ReadingStatisticsAdapter());
 
-  static Future<Box> openBooksBox() =>
-      Hive.openBox(BoxNames.booksBox);
-
-  static Future<Box> openBookmarksBox() =>
-      Hive.openBox(BoxNames.bookmarksBox);
-
-  static Future<Box> openSettingsBox() =>
-      Hive.openBox(BoxNames.appSettingsBox);
-
-  static Future<Box> openStatisticsBox() =>
-      Hive.openBox(BoxNames.readingStatisticsBox);
+    booksBox = await Hive.openBox<Book>(BoxNames.booksBox);
+    bookmarksBox = await Hive.openBox<Bookmark>(BoxNames.bookmarksBox);
+    settingsBox = await Hive.openBox<AppSettings>(BoxNames.appSettingsBox);
+    statisticsBox = await Hive.openBox<ReadingStatistics>(
+      BoxNames.readingStatisticsBox,
+    );
+  }
 }

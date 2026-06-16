@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'core/services/hive_service.dart';
+import 'repositories/book_repository.dart';
+import 'models/book.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await HiveService.init();
 
-  // opsiyonel preload
-  await HiveService.openBooksBox();
-  await HiveService.openSettingsBox();
+  final repo = BookRepository();
 
-  final box = await HiveService.openBooksBox();
-  await box.put("test", "StudySpritz");
-  print(box.get("test"));
+  // 🔹 CLEAN START (önemli)
+  final allBefore = await repo.getAllBooks();
+  print("START COUNT: ${allBefore.length}");
+
+  // 🔹 DELETE
+  await repo.deleteBook("test");
+
+  // 🔹 READ AGAIN
+  final afterDelete = await repo.getAllBooks();
+  print("AFTER DELETE: ${afterDelete.length}");
 
   runApp(const MyApp());
 }

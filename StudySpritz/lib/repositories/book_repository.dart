@@ -1,22 +1,29 @@
+import 'package:hive/hive.dart';
+
 import '../models/book.dart';
+import '../core/services/hive_service.dart';
+import '../core/constants/box_names.dart';
 
 class BookRepository {
-  Future<void> addBook(Book book)
-  async {}
+  Box<Book> get _box => HiveService.booksBox;
 
-  Future<void> updateBook(Book book)
-  async {}
-
-  Future<void> deleteBook(String bookId)
-  async {}
-
-  Future<Book?> getBook(String bookId)
-  async {
-    return null;
+  Future<void> addBook(Book book) async {
+    await _box.put(book.bookId, book);
   }
 
-  Future<List<Book>> getAllBooks()
-  async {
-    return [];
+  Future<void> updateBook(Book book) async {
+    await _box.put(book.bookId, book);
+  }
+
+  Future<void> deleteBook(String bookId) async {
+    await _box.delete(bookId);
+  }
+
+  Future<Book?> getBook(String bookId) async {
+    return _box.get(bookId);
+  }
+
+  Future<List<Book>> getAllBooks() async {
+    return _box.values.toList();
   }
 }
