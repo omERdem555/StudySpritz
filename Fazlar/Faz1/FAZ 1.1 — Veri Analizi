@@ -1,0 +1,114 @@
+Bookmark Neden Ayrı Model?
+
+Çünkü ilişki tipi farklı.
+
+Bir kitap:
+
+0 Yer İmi
+1 Yer İmi
+15 Yer İmi
+200 Yer İmi
+
+sahip olabilir. Örn
+Bookmark
+{
+  id
+  bookId
+  page
+  note
+  createdAt
+}
+
+
+
+
+Favorite Neden Ayrı Model Olmamalı?
+
+Bir kitap:
+
+Favori
+veya
+Favori Değil
+
+olabilir. Bu yüzden
+Book
+{
+  isFavorite
+  favoritedAt
+}
+
+
+
+RecentBook Neden Ayrı Model Olmamalı?
+
+Son Liste aslında veri değil.
+
+Bir görünüm.
+
+Şöyle:
+
+Book A
+lastOpenedAt = bugün
+
+Book B
+lastOpenedAt = dün
+
+Book C
+lastOpenedAt = geçen hafta
+
+
+
+
+AppSettings
+
+Kesinlikle ayrı model.
+
+Çünkü kitaplarla ilişkisi yok.
+
+Örneğin:
+
+themeMode
+language
+defaultWpm
+defaultFontSize
+orpColor
+
+
+
+
+ReadingStatistics Kesinlikle ayrı model
+ReadingStatistics
+{
+  totalBooks
+  totalPages
+  totalWords
+  totalReadingTime
+  averageWpm
+}
+
+
+
+
+Şu Anki En Mantıklı Model Seti:
+
+Book
+Bookmark
+AppSettings
+ReadingStatistics
+
+Yani başlangıçta düşündüğümüz 7 model:
+
+Book
+ReadingProgress
+Bookmark
+Favorite
+AppSettings
+ReadingStatistics
+RecentBook
+
+yerine sadece:
+
+Book
+Bookmark
+AppSettings
+ReadingStatistics
