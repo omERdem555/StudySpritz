@@ -1,0 +1,197 @@
+İlk Model: Book
+| Alan            | Sebep                   |
+| --------------- | ----------------------- |
+| bookId          | Benzersiz kitap kimliği |
+| bookName        | Kitap adı               |
+|                 |                         |
+| filePath        | Dosya yolu              |
+| fileType        | Parser seçebilmek.      |
+|                 |                         |
+| pageCount       | Toplam sayfa            |
+| wordCount       | Toplam Kelime           |
+| pageNumber      | Son okunan sayfa        |
+| wordIndex       | Son okunan kelime       |Kitabın başından itibaren kullanıcının ulaştığı son kelimenin indeksi.
+|                 |                         |
+| isFavorite      | Favori mi?              |
+| isCompleted     | Tamamlandı mı?          |
+|                 |                         |
+| completedAt     | Ne zaman bitti?         |
+| lastOpenedAt    | Son açılma zamanı       |
+| addedAt         | Kitap ne zaman eklendi? |
+
+Book
+{
+  bookId
+  bookName
+
+  filePath
+  fileType
+
+  pageCount
+  wordCount
+
+  pageNumber
+  wordIndex
+
+  isFavorite
+  isCompleted
+
+  addedAt
+  lastOpenedAt
+  completedAt
+}
+
+
+Bookmark
+| Alan       | Sebep                   |
+| ---------- | ----------------------- |
+| markId     | Yer imi kimliği         |
+| bookId     | Hangi kitaba ait olduğu |
+| pageNumber | Sayfa bazlı konum       |
+| wordIndex  | RSVP ve hassas konum    |
+| markNote   | Kullanıcı notu          |
+| createdAt  | Oluşturulma zamanı      |
+
+
+Bookmark
+{
+  markId
+  bookId
+
+  pageNumber
+  wordIndex
+
+  markNote
+
+  createdAt
+}
+
+AppSettings
+| Alan               | Sebep                            |
+| ------------------ | -------------------------------- |
+| themeMode          | Uygulama tema modu (light/dark)  |
+| language           | UI dili                          |
+| wpmSpeed           | RSVP okuma hızı                  |
+| animationSpeed     | Kelime geçiş animasyon davranışı |
+| fontSize           | Okuma yazı boyutu                |
+| rsvpHighlightColor | RSVP modunda ve bulma rengi      |
+
+
+AppSettings
+{
+  themeMode
+  language
+
+  wpmSpeed 
+  animationSpeed
+  fontSize 
+
+  rsvpHighlightColor
+}
+
+
+
+
+| Alan                | Sebep                                   |
+| ------------------- | --------------------------------------- |
+| bookId              | Kitap bazlı global istatistik referansı |
+| totalReadingTime    | Toplam okuma süresi                     |
+| sessionCount        | Okuma oturumu sayısı                    |
+| lastSessionDuration | Son oturum süresi                       |
+| averageWpm          | Ortalama okuma hızı                     |averageWpm = totalWordsRead / totalReadingTime
+| peakWpm             | En yüksek okuma hızı                    |
+| totalWordsRead      | Toplam okunan kelime                    |
+| totalPagesRead      | Toplam okunan sayfa                     |
+| firstReadAt         | İlk okuma zamanı                        |
+| lastReadAt          | Son okuma zamanı                        |
+
+
+ReadingStatistics
+{
+  bookId
+
+  totalReadingTime
+  sessionCount
+
+  lastSessionDuration
+
+  averageWpm
+  peakWpm
+
+  totalWordsRead
+  totalPagesRead
+
+  firstReadAt
+  lastReadAt
+}
+
+
+Book                → state of reading
+Bookmark            → saved snapshots
+AppSettings         → configuration
+ReadingStatistics   → aggregated metrics (cache)
+
+
+
+
+LOCAL-FIRST MİMARİ SONUCU
+
+Senin sistemin artık şu kategoriye giriyor:
+
+Single-device, offline-first, state-driven reader
+
+Bu şu anlama gelir:
+
+DB = sadece persistence layer (Hive)
+Backend yok
+Sync yok
+Conflict resolution yok
+
+Gerçek merkez: RSVP Engine + wordIndex state machine
+
+
+LOCAL STORAGE (HIVE) ROLÜ
+
+Hive burada şunu yapmalı:
+
+✔ persistence
+❌ logic değil
+
+Yani:
+
+Yanlış kullanım
+Hive içinde hesap yapmak ❌
+Hive query ile logic yürütmek ❌
+Doğru kullanım
+save(Book)
+save(Bookmark)
+save(Statistics)
+load()
+
+
+
+
+VERİ AKIŞ MODELİ (FAZ 2 ön hazırlık)
+
+Şu akış artık kesin:
+
+1. Dosya yüklenir
+filePath → parser → text stream
+
+2. Text normalize edilir
+text → words[]
+
+3. Engine çalışır
+words[] + WPM → wordIndex++
+
+4. Book güncellenir
+Book.wordIndex = currentIndex
+Book.lastOpenedAt = now
+
+5. Statistics güncellenir
+totalWordsRead += delta
+sessionTime += deltaTime
+
+6. Bookmark oluşur
+wordIndex snapshot
+pageNumber snapshot

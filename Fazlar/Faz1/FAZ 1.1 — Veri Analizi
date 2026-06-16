@@ -12,11 +12,14 @@ Bir kitap:
 sahip olabilir. Örn
 Bookmark
 {
-  id
+  markId
   bookId
+
   pageNumber
-  textPosition
-  note
+  wordIndex
+
+  markNote
+
   createdAt
 }
 
@@ -34,8 +37,24 @@ Favori Değil
 olabilir. Bu yüzden
 Book
 {
+  bookId
+  bookName
+
+  filePath
+  fileType
+
+  pageCount
+  wordCount
+
+  pageNumber
+  wordIndex
+
   isFavorite
-  favoritedAt
+  isCompleted
+
+  addedAt
+  lastOpenedAt
+  completedAt
 }
 
 
@@ -68,11 +87,17 @@ Kesinlikle ayrı model.
 
 Örneğin:
 
-themeMode
-language
-defaultWpm
-defaultFontSize
-orpColor
+AppSettings
+{
+  themeMode
+  language
+
+  wpmSpeed 
+  animationSpeed
+  fontSize 
+
+  rsvpHighlightColor
+}
 
 
 
@@ -80,11 +105,21 @@ orpColor
 ReadingStatistics Kesinlikle ayrı model
 ReadingStatistics
 {
-  totalBooks
-  totalPages
-  totalWords
+  bookId
+
   totalReadingTime
+  sessionCount
+
+  lastSessionDuration
+
   averageWpm
+  peakWpm
+
+  totalWordsRead
+  totalPagesRead
+
+  firstReadAt
+  lastReadAt
 }
 
 
