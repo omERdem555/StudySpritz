@@ -42,26 +42,28 @@ Henüz UI yok.
 FAZ 2 — Yerel Veri Katmanı
 
 Amaç:
-Hive altyapısını kurmak.
+Local persistence layer kurmak
+veri kaybolmamalı
+offline-first çalışmalı
+hızlı read/write
 
 İşler:
-Hive Kurulumu
-Adapter Oluşturma
-Repository Katmanı
-CRUD İşlemleri
+Hive setup
+Model adapters
+Box architecture
+Repository layer
+CRUD operations
+Persistence validation
 
 Book
 Bookmark
-Settings
-Progress
-Statistics
-Recent
-Favorite
+AppSettings
+ReadingStatistics
 
 Tamamlanma Kriteri:
-Veriler uygulama kapansa bile korunur.
-Henüz ekran yok.
-
+App restart sonrası veri kaybı yok
+Book state restore edilebiliyor
+Bookmark + Statistics persist ediliyor
 
 
 

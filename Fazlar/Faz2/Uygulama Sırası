@@ -1,0 +1,158 @@
+FAZ 2 — UYGULAMA SIRASI (KESİN AKIŞ)
+
+2.1 Hive Core Setup (temel iskelet)
+Yapılacaklar:
+hive_flutter init
+application bootstrap
+box registration standardı
+Çıktı
+uygulama açılıyor
+Hive çalışıyor
+boş box’lar erişilebilir
+
+
+
+2.2 Model → TypeAdapter üretimi
+
+Sıra kritik:
+1. BookAdapter
+2. BookmarkAdapter
+3. AppSettingsAdapter
+4. ReadingStatisticsAdapter
+
+Kurallar
+field index sabit kalacak
+enum/string uyumu korunacak
+nullable strateji net olacak
+
+Çıktı
+modeller Hive’a yazılabilir hale gelir
+
+
+
+2.3 Box Architecture Design
+
+Her model için ayrı box:
+booksBox
+bookmarksBox
+settingsBox
+statisticsBox
+
+Neden önemli
+query izolasyonu
+performans stabilitesi
+migration kolaylığı
+
+
+
+2.4 Repository Layer (core abstraction)
+
+UI asla Hive görmeyecek.
+
+Repository yapısı:
+BookRepository
+BookmarkRepository
+SettingsRepository
+StatisticsRepository
+
+Sorumluluk sınırı
+
+Repository:
+CRUD
+mapping
+persistence logic
+
+❌ RSVP logic yok
+❌ UI logic yok
+
+
+
+
+
+2.5 CRUD Implementation
+BookRepository
+addBook
+updateProgress (wordIndex/pageNumber)
+updateFavorite
+markCompleted
+getAllBooks
+BookmarkRepository
+addBookmark
+deleteBookmark
+getBookmarksByBook
+SettingsRepository
+getSettings
+updateSettings
+StatisticsRepository
+startSession
+endSession
+updateWpm
+incrementWords/pages
+
+
+
+
+2.6 Persistence Validation Layer (kritik)
+
+Bu aşama genelde atlanır ama senin projede önemli.
+
+Test senaryoları:
+App kill → restart → state restore
+Book progress kaybolmuyor mu?
+Bookmark list intact mi?
+Statistics accumulate doğru mu?
+
+
+
+
+FAZ 2 MİMARİ AKIŞ
+UI
+ ↓
+Repository
+ ↓
+Hive Box
+ ↓
+Disk
+KRİTİK TASARIM KURALLARI (DEĞİŞTİRİLEMEZ)
+
+1. Hive sadece storage layer
+hesap yapmaz
+logic içermez
+
+2. Book = runtime state holder
+current position burada
+
+3. Statistics = append-only logic
+sadece artırılır
+geri hesap yok (MVP)
+
+4. Bookmark = immutable snapshot
+update edilmez
+silinir veya eklenir
+
+
+
+
+
+FAZ 2 RİSK NOKTALARI (bilerek bilmen gerekiyor)
+RİSK 1 — double source of truth
+Book vs Statistics overlap
+→ çözüm: Book “state”, Statistics “history”
+
+RİSK 2 — adapter mismatch
+→ field order değişirse data bozulur
+
+RİSK 3 — wordIndex inconsistency
+→ engine dışında değiştirilmemeli
+
+
+
+
+FAZ 2 TAMAMLANDI SAYILMASI İÇİN
+
+Şu 4 şart:
+
+ App restart → Book restore
+ Bookmark persist
+ Statistics accumulate
+ Settings kalıcı
