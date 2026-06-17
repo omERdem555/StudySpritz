@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'core/services/hive_service.dart';
+import 'core/services/file_service.dart';
+import 'repositories/statistics_repository.dart';
+import 'repositories/bookmark_repository.dart';
+import 'repositories/settings_repository.dart';
 import 'repositories/book_repository.dart';
+import 'models/reading_statistics.dart';
+import 'models/app_settings.dart';
+import 'models/bookmark.dart';
 import 'models/book.dart';
 
 void main() async {
@@ -8,45 +15,15 @@ void main() async {
 
   await HiveService.init();
 
-  final repo = BookRepository();
-  final books = await repo.getAllBooks();
+  final statisticsRepo = StatisticsRepository();
 
-  print("AFTER RESTART: ${books.length}");
-  print("BOOK: ${books.first.bookName}");
+  final stats =
+      await statisticsRepo.getStatistics("stats-test");
+
+  print(stats?.totalWordsRead);
+  print(stats?.averageWpm);
 
   runApp(const MyApp());
-}
-
-Future<void> runPersistenceTests(BookRepository repo) async {
-  print("=== PERSISTENCE TEST START ===");
-
-  await repo.deleteBook("persist-test");
-
-  final before = await repo.getAllBooks();
-  print("BEFORE: ${before.length}");
-
-  final book = Book(
-    bookId: "persist-test",
-    bookName: "Persistence Test",
-    filePath: "",
-    fileType: "txt",
-    pageCount: 10,
-    wordCount: 100,
-    pageNumber: 0,
-    wordIndex: 0,
-    isFavorite: false,
-    isCompleted: false,
-    addedAt: DateTime.now(),
-    lastOpenedAt: DateTime.now(),
-    completedAt: null,
-  );
-
-  await repo.addBook(book);
-
-  final mid = await repo.getAllBooks();
-  print("AFTER ADD: ${mid.length}");
-
-  print("=== RESTART APP NOW ===");
 }
 
 class MyApp extends StatelessWidget {
