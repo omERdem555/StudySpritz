@@ -26,24 +26,35 @@ class BookRepository {
     return _box.values.toList();
   }
 
-  Future<void> updateProgress(String bookId, int wordIndex, int pageIndex) async {
+  Future<void> updateProgress(
+    String bookId,
+    int wordIndex,
+    int pageIndex,
+  ) async {
     final book = _box.get(bookId);
     if (book == null) return;
 
-    final updated = Book(
-      bookId: book.bookId,
-      bookName: book.bookName,
-      filePath: book.filePath,
-      fileType: book.fileType,
-      pageCount: book.pageCount,
-      wordCount: book.wordCount,
-      pageNumber: pageIndex,
+    final updated = book.copyWith(
       wordIndex: wordIndex,
-      isFavorite: book.isFavorite,
-      isCompleted: book.isCompleted,
-      addedAt: book.addedAt,
+      pageNumber: pageIndex,
       lastOpenedAt: DateTime.now(),
-      completedAt: book.completedAt,
+    );
+
+    await _box.put(bookId, updated);
+  }
+
+  Future<void> saveReadingSession({
+    required String bookId,
+    required int wordIndex,
+    required int pageIndex,
+  }) async {
+    final book = _box.get(bookId);
+    if (book == null) return;
+
+    final updated = book.copyWith(
+      wordIndex: wordIndex,
+      pageNumber: pageIndex,
+      lastOpenedAt: DateTime.now(),
     );
 
     await _box.put(bookId, updated);
@@ -53,7 +64,10 @@ class BookRepository {
     final book = _box.get(bookId);
     if (book == null) return;
 
-    book.lastOpenedAt = DateTime.now();
-    await _box.put(bookId, book);
+    final updated = book.copyWith(
+      lastOpenedAt: DateTime.now(),
+    );
+
+    await _box.put(bookId, updated);
   }
 }

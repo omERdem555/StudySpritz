@@ -7,10 +7,7 @@ import '../../repositories/book_repository.dart';
 class ReaderScreen extends StatefulWidget {
   final String bookId;
 
-  const ReaderScreen({
-    super.key,
-    required this.bookId,
-  });
+  const ReaderScreen({super.key, required this.bookId});
 
   @override
   State<ReaderScreen> createState() => _ReaderScreenState();
@@ -47,14 +44,23 @@ class _ReaderScreenState extends State<ReaderScreen> {
       wordsPerPage: 200,
     );
 
+    // SESSION RESTORE
     engine!.jumpTo(book.wordIndex);
 
-    setState(() {
-      loading = false;
-    });
+    setState(() => loading = false);
   }
 
-  Future<void> _nextPage() async {
+  Future<void> _sync() async {
+    if (engine == null) return;
+
+    await BookRepository().saveReadingSession(
+      bookId: widget.bookId,
+      wordIndex: engine!.state.wordIndex,
+      pageIndex: engine!.state.pageIndex,
+    );
+  }
+
+  Future<void> _next() async {
     if (engine == null) return;
 
     setState(() {
@@ -63,14 +69,10 @@ class _ReaderScreenState extends State<ReaderScreen> {
       );
     });
 
-    await BookRepository().updateProgress(
-      widget.bookId,
-      engine!.state.wordIndex,
-      engine!.state.pageIndex,
-    );
+    await _sync();
   }
 
-  Future<void> _previousPage() async {
+  Future<void> _prev() async {
     if (engine == null) return;
 
     setState(() {
@@ -79,79 +81,73 @@ class _ReaderScreenState extends State<ReaderScreen> {
       );
     });
 
-    await BookRepository().updateProgress(
-      widget.bookId,
-      engine!.state.wordIndex,
-      engine!.state.pageIndex,
-    );
+    await _sync();
+  }
+
+  @override
+  void dispose() {
+    _sync();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     if (loading) {
       return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
     if (engine == null) {
       return const Scaffold(
-        body: Center(
-          child: Text("Book not found"),
-        ),
+        body: Center(child: Text("Book not found")),
       );
     }
 
+    final progress =
+        engine!.state.wordIndex / engine!.words.length;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Reader"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            LinearProgressIndicator(
-              value: engine!.progress,
-            ),
+      appBar: AppBar(title: const Text("Reader")),
+      body: Column(
+        children: [
+          LinearProgressIndicator(value: progress),
 
-            const SizedBox(height: 20),
-
-            Text(
-              "Page ${engine!.state.pageIndex + 1}",
-            ),
-
-            const SizedBox(height: 20),
-
-            Expanded(
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
               child: SingleChildScrollView(
                 child: Text(
                   engine!.currentPageText,
                   style: const TextStyle(
                     fontSize: 18,
-                    height: 1.6,
+                    height: 1.7,
                   ),
                 ),
               ),
             ),
+          ),
 
-            Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 10,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed: _previousPage,
-                  child: const Text("Previous"),
+                  onPressed: _prev,
+                  child: const Text("Prev"),
                 ),
                 ElevatedButton(
-                  onPressed: _nextPage,
+                  onPressed: _next,
                   child: const Text("Next"),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

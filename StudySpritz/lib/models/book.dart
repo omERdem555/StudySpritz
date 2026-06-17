@@ -1,24 +1,24 @@
 class Book {
-  String bookId;
-  String bookName;
+  final String bookId;
+  final String bookName;
 
-  String filePath;
-  String fileType;
+  final String filePath;
+  final String fileType;
 
-  int pageCount;
-  int wordCount;
+  final int pageCount;
+  final int wordCount;
 
-  int pageNumber;
-  int wordIndex;
+  final int pageNumber;
+  final int wordIndex;
 
-  bool isFavorite;
-  bool isCompleted;
+  final bool isFavorite;
+  final bool isCompleted;
 
-  DateTime addedAt;
-  DateTime lastOpenedAt;
-  DateTime? completedAt;
+  final DateTime addedAt;
+  final DateTime lastOpenedAt;
+  final DateTime? completedAt;
 
-  Book({
+  const Book({
     required this.bookId,
     required this.bookName,
     required this.filePath,
