@@ -29,15 +29,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
         final books = snapshot.data!;
 
+        final recent = books.toList()
+          ..sort((a, b) => b.lastOpenedAt.compareTo(a.lastOpenedAt));
+
+        final favorites = books.where((b) => b.isFavorite).toList();
+
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const Text("Dashboard", style: TextStyle(fontSize: 22)),
+            const Text("Dashboard"),
 
             const SizedBox(height: 20),
 
-            const Text("Son Eklenenler"),
-            ...books.take(3).map((b) => Text(b.bookName)),
+            const Text("Son Okunanlar"),
+            ...recent.take(5).map((b) => Text(b.bookName)),
+
+            const SizedBox(height: 20),
+
+            const Text("Favoriler"),
+            ...favorites.map((b) => Text(b.bookName)),
 
             const SizedBox(height: 20),
 

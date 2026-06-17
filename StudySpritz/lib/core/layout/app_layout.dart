@@ -10,7 +10,12 @@ class AppLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const AppSidebar(),
-      body: child,
+      appBar: AppBar(
+        title: const Text("StudySpritz"),
+      ),
+      body: SafeArea(
+        child: child,
+      ),
     );
   }
 }

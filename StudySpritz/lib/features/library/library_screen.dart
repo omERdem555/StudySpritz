@@ -17,26 +17,17 @@ class LibraryScreen extends StatelessWidget {
 
         final books = snapshot.data!;
 
-        if (books.isEmpty) {
-          return const Center(child: Text("No books"));
-        }
-
-        return ListView.builder(
-          itemCount: books.length,
-          itemBuilder: (context, index) {
-            final book = books[index];
-
-            return ListTile(
-              title: Text(book.bookName),
-              subtitle: Text(book.filePath),
-              onTap: () {
-                context.push(
-                  '/reader',
-                  extra: book.bookId,
-                );
-              },
-            );
-          },
+        return Scaffold(
+          body: ListView(
+            children: books.map((book) {
+              return ListTile(
+                title: Text(book.bookName),
+                onTap: () {
+                  context.push('/reader', extra: book.bookId);
+                },
+              );
+            }).toList(),
+          ),
         );
       },
     );

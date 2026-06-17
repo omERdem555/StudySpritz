@@ -34,6 +34,10 @@ class _ReaderScreenState extends State<ReaderScreen> {
       return;
     }
 
+    await repo.updateBook(
+      book.copyWith(lastOpenedAt: DateTime.now()),
+    );
+
     final parser = ParserFactory.getParser(book.filePath);
     final text = await parser.extract(book.filePath);
 
