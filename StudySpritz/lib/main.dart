@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'core/reading_engine/progress_calculator.dart';
 import 'core/reading_engine/reader_state.dart';
 import 'core/reading_engine/pagination_engine.dart';
+import 'core/reading_engine/reader_engine.dart';
 import 'core/reading/reading_engine.dart';
 import 'core/parsers/parser_factory.dart';
 import 'core/services/file_validation_service.dart';
@@ -21,12 +22,18 @@ import 'models/book.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final words = "Bu bir test metnidir okuma motoru çalışıyor".split(" ");
+  final engine = ReaderEngine(
+    words: "Bu bir test metni okuma motoru".split(" "),
+    wordsPerPage: 2,
+  );
 
-  final pages = PaginationEngine.createPages(words, 3);
+  print(engine.progress);
 
-  print("PAGE COUNT: ${pages.length}");
-  print("PAGE 1: ${pages[0]}");
+  engine.jumpTo(3);
+
+  print(engine.state.wordIndex);
+  print(engine.state.pageIndex);
+  print(engine.progress);
 
   runApp(const MyApp());
 }
