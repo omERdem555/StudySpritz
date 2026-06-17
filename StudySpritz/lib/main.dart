@@ -22,18 +22,28 @@ import 'models/book.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await HiveService.init();
+
+  final repo = BookRepository();
+
   final engine = ReaderEngine(
     words: "Bu bir test metni okuma motoru".split(" "),
     wordsPerPage: 2,
   );
 
-  print(engine.progress);
+  print("INITIAL PROGRESS: ${engine.progress}");
 
   engine.jumpTo(3);
 
   print(engine.state.wordIndex);
   print(engine.state.pageIndex);
   print(engine.progress);
+
+  await repo.updateProgress(
+    "1",
+    engine.state.wordIndex,
+    engine.state.pageIndex,
+  );
 
   runApp(const MyApp());
 }

@@ -25,4 +25,27 @@ class BookRepository {
   Future<List<Book>> getAllBooks() async {
     return _box.values.toList();
   }
+
+  Future<void> updateProgress(String bookId, int wordIndex, int pageIndex) async {
+    final book = _box.get(bookId);
+    if (book == null) return;
+
+    final updated = Book(
+      bookId: book.bookId,
+      bookName: book.bookName,
+      filePath: book.filePath,
+      fileType: book.fileType,
+      pageCount: book.pageCount,
+      wordCount: book.wordCount,
+      pageNumber: pageIndex,
+      wordIndex: wordIndex,
+      isFavorite: book.isFavorite,
+      isCompleted: book.isCompleted,
+      addedAt: book.addedAt,
+      lastOpenedAt: DateTime.now(),
+      completedAt: book.completedAt,
+    );
+
+    await _box.put(bookId, updated);
+  }
 }
