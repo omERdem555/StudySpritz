@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'core/parsers/parser_factory.dart';
+import 'core/reading_engine/progress_calculator.dart';
+import 'core/reading_engine/reader_state.dart';
+import 'core/reading_engine/pagination_engine.dart';
 import 'core/reading/reading_engine.dart';
+import 'core/parsers/parser_factory.dart';
 import 'core/services/file_validation_service.dart';
 import 'core/services/book_creation_service.dart';
 import 'core/parsers/pdf_parser_service.dart';
@@ -18,16 +21,12 @@ import 'models/book.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final engine = ReadingEngine();
+  final words = "Bu bir test metnidir okuma motoru çalışıyor".split(" ");
 
-  final text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+  final pages = PaginationEngine.createPages(words, 3);
 
-  final words = engine.toWords(text);
-  final pageCount = engine.getPageCount(words);
-
-  print("WORDS: ${words.length}");
-  print("PAGES: $pageCount");
-  print("WORDS LIST: $words");
+  print("PAGE COUNT: ${pages.length}");
+  print("PAGE 1: ${pages[0]}");
 
   runApp(const MyApp());
 }
