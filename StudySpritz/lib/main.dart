@@ -15,13 +15,13 @@ void main() async {
 
   await HiveService.init();
 
-  final statisticsRepo = StatisticsRepository();
+  final file = await FileService.pickFile();
 
-  final stats =
-      await statisticsRepo.getStatistics("stats-test");
-
-  print(stats?.totalWordsRead);
-  print(stats?.averageWpm);
+  if (file != null) {
+    print("NAME: ${file.name}");
+    print("PATH: ${file.path}");
+    print("SIZE: ${file.size}");
+}
 
   runApp(const MyApp());
 }
