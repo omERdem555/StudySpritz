@@ -1,0 +1,70 @@
+FAZ 4 — METİN ÇIKARMA MOTORU (BAŞLANGIÇ)
+
+Burada artık mimari ciddi şekilde değişiyor.
+
+FAZ 4 hedefi
+
+Her Book için:
+filePath → raw text
+
+
+
+4.1 Genel pipeline
+Book.filePath
+      ↓
+Parser seçimi
+      ↓
+Raw text üretimi
+      ↓
+Reading Engine input
+
+
+
+
+4.2 Modül yapısı (kesin kurulum)
+
+Şu klasörleri oluştur:
+lib/core/parsers/
+
+İçine:
+pdf_parser.dart
+docx_parser.dart
+txt_parser.dart
+
+
+
+
+4.3 FAZ 4 KURALI (ÖNEMLİ)
+
+❌ UI yok
+❌ Hive yok (şimdilik)
+❌ sadece IO + parsing
+
+
+
+
+4.4 İlk adım (PDF parser)
+
+Başlangıçta şunu kuracağız:
+
+dependencies:
+  pdf_text: ^0.5.0
+
+
+
+
+4.5 FAZ 4 başlangıç görevi
+
+Şu 1 şeyi yapacağız:
+👉 PDF → String extraction
+
+
+
+
+4.6 Sıradaki adım
+
+İlk implementasyon:
+PDF parser service
+
+tek fonksiyon:
+Future<String> extractText(String path)
