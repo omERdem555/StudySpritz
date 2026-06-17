@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 
 import '../models/book.dart';
 import '../core/services/hive_service.dart';
+import '../models/bookmark.dart';
 
 class BookRepository {
   Box<Book> get _box => HiveService.booksBox;
@@ -69,5 +70,29 @@ class BookRepository {
     );
 
     await _box.put(bookId, updated);
+  }
+
+  Future<void> addBookmark(String bookId, Bookmark bookmark) async {
+    await HiveService.bookmarksBox.put(bookmark.markId, bookmark);
+  }
+
+  Future<void> removeBookmark(String bookmarkId) async {
+    await HiveService.bookmarksBox.delete(bookmarkId);
+  }
+
+  Future<List<Bookmark>> getBookmarks(String bookId) async {
+    return HiveService.bookmarksBox.values
+        .where((b) => b.bookId == bookId)
+        .toList();
+  }
+
+  Future<void> toggleFavorite(String bookId) async {
+    final book = _box.get(bookId);
+    if (book == null) return;
+
+    await _box.put(
+      bookId,
+      book.copyWith(isFavorite: !book.isFavorite),
+    );
   }
 }
