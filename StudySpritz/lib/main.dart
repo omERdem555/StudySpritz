@@ -20,33 +20,14 @@ import 'models/bookmark.dart';
 import 'models/book.dart';
 import 'core/router/app_router.dart';
 
+import 'features/reader/reader_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await HiveService.init();
-
-  final repo = BookRepository();
-
-  final engine = ReaderEngine(
-    words: "Bu bir test metni okuma motoru".split(" "),
-    wordsPerPage: 2,
-  );
-
-  print("INITIAL PROGRESS: ${engine.progress}");
-
-  engine.jumpTo(3);
-
-  print(engine.state.wordIndex);
-  print(engine.state.pageIndex);
-  print(engine.progress);
-
-  await repo.updateProgress(
-    "1",
-    engine.state.wordIndex,
-    engine.state.pageIndex,
-  );
-
-  runApp(const MyApp());
+  runApp(const MaterialApp(
+    home: ReaderScreen(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -54,8 +35,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
       routerConfig: AppRouter.router,
+      title: 'StudySpritz',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
     );
   }
 }
