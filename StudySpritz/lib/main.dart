@@ -18,6 +18,7 @@ import 'models/reading_statistics.dart';
 import 'models/app_settings.dart';
 import 'models/bookmark.dart';
 import 'models/book.dart';
+import 'core/router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,14 +51,11 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(child: Text("StudySpritz Ready")),
-      ),
+      routerConfig: AppRouter.router,
     );
   }
 }
