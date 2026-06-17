@@ -7,16 +7,19 @@ import '../../features/favorites/favorites_screen.dart';
 import '../../features/bookmarks/bookmarks_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/reader/reader_screen.dart';
-import '../layout/app_layout.dart';
+
+import 'package:studyspritz/core/layout/app_layout.dart';
 
 class AppRouter {
   static final router = GoRouter(
     initialLocation: '/',
+
     routes: [
       ShellRoute(
         builder: (context, state, child) {
           return AppLayout(child: child);
         },
+
         routes: [
           GoRoute(
             path: '/',
