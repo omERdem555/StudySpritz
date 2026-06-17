@@ -1,0 +1,162 @@
+FAZ 3 — Dosya Yönetim Sistemi (NET IMPLEMENTASYON AKIŞI)
+
+Burada hedef “okuma motoru” değil. Sadece:
+
+cihazdan dosya seç → path al → Book olarak Hive’a kaydet
+
+
+3.1 — GEREKLİ PAKET
+Kurulum
+dependencies:
+  file_picker: ^8.0.0
+
+
+
+
+3.2 — FILE MODEL GENİŞLETME (KRİTİK KARAR)
+
+Book içinde şunlar zaten var:
+
+String filePath;
+String fileType;
+
+👉 FAZ 3 için yeterli.
+Model değiştirmiyoruz.
+
+
+
+
+3.3 — FILE PICKER SERVICE (YENİ KATMAN)
+
+📍 dosya:
+
+lib/core/services/file_service.dart
+import 'package:file_picker/file_picker.dart';
+
+class FileService {
+  static Future<PlatformFile?> pickFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'txt', 'docx'],
+    );
+
+    if (result == null || result.files.isEmpty) {
+      return null;
+    }
+
+    return result.files.first;
+  }
+}
+
+
+
+
+3.4 — BOOK CREATION PIPELINE (KRİTİK AKIŞ)
+
+Bu FAZ 3’ün kalbi.
+
+File seç
+→ validate
+→ Book oluştur
+→ Hive’a kaydet
+
+
+
+
+3.5 — TEST KODU (main içinde geçici)
+
+Bunu FAZ 3 test için kullan:
+
+import 'package:flutter/material.dart';
+import 'core/services/hive_service.dart';
+import 'core/services/file_service.dart';
+import 'repositories/book_repository.dart';
+import 'models/book.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await HiveService.init();
+
+  final repo = BookRepository();
+
+  final file = await FileService.pickFile();
+
+  if (file != null) {
+    final book = Book(
+      bookId: DateTime.now().millisecondsSinceEpoch.toString(),
+      bookName: file.name,
+      filePath: file.path ?? "",
+      fileType: file.extension ?? "",
+      pageCount: 0,
+      wordCount: 0,
+      pageNumber: 0,
+      wordIndex: 0,
+      isFavorite: false,
+      isCompleted: false,
+      addedAt: DateTime.now(),
+      lastOpenedAt: DateTime.now(),
+      completedAt: null,
+    );
+
+    await repo.addBook(book);
+
+    print("BOOK ADDED: ${book.bookName}");
+  }
+
+  runApp(const MyApp());
+}
+
+
+
+
+3.6 — FAZ 3 KURALLARI (DEĞİŞMEZ)
+❌ Yapmayacağız
+PDF parse
+DOCX read
+text extraction
+content indexing
+
+✔ Yapacağız
+file path saklama
+metadata kaydı
+Hive persistence
+
+
+
+
+3.7 — TAMAMLANMA KRİTERİ
+
+Şunlar çalışıyorsa FAZ 3 biter:
+
+✔ dosya seçiliyor
+✔ Book oluşturuluyor
+✔ Hive’a kaydediliyor
+✔ restart sonrası Book duruyor
+✔ filePath geçerli
+
+
+
+
+3.8 — KRİTİK MİMARİ NOT
+
+Burada yanlış yapılabilecek şey:
+file içeriklerini uygulamaya almak
+Bunu özellikle yapmıyoruz çünkü:
+
+
+
+FAZ 4 reading engine kırılır
+memory şişer
+async parsing problemi çıkar
+SONRAKİ ADIM
+
+FAZ 3 bitince şuraya geçiyoruz:
+👉 FAZ 4 — READING ENGINE (asıl sistem)
+
+Burada olacaklar:
+live word streaming
+RSVP logic
+WPM engine
+session state machine
+statistics auto update
