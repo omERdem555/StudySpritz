@@ -160,3 +160,53 @@ RSVP logic
 WPM engine
 session state machine
 statistics auto update
+
+
+Faz 3.3 — Book Creation Pipeline
+
+Amaç:
+Dosya seç
+↓
+Doğrula
+↓
+Book oluştur
+↓
+Repository ile Hive'a kaydet
+
+
+Yapılacak:
+FileService.pickFile()
+FileValidationService
+Book(...)
+repo.addBook(book)
+
+tek bir akışta birleştirilecek.
+
+Örnek:
+final file = await FileService.pickFile();
+
+if (file == null) return;
+
+if (!await FileValidationService.exists(file.path!)) return;
+
+final book = Book(...);
+
+await repo.addBook(book);
+
+
+
+Faz 3.4 — Persistence Test
+
+Kontrol:
+Kitap ekle
+↓
+Uygulamayı kapat
+↓
+Tekrar aç
+↓
+BookRepository.getAllBooks()
+
+Beklenen:
+Kitap hâlâ duruyor
+Path aynı
+Dosya adı aynı

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/services/file_validation_service.dart';
+import 'core/services/book_creation_service.dart';
 import 'core/services/hive_service.dart';
 import 'core/services/file_service.dart';
 import 'repositories/statistics_repository.dart';
@@ -16,26 +17,12 @@ void main() async {
 
   await HiveService.init();
 
-  final file = await FileService.pickFile();
+  final book = await BookCreationService.createBook();
 
-  if (file != null) {
-    print(
-      await FileValidationService.exists(
-        file.path!,
-      ),
-    );
-
-    print(
-      FileValidationService.isSupported(
-        file.path!,
-      ),
-    );
-
-    print(
-      await FileValidationService.isReadable(
-        file.path!,
-      ),
-    );
+  if (book != null) {
+    print("BOOK CREATED:");
+    print(book.bookName);
+    print(book.filePath);
   }
 
   runApp(const MyApp());
