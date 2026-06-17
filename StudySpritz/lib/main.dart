@@ -20,22 +20,10 @@ void main() async {
 
   final repo = BookRepository();
 
-  // 1. LOAD EXISTING DATA
-  final books = await repo.getAllBooks();
-
-  print("=== APP START ===");
-  print("BOOK COUNT: ${books.length}");
-
-  for (final b in books) {
-    print("${b.bookName} -> ${b.filePath}");
-  }
-
-  // 2. FILE PICK + PARSE TEST (FAZ 4 CORE TEST)
   await runFileToTextTest(repo);
 
   runApp(const MyApp());
 }
-
 
 Future<void> runFileToTextTest(BookRepository repo) async {
   final file = await FileService.pickFile();
@@ -55,7 +43,6 @@ Future<void> runFileToTextTest(BookRepository repo) async {
   print(text);
   print("=== EXTRACTED TEXT END ===");
 
-  // Book creation (FAZ 3 + 4 birleşim noktası)
   final book = Book(
     bookId: DateTime.now().millisecondsSinceEpoch.toString(),
     bookName: file.name,
@@ -74,7 +61,7 @@ Future<void> runFileToTextTest(BookRepository repo) async {
 
   await repo.addBook(book);
 
-  print("BOOK SAVED FROM FILE PIPELINE");
+  print("BOOK SAVED");
 }
 
 class MyApp extends StatelessWidget {

@@ -4,18 +4,13 @@ import 'txt_parser.dart';
 import 'docx_parser.dart';
 
 class ParserFactory {
-  static BaseParser getParser(String filePath) {
-    final ext = filePath.split('.').last.toLowerCase();
+  static BaseParser getParser(String path) {
+    final lower = path.toLowerCase();
 
-    switch (ext) {
-      case 'txt':
-        return TxtParser();
-      case 'pdf':
-        return PdfParser();
-      case 'docx':
-        return DocxParser();
-      default:
-        throw Exception("Unsupported file type: $ext");
-    }
+    if (lower.endsWith('.pdf')) return PdfParser();
+    if (lower.endsWith('.txt')) return TxtParser();
+    if (lower.endsWith('.docx')) return DocxParser();
+
+    throw UnsupportedError("Unsupported file type");
   }
 }

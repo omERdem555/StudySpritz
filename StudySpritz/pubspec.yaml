@@ -2,15 +2,22 @@ name: studyspritz
 description: A new Flutter project
 
 environment:
-
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
-
     sdk: flutter
+
+  # FILE PICKER
   file_picker: ^8.0.0
 
+  # PDF PARSING (cross-platform)
+  syncfusion_flutter_pdf: ^28.1.0
+
+  # DOCX (zip parsing)
+  archive: ^3.4.10
+
+  # LOCAL STORAGE
   hive: ^2.2.3
   hive_flutter: ^1.1.0
 
