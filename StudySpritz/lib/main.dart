@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'core/parsers/parser_factory.dart';
 import 'core/services/file_validation_service.dart';
 import 'core/services/book_creation_service.dart';
 import 'core/services/hive_service.dart';
@@ -19,46 +20,61 @@ void main() async {
 
   final repo = BookRepository();
 
-  // 1. Mevcut veriyi oku
-  final before = await repo.getAllBooks();
-  print("BEFORE RESTART LOAD: ${before.length}");
+  // 1. LOAD EXISTING DATA
+  final books = await repo.getAllBooks();
 
-  for (final b in before) {
+  print("=== APP START ===");
+  print("BOOK COUNT: ${books.length}");
+
+  for (final b in books) {
     print("${b.bookName} -> ${b.filePath}");
   }
 
-  // 2. Eğer ilk çalıştırma ise manuel test ekleme (opsiyonel)
-  // Bunu sadece debug amaçlı kullan
-  if (before.isEmpty) {
-    final testBook = Book(
-      bookId: "persist-test-1",
-      bookName: "Persistence Test Book",
-      filePath: "C:/test/path.pdf",
-      fileType: "pdf",
-      pageCount: 10,
-      wordCount: 100,
-      pageNumber: 0,
-      wordIndex: 0,
-      isFavorite: false,
-      isCompleted: false,
-      addedAt: DateTime.now(),
-      lastOpenedAt: DateTime.now(),
-      completedAt: null,
-    );
-
-    await repo.addBook(testBook);
-    print("TEST BOOK CREATED");
-  }
-
-  // 3. Yeniden oku (asıl kontrol)
-  final after = await repo.getAllBooks();
-
-  print("AFTER LOAD: ${after.length}");
-  for (final b in after) {
-    print("BOOK: ${b.bookName} | ${b.filePath}");
-  }
+  // 2. FILE PICK + PARSE TEST (FAZ 4 CORE TEST)
+  await runFileToTextTest(repo);
 
   runApp(const MyApp());
+}
+
+
+Future<void> runFileToTextTest(BookRepository repo) async {
+  final file = await FileService.pickFile();
+
+  if (file == null || file.path == null) {
+    print("NO FILE SELECTED");
+    return;
+  }
+
+  print("SELECTED FILE: ${file.name}");
+  print("PATH: ${file.path}");
+
+  final parser = ParserFactory.getParser(file.path!);
+  final text = await parser.extract(file.path!);
+
+  print("=== EXTRACTED TEXT START ===");
+  print(text);
+  print("=== EXTRACTED TEXT END ===");
+
+  // Book creation (FAZ 3 + 4 birleşim noktası)
+  final book = Book(
+    bookId: DateTime.now().millisecondsSinceEpoch.toString(),
+    bookName: file.name,
+    filePath: file.path!,
+    fileType: file.extension ?? "",
+    pageCount: 0,
+    wordCount: text.length,
+    pageNumber: 0,
+    wordIndex: 0,
+    isFavorite: false,
+    isCompleted: false,
+    addedAt: DateTime.now(),
+    lastOpenedAt: DateTime.now(),
+    completedAt: null,
+  );
+
+  await repo.addBook(book);
+
+  print("BOOK SAVED FROM FILE PIPELINE");
 }
 
 class MyApp extends StatelessWidget {
