@@ -48,4 +48,12 @@ class BookRepository {
 
     await _box.put(bookId, updated);
   }
+
+  Future<void> markAsOpened(String bookId) async {
+    final book = _box.get(bookId);
+    if (book == null) return;
+
+    book.lastOpenedAt = DateTime.now();
+    await _box.put(bookId, book);
+  }
 }

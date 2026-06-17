@@ -34,21 +34,43 @@ class _ReaderScreenState extends State<ReaderScreen> {
       return;
     }
 
-    await repo.updateBook(
-      book.copyWith(lastOpenedAt: DateTime.now()),
-    );
+    await repo.markAsOpened(book.bookId);
 
     final parser = ParserFactory.getParser(book.filePath);
     final text = await parser.extract(book.filePath);
 
     final words = text.split(RegExp(r'\s+'));
 
-    engine = ReaderEngine(
+    final createdEngine = ReaderEngine(
       words: words,
       wordsPerPage: 200,
     );
 
-    setState(() => loading = false);
+    createdEngine.state = createdEngine.state.copyWith(
+      wordIndex: book.wordIndex,
+      pageIndex: book.pageNumber,
+    );
+
+    setState(() {
+      engine = createdEngine;
+      loading = false;
+    });
+  }
+
+  Future<void> _onNextWord() async {
+    if (engine == null) return;
+
+    setState(() {
+      engine!.nextWord();
+    });
+
+    final repo = BookRepository();
+
+    await repo.updateProgress(
+      widget.bookId,
+      engine!.state.wordIndex,
+      engine!.state.pageIndex,
+    );
   }
 
   @override
@@ -74,11 +96,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
             Text("WORD: ${engine!.state.wordIndex}"),
             Text("PROGRESS: ${engine!.progress}"),
             ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  engine!.nextWord();
-                });
-              },
+              onPressed: _onNextWord,
               child: const Text("NEXT WORD"),
             ),
           ],
