@@ -25,21 +25,18 @@ import 'features/reader/reader_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveService.init();
-  runApp(const MaterialApp(
-    home: ReaderScreen(),
-  ));
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: AppRouter.router,
       title: 'StudySpritz',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
     );
   }
 }

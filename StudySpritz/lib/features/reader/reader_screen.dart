@@ -6,7 +6,12 @@ import '../../repositories/book_repository.dart';
 import '../../models/book.dart';
 
 class ReaderScreen extends StatefulWidget {
-  const ReaderScreen({super.key});
+  final String bookId;
+
+  const ReaderScreen({
+    super.key,
+    required this.bookId,
+  });
 
   @override
   State<ReaderScreen> createState() => _ReaderScreenState();
@@ -24,14 +29,12 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
   Future<void> _loadBook() async {
     final repo = BookRepository();
-    final books = await repo.getAllBooks();
+    final book = await repo.getBook(widget.bookId);
 
-    if (books.isEmpty) {
+    if (book == null) {
       setState(() => loading = false);
       return;
     }
-
-    final Book book = books.first;
 
     final parser = ParserFactory.getParser(book.filePath);
     final text = await parser.extract(book.filePath);
@@ -58,7 +61,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
     if (engine == null) {
       return const Scaffold(
-        body: Center(child: Text("No book found")),
+        body: Center(child: Text("Book not found")),
       );
     }
 
@@ -70,6 +73,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
             Text("PAGE: ${engine!.state.pageIndex}"),
             Text("WORD: ${engine!.state.wordIndex}"),
             Text("PROGRESS: ${engine!.progress}"),
+
             ElevatedButton(
               onPressed: () {
                 setState(() {
