@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-
 import '../../core/reading_engine/reader_engine.dart';
 import '../../core/parsers/parser_factory.dart';
 import '../../repositories/book_repository.dart';
-import '../../models/book.dart';
 
 class ReaderScreen extends StatefulWidget {
   final String bookId;
@@ -46,9 +44,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
       wordsPerPage: 200,
     );
 
-    setState(() {
-      loading = false;
-    });
+    setState(() => loading = false);
   }
 
   @override
@@ -73,7 +69,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
             Text("PAGE: ${engine!.state.pageIndex}"),
             Text("WORD: ${engine!.state.wordIndex}"),
             Text("PROGRESS: ${engine!.progress}"),
-
             ElevatedButton(
               onPressed: () {
                 setState(() {

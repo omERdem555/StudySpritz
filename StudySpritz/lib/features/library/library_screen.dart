@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../repositories/book_repository.dart';
 import '../../models/book.dart';
 
@@ -31,7 +30,10 @@ class LibraryScreen extends StatelessWidget {
               title: Text(book.bookName),
               subtitle: Text(book.filePath),
               onTap: () {
-                context.push('/reader/${book.bookId}');
+                context.push(
+                  '/reader',
+                  extra: book.bookId,
+                );
               },
             );
           },
