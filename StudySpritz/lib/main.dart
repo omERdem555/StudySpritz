@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'core/services/file_validation_service.dart';
 import 'core/services/hive_service.dart';
 import 'core/services/file_service.dart';
 import 'repositories/statistics_repository.dart';
@@ -18,10 +19,24 @@ void main() async {
   final file = await FileService.pickFile();
 
   if (file != null) {
-    print("NAME: ${file.name}");
-    print("PATH: ${file.path}");
-    print("SIZE: ${file.size}");
-}
+    print(
+      await FileValidationService.exists(
+        file.path!,
+      ),
+    );
+
+    print(
+      FileValidationService.isSupported(
+        file.path!,
+      ),
+    );
+
+    print(
+      await FileValidationService.isReadable(
+        file.path!,
+      ),
+    );
+  }
 
   runApp(const MyApp());
 }
