@@ -1,29 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-import '../../repositories/book_repository.dart';
+import '../../core/services/hive_service.dart';
 import '../../models/book.dart';
+import '../../repositories/book_repository.dart';
 
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Library")),
-      body: FutureBuilder<List<Book>>(
-        future: BookRepository().getAllBooks(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return ValueListenableBuilder(
+      valueListenable: HiveService.booksBox.listenable(),
+      builder: (context, box, _) {
+        final books = box.values.toList();
 
-          final books = snapshot.data!;
-          if (books.isEmpty) {
-            return const Center(child: Text("No books"));
-          }
-
-          return GridView.builder(
+        return Scaffold(
+          appBar: AppBar(title: const Text("Library")),
+          body: GridView.builder(
             padding: const EdgeInsets.all(16),
             gridDelegate:
                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -46,23 +41,31 @@ class LibraryScreen extends StatelessWidget {
                   context.push('/reader', extra: book.bookId);
                 },
                 child: Card(
-                  elevation: 2,
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Expanded(
-                          child: Center(
-                            child: Icon(Icons.menu_book, size: 40),
-                          ),
+                          child: Icon(Icons.menu_book, size: 40),
                         ),
                         Text(
                           book.bookName,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 8),
+                        IconButton(
+                          icon: Icon(
+                            book.isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color:
+                                book.isFavorite ? Colors.red : null,
+                          ),
+                          onPressed: () {
+                            BookRepository()
+                                .toggleFavorite(book.bookId);
+                          },
+                        ),
                         LinearProgressIndicator(value: progress),
                       ],
                     ),
@@ -70,9 +73,9 @@ class LibraryScreen extends StatelessWidget {
                 ),
               );
             },
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
-} 
+}

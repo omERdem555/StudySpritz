@@ -53,11 +53,28 @@ class _ReaderScreenState extends State<ReaderScreen> {
   Future<void> _sync() async {
     if (engine == null) return;
 
-    await BookRepository().saveReadingSession(
+    final repo = BookRepository();
+
+    final currentWord = engine!.state.wordIndex;
+    final totalWords = engine!.words.length;
+
+    final isFinished = engine!.state.wordIndex >= engine!.words.length - 1;
+
+    await repo.saveReadingSession(
       bookId: widget.bookId,
-      wordIndex: engine!.state.wordIndex,
+      wordIndex: currentWord,
       pageIndex: engine!.state.pageIndex,
     );
+
+    // AUTO COMPLETION
+    if (isFinished) {
+      final book = await repo.getBook(widget.bookId);
+      if (book != null && !book.isCompleted) {
+        await repo.updateBook(
+          book.copyWith(isCompleted: true),
+        );
+      }
+    }
   }
 
   Future<void> _next() async {
@@ -143,6 +160,19 @@ class _ReaderScreenState extends State<ReaderScreen> {
                 ElevatedButton(
                   onPressed: _next,
                   child: const Text("Next"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final repo = BookRepository();
+                    final book = await repo.getBook(widget.bookId);
+
+                    if (book != null) {
+                      await repo.updateBook(
+                        book.copyWith(isCompleted: true),
+                      );
+                    }
+                  },
+                  child: const Text("Done"),
                 ),
               ],
             ),
