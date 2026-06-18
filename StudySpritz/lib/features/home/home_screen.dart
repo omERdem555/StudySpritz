@@ -71,6 +71,14 @@ class HomeScreen extends StatelessWidget {
             children: [
               _SectionTitle("Son Okunanlar"),
               const SizedBox(height: 10),
+              if (recent.isEmpty)
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text("Kütüphane boş"),
+                  ),
+                )
+              else
               _HorizontalBookList(
                 items: recent.take(10).toList(),
                 cardBuilder: (book) => _BookCard(book: book),
@@ -80,6 +88,14 @@ class HomeScreen extends StatelessWidget {
 
               _SectionTitle("Favoriler"),
               const SizedBox(height: 10),
+              if (favorites.isEmpty)
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text("Henüz favoride kitap yok"),
+                  ),
+                )
+              else
               _HorizontalBookList(
                 items: favorites,
                 cardBuilder: (book) => _BookCard(book: book),
@@ -89,6 +105,14 @@ class HomeScreen extends StatelessWidget {
 
               _SectionTitle("Tüm Kitaplar"),
               const SizedBox(height: 10),
+              if (books.isEmpty)
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text("Kütüphane boş"),
+                  ),
+                )
+              else
               _HorizontalBookList(
                 items: books,
                 cardBuilder: (book) => _BookCard(book: book),
@@ -123,7 +147,7 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     _StatItem(
                       value: books.length.toString(),
-                      label: "Toplam",
+                      label: "Toplam Kitap",
                     ),
                     const SizedBox(width: 12),
                     _StatItem(
