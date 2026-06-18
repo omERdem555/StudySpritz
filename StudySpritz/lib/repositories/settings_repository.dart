@@ -15,6 +15,10 @@ class SettingsRepository {
     await _box.put(_key, settings);
   }
 
+  Future<void> saveSettings(AppSettings settings) async {
+    await _box.put(_key, settings);
+  }
+
   Future<void> initIfEmpty() async {
     final existing = _box.get(_key);
 

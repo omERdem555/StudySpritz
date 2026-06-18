@@ -37,6 +37,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const SizedBox(height: 20),
+
+          const Text("Language"),
+          DropdownButton<String>(
+            value: settings.language,
+            items: const [
+              DropdownMenuItem(value: "en", child: Text("English")),
+              DropdownMenuItem(value: "tr", child: Text("Türkçe")),
+            ],
+            onChanged: (v) {
+              if (v == null) return;
+              state.setLanguage(v);
+            },
+          ),
+
+          const SizedBox(height: 20),
+
+          const Text("Animation Speed"),
+          Slider(
+            value: settings.animationSpeed.toDouble(),
+            min: 1,
+            max: 5,
+            divisions: 4,
+            label: settings.animationSpeed.toString(),
+            onChanged: (v) {
+              state.setAnimationSpeed(v.toInt());
+            },
+          ),
+
+          const SizedBox(height: 20),
+
+          const Text("RSVP Highlight Color"),
+          DropdownButton<String>(
+            value: settings.rsvpHighlightColor,
+            items: const [
+              DropdownMenuItem(value: "yellow", child: Text("Yellow")),
+              DropdownMenuItem(value: "green", child: Text("Green")),
+              DropdownMenuItem(value: "blue", child: Text("Blue")),
+              DropdownMenuItem(value: "red", child: Text("Red")),
+            ],
+            onChanged: (v) {
+              if (v == null) return;
+              state.setRsvpColor(v);
+            },
+          ),
           const Text("Theme"),
 
           DropdownButton<String>(

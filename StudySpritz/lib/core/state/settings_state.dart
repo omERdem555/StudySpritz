@@ -11,79 +11,68 @@ class SettingsState extends ChangeNotifier {
   bool _loading = false;
   bool get loading => _loading;
 
-  bool get isReady => _settings != null;
-
   Future<void> load() async {
     _loading = true;
     notifyListeners();
 
     _settings = await _repo.getSettings();
 
-    if (_settings == null) {
-      await _repo.initIfEmpty();
-      _settings = await _repo.getSettings();
-    }
+    // ilk açılış default fix
+    _settings ??= AppSettings(
+      themeMode: "system",
+      language: "en",
+      wpmSpeed: 250,
+      animationSpeed: 1,
+      fontSize: 18,
+      rsvpHighlightColor: "yellow",
+    );
+
+    await _repo.saveSettings(_settings!);
 
     _loading = false;
     notifyListeners();
   }
-    
+
   Future<void> update(AppSettings newSettings) async {
     _settings = newSettings;
     notifyListeners();
-    await _repo.updateSettings(newSettings);
-  }
 
-  AppSettings get requireSettings {
-    final s = _settings;
-    if (s == null) {
-      throw Exception("Settings not initialized. Call load() first.");
-    }
-    return s;
+    await _repo.saveSettings(_settings!);
   }
 
   Future<void> setTheme(String theme) async {
-    final s = requireSettings;
+    if (_settings == null) return;
 
-    await update(
-      AppSettings(
-        themeMode: theme,
-        language: s.language,
-        wpmSpeed: s.wpmSpeed,
-        animationSpeed: s.animationSpeed,
-        fontSize: s.fontSize,
-        rsvpHighlightColor: s.rsvpHighlightColor,
-      ),
-    );
+    await update(_settings!.copyWith(themeMode: theme));
   }
 
   Future<void> setFontSize(int size) async {
-    final s = requireSettings;
+    if (_settings == null) return;
 
-    await update(
-      AppSettings(
-        themeMode: s.themeMode,
-        language: s.language,
-        wpmSpeed: s.wpmSpeed,
-        animationSpeed: s.animationSpeed,
-        fontSize: size,
-        rsvpHighlightColor: s.rsvpHighlightColor,
-      ),
-    );
+    await update(_settings!.copyWith(fontSize: size));
   }
 
   Future<void> setWpm(int wpm) async {
-    final s = requireSettings;
+    if (_settings == null) return;
 
-    await update(
-      AppSettings(
-        themeMode: s.themeMode,
-        language: s.language,
-        wpmSpeed: wpm,
-        animationSpeed: s.animationSpeed,
-        fontSize: s.fontSize,
-        rsvpHighlightColor: s.rsvpHighlightColor,
-      ),
-    );
+    await update(_settings!.copyWith(wpmSpeed: wpm));
+  }
+
+  Future<void> setLanguage(String lang) async {
+    if (_settings == null) return;
+
+    await update(_settings!.copyWith(language: lang));
+  }
+
+  Future<void> setAnimationSpeed(int speed) async {
+    if (_settings == null) return;
+
+    await update(_settings!.copyWith(animationSpeed: speed));
+  }
+
+  Future<void> setRsvpColor(String color) async {
+    if (_settings == null) return;
+
+    await update(_settings!.copyWith(rsvpHighlightColor: color));
   }
 }
