@@ -47,6 +47,34 @@ class BookmarksScreen extends StatelessWidget {
                     );
                   },  
                   onLongPress: () async {
+                    final shouldDelete = await showDialog<bool>(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text("Delete Bookmark"),
+                          content: const Text(
+                            "Are you sure you want to delete this bookmark?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context, false);
+                              },
+                              child: const Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                              child: const Text("Delete"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (shouldDelete != true) return;
+
                     final repo = BookmarkRepository();
                     await repo.deleteBookmark(b.markId);
                   },
