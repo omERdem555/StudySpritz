@@ -5,7 +5,6 @@ import '../../models/bookmark.dart';
 import '../../models/app_settings.dart';
 import '../../models/reading_statistics.dart';
 
-// ADAPTER IMPORTLARI (BUNU EKLEMEZSEN KIRMIZI OLUR)
 import 'package:studyspritz/adapters/book_adapter.dart';
 import 'package:studyspritz/adapters/bookmark_adapter.dart';
 import 'package:studyspritz/adapters/app_settings_adapter.dart';

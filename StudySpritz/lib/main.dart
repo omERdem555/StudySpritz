@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'core/state/settings_state.dart';
 import 'core/services/hive_service.dart';
 import 'core/router/app_router.dart';
 
@@ -14,9 +17,40 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) {
+        final state = SettingsState();
+        state.load();
+        return state;
+      },
+      child: const _AppView(),
+    );
+  }
+}
+
+class _AppView extends StatelessWidget {
+  const _AppView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<SettingsState>();
+
     return MaterialApp.router(
       routerConfig: AppRouter.router,
-      title: 'StudySpritz',
+      themeMode: _mapTheme(state.settings?.themeMode),
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
     );
+  }
+
+  ThemeMode _mapTheme(String? mode) {
+    switch (mode) {
+      case "dark":
+        return ThemeMode.dark;
+      case "light":
+        return ThemeMode.light;
+      default:
+        return ThemeMode.system;
+    }
   }
 }
