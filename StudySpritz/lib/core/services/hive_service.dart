@@ -2,7 +2,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../constants/box_names.dart';
 import '../../models/book.dart';
 import '../../models/bookmark.dart';
-import '../../models/highlight.dart';
 import '../../models/app_settings.dart';
 import '../../models/reading_statistics.dart';
 

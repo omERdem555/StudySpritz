@@ -4,7 +4,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../core/services/hive_service.dart';
 import '../../models/bookmark.dart';
-import '../../repositories/book_repository.dart';
 import '../../repositories/bookmark_repository.dart';
 
 class BookmarksScreen extends StatelessWidget {

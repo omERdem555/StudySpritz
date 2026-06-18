@@ -157,6 +157,39 @@ class _BookCard extends StatelessWidget {
             },
          );
        },
+        onLongPress: () async {
+          final shouldDelete = await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Delete Book"),
+                content: Text(
+                  "Delete '${book.bookName}' ?",
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                    child: const Text("Cancel"),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context, true);
+                    },
+                    child: const Text("Delete"),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (shouldDelete != true) return;
+
+          await BookRepository().deleteBook(
+            book.bookId,
+          );
+        },
         trailing: Icon(
           book.isFavorite
               ? Icons.favorite

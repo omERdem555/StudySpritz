@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../core/services/hive_service.dart';
-import '../../models/book.dart';
+import '../../repositories/book_repository.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -39,6 +39,39 @@ class FavoritesScreen extends StatelessWidget {
                           extra: {
                             "bookId": book.bookId,
                           },
+                        );
+                      },
+                      onLongPress: () async {
+                        final shouldDelete = await showDialog<bool>(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Delete Book"),
+                              content: Text(
+                                "Delete '${book.bookName}' ?",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  child: const Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  child: const Text("Delete"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (shouldDelete != true) return;
+
+                        await BookRepository().deleteBook(
+                          book.bookId,
                         );
                       },
                     );
