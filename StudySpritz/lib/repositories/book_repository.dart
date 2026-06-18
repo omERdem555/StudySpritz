@@ -16,6 +16,16 @@ class BookRepository {
   }
 
   Future<void> deleteBook(String bookId) async {
+    final relatedBookmarks = HiveService.bookmarksBox.values
+        .where((b) => b.bookId == bookId)
+        .toList();
+
+    for (final bookmark in relatedBookmarks) {
+      await HiveService.bookmarksBox.delete(
+        bookmark.markId,
+      );
+    }
+
     await _box.delete(bookId);
   }
 
