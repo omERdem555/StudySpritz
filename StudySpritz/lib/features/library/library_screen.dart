@@ -8,6 +8,36 @@ import '../../repositories/book_repository.dart';
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
 
+  Future<void> _confirmAndDelete(
+    BuildContext context,
+    String bookId,
+    String bookName,
+  ) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete Book"),
+          content: Text("Delete '$bookName'? This cannot be undone."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete != true) return;
+
+    await BookRepository().deleteBook(bookId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -42,39 +72,15 @@ class LibraryScreen extends StatelessWidget {
                     },
                   );
                 },
-                onLongPress: () async {
-                  final shouldDelete = await showDialog<bool>(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Delete Book"),
-                        content: Text(
-                          "Delete '${book.bookName}' ?",
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, false);
-                            },
-                            child: const Text("Cancel"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, true);
-                            },
-                            child: const Text("Delete"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
 
-                  if (shouldDelete != true) return;
-
-                  await BookRepository().deleteBook(
+                onLongPress: () {
+                  _confirmAndDelete(
+                    context,
                     book.bookId,
+                    book.bookName,
                   );
                 },
+
                 child: Card(
                   child: Padding(
                     padding: const EdgeInsets.all(12),

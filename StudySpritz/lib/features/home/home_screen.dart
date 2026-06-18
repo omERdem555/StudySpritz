@@ -10,6 +10,8 @@ import '../../repositories/book_repository.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  static const double _cardWidth = 160;
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -18,19 +20,15 @@ class HomeScreen extends StatelessWidget {
         final books = box.values.toList();
 
         final recent = books.toList()
-          ..sort((a, b) {
-            final scoreA =
-                a.lastOpenedAt.millisecondsSinceEpoch + a.wordIndex;
-            final scoreB =
-                b.lastOpenedAt.millisecondsSinceEpoch + b.wordIndex;
-            return scoreB.compareTo(scoreA);
-          });
+          ..sort((a, b) =>
+              (b.lastOpenedAt.millisecondsSinceEpoch + b.wordIndex)
+                  .compareTo(a.lastOpenedAt.millisecondsSinceEpoch + a.wordIndex));
 
         final favorites = books.where((b) => b.isFavorite).toList();
-
         final completed = books.where((b) => b.isCompleted).length;
 
-        final recentBookmarks = HiveService.bookmarksBox.values.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        final recentBookmarks = HiveService.bookmarksBox.values.toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
         return Scaffold(
           appBar: AppBar(
@@ -40,7 +38,6 @@ class HomeScreen extends StatelessWidget {
                 icon: const Icon(Icons.add),
                 onPressed: () async {
                   final result = await FilePicker.platform.pickFiles();
-
                   if (result == null || result.files.single.path == null) return;
 
                   final file = result.files.single;
@@ -68,29 +65,39 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
+
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
               _SectionTitle("Son Okunanlar"),
-              const SizedBox(height: 8),
-              ...recent.take(5).map((b) => _BookCard(book: b)),
+              const SizedBox(height: 10),
+              _HorizontalBookList(
+                items: recent.take(10).toList(),
+                cardBuilder: (book) => _BookCard(book: book),
+              ),
 
               const SizedBox(height: 24),
 
               _SectionTitle("Favoriler"),
-              const SizedBox(height: 8),
-              ...favorites.map((b) => _BookCard(book: b)),
+              const SizedBox(height: 10),
+              _HorizontalBookList(
+                items: favorites,
+                cardBuilder: (book) => _BookCard(book: book),
+              ),
 
               const SizedBox(height: 24),
 
               _SectionTitle("Tüm Kitaplar"),
-              const SizedBox(height: 8),
-              ...books.map((b) => _BookCard(book: b)),
+              const SizedBox(height: 10),
+              _HorizontalBookList(
+                items: books,
+                cardBuilder: (book) => _BookCard(book: book),
+              ),
 
               const SizedBox(height: 24),
 
               _SectionTitle("Son Yer İmleri"),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
 
               if (recentBookmarks.isEmpty)
                 const Card(
@@ -98,38 +105,16 @@ class HomeScreen extends StatelessWidget {
                     padding: EdgeInsets.all(16),
                     child: Text("Henüz yer imi yok"),
                   ),
+                )
+              else
+                _HorizontalBookmarkList(
+                  items: recentBookmarks.take(10).toList(),
                 ),
-
-              ...recentBookmarks.take(5).map(
-                (bookmark) => Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.bookmark),
-                    title: Text(
-                      bookmark.markNote.isEmpty
-                          ? "Page ${bookmark.pageNumber}"
-                          : bookmark.markNote,
-                    ),
-                    subtitle: Text(
-                      "Page ${bookmark.pageNumber}",
-                    ),
-                    onTap: () {
-                      context.push(
-                        '/reader',
-                        extra: {
-                          "bookId": bookmark.bookId,
-                          "wordIndex": bookmark.wordIndex,
-                          "pageIndex": bookmark.pageNumber,
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
 
               const SizedBox(height: 24),
 
               _SectionTitle("İstatistiklerim"),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
 
               SizedBox(
                 height: 110,
@@ -161,6 +146,85 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+class _HorizontalBookList extends StatelessWidget {
+  final List<Book> items;
+  final Widget Function(Book) cardBuilder;
+
+  const _HorizontalBookList({
+    required this.items,
+    required this.cardBuilder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 220,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: items.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          return SizedBox(
+            width: HomeScreen._cardWidth,
+            child: cardBuilder(items[index]),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _HorizontalBookmarkList extends StatelessWidget {
+  final List<dynamic> items;
+
+  const _HorizontalBookmarkList({
+    required this.items,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 120,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: items.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final bookmark = items[index];
+
+          return SizedBox(
+            width: 180,
+            child: Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(8),
+                leading: const Icon(Icons.bookmark),
+                title: Text(
+                  bookmark.markNote.isEmpty
+                      ? "Page ${bookmark.pageNumber}"
+                      : bookmark.markNote,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text("Page ${bookmark.pageNumber}"),
+                onTap: () {
+                  context.push(
+                    '/reader',
+                    extra: {
+                      "bookId": bookmark.bookId,
+                      "wordIndex": bookmark.wordIndex,
+                      "pageIndex": bookmark.pageNumber,
+                    },
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class _SectionTitle extends StatelessWidget {
   final String text;
   const _SectionTitle(this.text);
@@ -186,36 +250,31 @@ class _BookCard extends StatelessWidget {
         : (book.wordIndex / book.wordCount).clamp(0.0, 1.0);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: ListTile(
+      child: InkWell(
         onTap: () {
           context.push(
             '/reader',
             extra: {
-            "bookId": book.bookId,
+              "bookId": book.bookId,
+              "wordIndex": book.wordIndex,
+              "pageIndex": book.pageNumber,
             },
-         );
-       },
+          );
+        },
         onLongPress: () async {
           final shouldDelete = await showDialog<bool>(
             context: context,
             builder: (context) {
               return AlertDialog(
                 title: const Text("Delete Book"),
-                content: Text(
-                  "Delete '${book.bookName}' ?",
-                ),
+                content: Text("Delete '${book.bookName}' ?"),
                 actions: [
                   TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
+                    onPressed: () => Navigator.pop(context, false),
                     child: const Text("Cancel"),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.pop(context, true);
-                    },
+                    onPressed: () => Navigator.pop(context, true),
                     child: const Text("Delete"),
                   ),
                 ],
@@ -225,25 +284,26 @@ class _BookCard extends StatelessWidget {
 
           if (shouldDelete != true) return;
 
-          await BookRepository().deleteBook(
-            book.bookId,
-          );
+          await BookRepository().deleteBook(book.bookId);
         },
-        trailing: Icon(
-          book.isFavorite
-              ? Icons.favorite
-              : Icons.favorite_border,
-          color: book.isFavorite ? Colors.red : null,
-        ),
-        title: Text(book.bookName),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 6),
-            LinearProgressIndicator(value: progress),
-            const SizedBox(height: 6),
-            Text("${(progress * 100).toStringAsFixed(1)}%"),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.menu_book, size: 36),
+              const SizedBox(height: 8),
+              Text(
+                book.bookName,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              LinearProgressIndicator(value: progress),
+              const SizedBox(height: 6),
+              Text("${(progress * 100).toStringAsFixed(1)}%"),
+            ],
+          ),
         ),
       ),
     );
