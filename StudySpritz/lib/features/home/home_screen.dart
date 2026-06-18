@@ -115,8 +115,13 @@ class _BookCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
         onTap: () {
-          context.push('/reader', extra: book.bookId);
-        },
+          context.push(
+            '/reader',
+            extra: {
+            "bookId": book.bookId,
+            },
+         );
+       },
         trailing: Icon(
           book.isFavorite
               ? Icons.favorite

@@ -49,8 +49,9 @@ class AppRouter {
           GoRoute(
             path: '/reader',
             builder: (context, state) {
-              final bookId = state.extra as String;
-              return ReaderScreen(bookId: bookId);
+              final extra = state.extra as Map;
+
+              return ReaderScreen(extra: extra);
             },
           ),
         ],

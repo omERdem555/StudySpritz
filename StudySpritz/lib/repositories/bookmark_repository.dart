@@ -18,8 +18,14 @@ class BookmarkRepository {
   }
 
   Future<List<Bookmark>> getBookmarksByBook(String bookId) async {
-    return _box.values
-        .where((b) => b.bookId == bookId)
-        .toList();
+    return _box.values.where((b) => b.bookId == bookId).toList();
+  }
+
+  Future<List<Bookmark>> getAllBookmarks() async {
+    return _box.values.toList();
+  }
+
+  Future<void> updateBookmark(Bookmark bookmark) async {
+    await _box.put(bookmark.markId, bookmark);
   }
 }

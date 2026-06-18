@@ -20,8 +20,7 @@ class LibraryScreen extends StatelessWidget {
           appBar: AppBar(title: const Text("Library")),
           body: GridView.builder(
             padding: const EdgeInsets.all(16),
-            gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 0.72,
               crossAxisSpacing: 12,
@@ -33,12 +32,16 @@ class LibraryScreen extends StatelessWidget {
 
               final progress = book.wordCount == 0
                   ? 0.0
-                  : (book.wordIndex / book.wordCount)
-                      .clamp(0.0, 1.0);
+                  : (book.wordIndex / book.wordCount).clamp(0.0, 1.0);
 
               return InkWell(
                 onTap: () {
-                  context.push('/reader', extra: book.bookId);
+                  context.push(
+                    '/reader',
+                    extra: {
+                      "bookId": book.bookId,
+                    },
+                  );
                 },
                 child: Card(
                   child: Padding(
@@ -58,12 +61,10 @@ class LibraryScreen extends StatelessWidget {
                             book.isFavorite
                                 ? Icons.favorite
                                 : Icons.favorite_border,
-                            color:
-                                book.isFavorite ? Colors.red : null,
+                            color: book.isFavorite ? Colors.red : null,
                           ),
                           onPressed: () {
-                            BookRepository()
-                                .toggleFavorite(book.bookId);
+                            BookRepository().toggleFavorite(book.bookId);
                           },
                         ),
                         LinearProgressIndicator(value: progress),

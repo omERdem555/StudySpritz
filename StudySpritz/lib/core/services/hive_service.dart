@@ -28,6 +28,7 @@ class HiveService {
 
     booksBox = await Hive.openBox<Book>(BoxNames.booksBox);
     bookmarksBox = await Hive.openBox<Bookmark>(BoxNames.bookmarksBox);
+
     settingsBox = await Hive.openBox<AppSettings>(BoxNames.appSettingsBox);
     statisticsBox = await Hive.openBox<ReadingStatistics>(
       BoxNames.readingStatisticsBox,

@@ -4,10 +4,17 @@ import '../../core/reading_engine/reader_engine.dart';
 import '../../core/parsers/parser_factory.dart';
 import '../../repositories/book_repository.dart';
 
-class ReaderScreen extends StatefulWidget {
-  final String bookId;
+import '../../models/bookmark.dart';
+import '../../repositories/bookmark_repository.dart';
+import 'package:uuid/uuid.dart';
 
-  const ReaderScreen({super.key, required this.bookId});
+class ReaderScreen extends StatefulWidget {
+  final dynamic extra;
+
+  const ReaderScreen({
+    super.key,
+    required this.extra,
+  });
 
   @override
   State<ReaderScreen> createState() => _ReaderScreenState();
@@ -17,6 +24,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
   ReaderEngine? engine;
   bool loading = true;
 
+  String get bookId => widget.extra["bookId"] as String;
+
   @override
   void initState() {
     super.initState();
@@ -25,7 +34,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
   Future<void> _loadBook() async {
     final repo = BookRepository();
-    final book = await repo.getBook(widget.bookId);
+
+    final startWord = widget.extra["wordIndex"] as int?;
+    final startPage = widget.extra["pageIndex"] as int?;
+
+    final book = await repo.getBook(bookId);
 
     if (book == null) {
       setState(() => loading = false);
@@ -44,8 +57,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
       wordsPerPage: 200,
     );
 
-    // SESSION RESTORE
-    engine!.jumpTo(book.wordIndex);
+    if (startWord != null) {
+      engine!.jumpTo(startWord);
+    } else {
+      engine!.jumpTo(book.wordIndex);
+    }
 
     setState(() => loading = false);
   }
@@ -56,19 +72,18 @@ class _ReaderScreenState extends State<ReaderScreen> {
     final repo = BookRepository();
 
     final currentWord = engine!.state.wordIndex;
-    final totalWords = engine!.words.length;
 
-    final isFinished = engine!.state.wordIndex >= engine!.words.length - 1;
+    final isFinished =
+        engine!.state.wordIndex >= engine!.words.length - 1;
 
     await repo.saveReadingSession(
-      bookId: widget.bookId,
+      bookId: bookId,
       wordIndex: currentWord,
       pageIndex: engine!.state.pageIndex,
     );
 
-    // AUTO COMPLETION
     if (isFinished) {
-      final book = await repo.getBook(widget.bookId);
+      final book = await repo.getBook(bookId);
       if (book != null && !book.isCompleted) {
         await repo.updateBook(
           book.copyWith(isCompleted: true),
@@ -101,6 +116,54 @@ class _ReaderScreenState extends State<ReaderScreen> {
     await _sync();
   }
 
+  Future<void> _addBookmark() async {
+    if (engine == null) return;
+
+    final noteController = TextEditingController();
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Add Bookmark"),
+          content: TextField(
+            controller: noteController,
+            decoration: const InputDecoration(
+              hintText: "Optional note...",
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, noteController.text);
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == null) return;
+
+    final repo = BookmarkRepository();
+
+    final bookmark = Bookmark(
+      markId: const Uuid().v4(),
+      bookId: bookId,
+      pageNumber: engine!.state.pageIndex,
+      wordIndex: engine!.state.wordIndex,
+      markNote: result,
+      createdAt: DateTime.now(),
+    );
+
+    await repo.addBookmark(bookmark);
+  }
+
   @override
   void dispose() {
     _sync();
@@ -125,11 +188,18 @@ class _ReaderScreenState extends State<ReaderScreen> {
         engine!.state.wordIndex / engine!.words.length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Reader")),
+      appBar: AppBar(
+        title: const Text("Reader"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.bookmark_add),
+            onPressed: _addBookmark,
+          ),
+        ],
+      ),
       body: Column(
         children: [
           LinearProgressIndicator(value: progress),
-
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -144,7 +214,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
               ),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -164,7 +233,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                 ElevatedButton(
                   onPressed: () async {
                     final repo = BookRepository();
-                    final book = await repo.getBook(widget.bookId);
+                    final book = await repo.getBook(bookId);
 
                     if (book != null) {
                       await repo.updateBook(

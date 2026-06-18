@@ -1,56 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../core/services/hive_service.dart';
 import '../../models/book.dart';
-import '../../repositories/book_repository.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Favorites"),
-      ),
-      body: FutureBuilder<List<Book>>(
-        future: BookRepository().getAllBooks(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+    return ValueListenableBuilder(
+      valueListenable: HiveService.booksBox.listenable(),
+      builder: (context, box, _) {
+        final books = box.values.toList();
 
-          final favorites = snapshot.data!
-              .where((b) => b.isFavorite)
-              .toList();
+        final favorites =
+            books.where((b) => b.isFavorite).toList();
 
-          if (favorites.isEmpty) {
-            return const Center(
-              child: Text("No favorite books"),
-            );
-          }
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("Favorites"),
+          ),
+          body: favorites.isEmpty
+              ? const Center(child: Text("No favorite books"))
+              : ListView.builder(
+                  itemCount: favorites.length,
+                  itemBuilder: (context, index) {
+                    final book = favorites[index];
 
-          return ListView.builder(
-            itemCount: favorites.length,
-            itemBuilder: (context, index) {
-              final book = favorites[index];
+                    return ListTile(
+                      leading: const Icon(Icons.favorite),
+                      title: Text(book.bookName),
 
-              return ListTile(
-                leading: const Icon(Icons.favorite),
-                title: Text(book.bookName),
-                onTap: () {
-                  context.push(
-                    '/reader',
-                    extra: book.bookId,
-                  );
-                },
-              );
-            },
-          );
-        },
-      ),
+                      onTap: () {
+                        context.push(
+                          '/reader',
+                          extra: {
+                            "bookId": book.bookId,
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+        );
+      },
     );
   }
 }

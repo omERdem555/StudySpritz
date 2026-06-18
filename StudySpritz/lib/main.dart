@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'core/reading_engine/progress_calculator.dart';
 import 'core/reading_engine/reader_state.dart';
 import 'core/reading_engine/pagination_engine.dart';
