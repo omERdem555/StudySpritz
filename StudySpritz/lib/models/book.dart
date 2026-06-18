@@ -2,9 +2,6 @@ class Book {
   final String bookId;
   final String bookName;
 
-  final List<String> bookmarkIds;
-  final List<String> highlightIds;
-
   final String filePath;
   final String fileType;
 
@@ -24,8 +21,6 @@ class Book {
   const Book({
     required this.bookId,
     required this.bookName,
-    required this.bookmarkIds,
-    required this.highlightIds, 
     required this.filePath,
     required this.fileType,
     required this.pageCount,
@@ -41,8 +36,6 @@ class Book {
 
   Book copyWith({
     String? bookName,
-    List<String>? bookmarkIds,
-    List<String>? highlightIds,
     String? filePath,
     String? fileType,
     int? pageCount,
@@ -57,8 +50,6 @@ class Book {
   }) {
     return Book(
       bookId: bookId,
-      bookmarkIds: bookmarkIds ?? this.bookmarkIds,
-      highlightIds: highlightIds ?? this.highlightIds,
       bookName: bookName ?? this.bookName,
       filePath: filePath ?? this.filePath,
       fileType: fileType ?? this.fileType,

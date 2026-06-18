@@ -15,7 +15,6 @@ import 'package:studyspritz/adapters/reading_statistics_adapter.dart';
 class HiveService {
   static late Box<Book> booksBox;
   static late Box<Bookmark> bookmarksBox;
-  static late Box<Highlight> highlightsBox;
   static late Box<AppSettings> settingsBox;
   static late Box<ReadingStatistics> statisticsBox;
 
@@ -24,13 +23,11 @@ class HiveService {
 
     Hive.registerAdapter(BookAdapter());
     Hive.registerAdapter(BookmarkAdapter());
-    Hive.registerAdapter(HighlightAdapter());
     Hive.registerAdapter(AppSettingsAdapter());
     Hive.registerAdapter(ReadingStatisticsAdapter());
 
     booksBox = await Hive.openBox<Book>(BoxNames.booksBox);
     bookmarksBox = await Hive.openBox<Bookmark>(BoxNames.bookmarksBox);
-    highlightsBox = await Hive.openBox<Highlight>("highlightsBox");
     settingsBox = await Hive.openBox<AppSettings>(BoxNames.appSettingsBox);
     statisticsBox = await Hive.openBox<ReadingStatistics>(
       BoxNames.readingStatisticsBox,

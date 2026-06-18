@@ -39,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
           });
 
         final favorites = books.where((b) => b.isFavorite).toList();
+        final completed = books.where((b) => b.isCompleted).length;
 
         return Scaffold(
           appBar: AppBar(
@@ -62,6 +63,24 @@ class _HomeScreenState extends State<HomeScreen> {
               _SectionTitle("Tüm Kitaplar"),
               const SizedBox(height: 8),
               ...books.map((b) => _BookCard(book: b)),
+
+              _SectionTitle("İstatistiklerim"),
+              const SizedBox(height: 8),
+
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Toplam Kitap: ${books.length}"),
+                      Text("Favori Kitap: ${favorites.length}"),
+                      Text("Tamamlanan Kitap: $completed"),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         );
