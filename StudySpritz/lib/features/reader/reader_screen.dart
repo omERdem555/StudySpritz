@@ -7,6 +7,7 @@ import '../../repositories/book_repository.dart';
 import '../../models/bookmark.dart';
 import '../../repositories/bookmark_repository.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:io';
 
 class ReaderScreen extends StatefulWidget {
   final dynamic extra;
@@ -46,6 +47,30 @@ class _ReaderScreenState extends State<ReaderScreen> {
     }
 
     await repo.markAsOpened(book.bookId);
+    
+    final file = File(book.filePath);
+
+    if (!await file.exists()) {
+      if (!mounted) return;
+
+      await showDialog(
+        context: context,
+        builder: (_) {
+          return const AlertDialog(
+            title: Text("File Not Found"),
+            content: Text(
+              "The original file cannot be found on this device.",
+            ),
+          );
+        },
+      );
+
+      if (!mounted) return;
+
+      Navigator.pop(context);
+
+      return;
+    }
 
     final parser = ParserFactory.getParser(book.filePath);
     final text = await parser.extract(book.filePath);

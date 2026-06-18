@@ -26,11 +26,11 @@ class HomeScreen extends StatelessWidget {
             return scoreB.compareTo(scoreA);
           });
 
-        final favorites =
-            books.where((b) => b.isFavorite).toList();
+        final favorites = books.where((b) => b.isFavorite).toList();
 
-        final completed =
-            books.where((b) => b.isCompleted).length;
+        final completed = books.where((b) => b.isCompleted).length;
+
+        final recentBookmarks = HiveService.bookmarksBox.values.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
         return Scaffold(
           appBar: AppBar(
@@ -86,6 +86,45 @@ class HomeScreen extends StatelessWidget {
               _SectionTitle("Tüm Kitaplar"),
               const SizedBox(height: 8),
               ...books.map((b) => _BookCard(book: b)),
+
+              const SizedBox(height: 24),
+
+              _SectionTitle("Son Yer İmleri"),
+              const SizedBox(height: 8),
+
+              if (recentBookmarks.isEmpty)
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text("Henüz yer imi yok"),
+                  ),
+                ),
+
+              ...recentBookmarks.take(5).map(
+                (bookmark) => Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.bookmark),
+                    title: Text(
+                      bookmark.markNote.isEmpty
+                          ? "Page ${bookmark.pageNumber}"
+                          : bookmark.markNote,
+                    ),
+                    subtitle: Text(
+                      "Page ${bookmark.pageNumber}",
+                    ),
+                    onTap: () {
+                      context.push(
+                        '/reader',
+                        extra: {
+                          "bookId": bookmark.bookId,
+                          "wordIndex": bookmark.wordIndex,
+                          "pageIndex": bookmark.pageNumber,
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
 
               const SizedBox(height: 24),
 
