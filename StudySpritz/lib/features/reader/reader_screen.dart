@@ -227,10 +227,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
                   child: const Text("Prev"),
                 ),
                 ElevatedButton(
-                  onPressed: _next,
-                  child: const Text("Next"),
-                ),
-                ElevatedButton(
                   onPressed: () async {
                     final repo = BookRepository();
                     final book = await repo.getBook(bookId);
@@ -243,6 +239,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
                   },
                   child: const Text("Done"),
                 ),
+                ElevatedButton(
+                  onPressed: _next,
+                  child: const Text("Next"),
+                ),
+
               ],
             ),
           ),

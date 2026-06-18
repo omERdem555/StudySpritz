@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 
 import '../../core/services/hive_service.dart';
 import '../../models/book.dart';
@@ -32,7 +33,41 @@ class HomeScreen extends StatelessWidget {
             books.where((b) => b.isCompleted).length;
 
         return Scaffold(
-          appBar: AppBar(title: const Text("Dashboard")),
+          appBar: AppBar(
+            title: const Text("Dashboard"),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () async {
+                  final result = await FilePicker.platform.pickFiles();
+
+                  if (result == null || result.files.single.path == null) return;
+
+                  final file = result.files.single;
+
+                  final repo = BookRepository();
+
+                  final book = Book(
+                    bookId: DateTime.now().millisecondsSinceEpoch.toString(),
+                    bookName: file.name,
+                    filePath: file.path!,
+                    fileType: file.extension ?? "txt",
+                    pageCount: 0,
+                    wordCount: 0,
+                    pageNumber: 0,
+                    wordIndex: 0,
+                    isFavorite: false,
+                    isCompleted: false,
+                    addedAt: DateTime.now(),
+                    lastOpenedAt: DateTime.now(),
+                    completedAt: null,
+                  );
+
+                  await repo.addBook(book);
+                },
+              ),
+            ],
+          ),
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
