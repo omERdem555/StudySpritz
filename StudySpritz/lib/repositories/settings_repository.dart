@@ -7,12 +7,21 @@ class SettingsRepository {
 
   static const String _key = "app_settings";
 
-  Future<AppSettings?> getSettings() async {
-    return _box.get(_key);
+  AppSettings getSettings() {
+    final box = HiveService.settingsBox;
+
+    final raw = box.get(_key);
+    if (raw == null) {
+      final defaults = AppSettings.defaults();
+      box.put(_key, defaults);
+      return defaults;
+    }
+
+    return raw;
   }
 
   Future<void> updateSettings(AppSettings settings) async {
-    await _box.put(_key, settings);
+    await HiveService.settingsBox.put(_key, settings);
   }
 
   Future<void> saveSettings(AppSettings settings) async {

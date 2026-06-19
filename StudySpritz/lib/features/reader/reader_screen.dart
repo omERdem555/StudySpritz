@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import '../../core/reading_engine/reader_engine.dart';
 import '../../core/parsers/parser_factory.dart';
 import '../../repositories/book_repository.dart';
+import '../../core/state/settings_state.dart';
 
+import '../../models/app_settings.dart';
 import '../../models/bookmark.dart';
 import '../../repositories/bookmark_repository.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
+import 'package:provider/provider.dart';
 
 class ReaderScreen extends StatefulWidget {
   final dynamic extra;
@@ -25,7 +28,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
   ReaderEngine? engine;
   bool loading = true;
 
-  String get bookId => widget.extra["bookId"] as String;
+  late AppSettings settings;
+
+  String get bookId =>
+      widget.extra["bookId"] as String;
+
 
   @override
   void initState() {
@@ -77,9 +84,13 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
     final words = text.split(RegExp(r'\s+'));
 
+    settings = context.read<SettingsState>().settings ?? AppSettings.defaults();
+
+
     engine = ReaderEngine(
       words: words,
       wordsPerPage: 200,
+      wpm: settings.wpmSpeed,
     );
 
     if (startWord != null) {
@@ -126,17 +137,26 @@ class _ReaderScreenState extends State<ReaderScreen> {
       );
     });
 
+    await Future.delayed(
+      Duration(milliseconds: 250 ~/ settings.animationSpeed,)
+    );
+
     await _sync();
   }
 
   Future<void> _prev() async {
     if (engine == null) return;
 
+
     setState(() {
       engine!.jumpTo(
         engine!.state.wordIndex - engine!.wordsPerPage,
       );
     });
+
+    await Future.delayed(
+      Duration(milliseconds: 250 ~/ settings.animationSpeed,)
+    );
 
     await _sync();
   }
@@ -231,8 +251,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
               child: SingleChildScrollView(
                 child: Text(
                   engine!.currentPageText,
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: TextStyle(
+                    fontSize: settings.fontSize.toDouble(),
                     height: 1.7,
                   ),
                 ),

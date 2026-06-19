@@ -1,14 +1,14 @@
 class AppSettings {
-  String themeMode;
-  String language;
+  final String themeMode;
+  final String language;
 
-  int wpmSpeed;
-  int animationSpeed;
-  int fontSize;
+  final int wpmSpeed;
+  final int animationSpeed;
+  final int fontSize;
 
-  String rsvpHighlightColor;
+  final String rsvpHighlightColor;
 
-  AppSettings({
+  const AppSettings({
     required this.themeMode,
     required this.language,
     required this.wpmSpeed,
@@ -32,6 +32,17 @@ class AppSettings {
       animationSpeed: animationSpeed ?? this.animationSpeed,
       fontSize: fontSize ?? this.fontSize,
       rsvpHighlightColor: rsvpHighlightColor ?? this.rsvpHighlightColor,
+    );
+  }
+
+  factory AppSettings.defaults() {
+    return const AppSettings(
+      themeMode: "system",
+      language: "en",
+      wpmSpeed: 250,
+      animationSpeed: 3,
+      fontSize: 16,
+      rsvpHighlightColor: "yellow",
     );
   }
 }

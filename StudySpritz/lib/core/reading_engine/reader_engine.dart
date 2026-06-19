@@ -4,19 +4,21 @@ import 'pagination_engine.dart';
 class ReaderEngine {
   final List<String> words;
   final int wordsPerPage;
+  final int wpm;
 
   late final List<String> pages;
 
   ReaderState state;
 
   double get progress {
-  if (words.isEmpty) return 0.0;
-  return state.wordIndex / words.length;
-}
+    if (words.isEmpty) return 0.0;
+    return state.wordIndex / words.length;
+  }
 
   ReaderEngine({
     required this.words,
     required this.wordsPerPage,
+    required this.wpm,
   }) : state = ReaderState(wordIndex: 0, pageIndex: 0) {
     pages = PaginationEngine.createPages(words, wordsPerPage);
   }

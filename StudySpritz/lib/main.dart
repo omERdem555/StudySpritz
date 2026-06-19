@@ -35,10 +35,13 @@ class _AppView extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<SettingsState>();
 
+
     return MaterialApp.router(
       routerConfig: AppRouter.router,
       themeMode: _mapTheme(state.settings?.themeMode),
+
       theme: ThemeData.light(),
+
       darkTheme: ThemeData.dark(),
     );
   }
