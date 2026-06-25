@@ -1,39 +1,94 @@
 import 'package:hive/hive.dart';
-
 import '../core/services/hive_service.dart';
-import '../models/app_settings.dart';
+import '../models/reading_statistics.dart';
 
-class SettingsRepository {
-  static const String _key = "app_settings";
+class StatisticsRepository {
+  Box<ReadingStatistics> get _box => HiveService.statisticsBox;
 
-  Box<AppSettings> get _box => HiveService.settingsBox;
+  Future<ReadingStatistics?> getByBookId(String bookId) async {
+    return _box.get(bookId);
+  }
 
-  AppSettings getSettings() {
-    final existing = _box.get(_key);
+  Future<List<ReadingStatistics>> getAll() async {
+    final all = _box.values.toList();
 
-    if (existing != null) {
-      return existing;
+    return all.where((s) {
+      return s.sessionCount > 0 ||
+          s.totalReadingTime > 0 ||
+          s.totalWordsRead > 0 ||
+          s.totalPagesRead > 0;
+    }).toList();
+  }
+
+  Future<void> save(ReadingStatistics statistics) async {
+    await _box.put(statistics.bookId, statistics);
+  }
+
+  Future<void> delete(String bookId) async {
+    await _box.delete(bookId);
+  }
+
+  Future<void> updateSession({
+    required String bookId,
+    required int sessionDurationSeconds,
+    required int wordsRead,
+    required int pagesRead,
+  }) async {
+    final existing = _box.get(bookId);
+
+    final safeWords = wordsRead < 0 ? 0 : wordsRead;
+    final safePages = pagesRead < 0 ? 0 : pagesRead;
+
+    final sessionMinutes =
+        sessionDurationSeconds <= 0
+            ? 1.0
+            : sessionDurationSeconds / 60.0;
+
+    final sessionWpm =
+        sessionMinutes <= 0.0
+            ? 0.0
+            : safeWords / sessionMinutes;
+
+    if (existing == null) {
+      final statistics = ReadingStatistics(
+        bookId: bookId,
+        totalReadingTime: sessionDurationSeconds,
+        sessionCount: 1,
+        lastSessionDuration: sessionDurationSeconds,
+        averageWpm: sessionWpm.toDouble(),
+        peakWpm: sessionWpm.toDouble(),
+        totalWordsRead: safeWords,
+        totalPagesRead: safePages,
+        firstReadAt: DateTime.now(),
+        lastReadAt: DateTime.now(),
+      );
+
+      await save(statistics);
+      return;
     }
 
-    final defaults = AppSettings.defaults();
+    final totalSessions = existing.sessionCount + 1;
 
-    _box.put(_key, defaults);
+    final newAverageWpm =
+        ((existing.averageWpm * existing.sessionCount) + sessionWpm) /
+            totalSessions;
 
-    return defaults;
-  }
-
-  Future<void> saveSettings(
-    AppSettings settings,
-  ) async {
-    await _box.put(_key, settings);
-  }
-
-  Future<void> initIfEmpty() async {
-    if (_box.get(_key) != null) return;
-
-    await _box.put(
-      _key,
-      AppSettings.defaults(),
+    final updated = ReadingStatistics(
+      bookId: existing.bookId,
+      totalReadingTime:
+          existing.totalReadingTime + sessionDurationSeconds,
+      sessionCount: totalSessions,
+      lastSessionDuration: sessionDurationSeconds,
+      averageWpm: newAverageWpm.toDouble(),
+      peakWpm: (sessionWpm > existing.peakWpm)
+          ? sessionWpm.toDouble()
+          : existing.peakWpm,
+      totalWordsRead: existing.totalWordsRead + safeWords,
+      totalPagesRead: existing.totalPagesRead + safePages,
+      firstReadAt: existing.firstReadAt,
+      lastReadAt: DateTime.now(),
     );
+
+    await save(updated);
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/reading_engine/reader_engine.dart';
 import '../../core/parsers/parser_factory.dart';
 import '../../repositories/book_repository.dart';
+import '../../repositories/statistics_repository.dart'; 
 import '../../core/state/settings_state.dart';
 
 import '../../models/app_settings.dart';
@@ -27,6 +28,11 @@ class ReaderScreen extends StatefulWidget {
 class _ReaderScreenState extends State<ReaderScreen> {
   ReaderEngine? engine;
   bool loading = true;
+
+  DateTime? sessionStartedAt;
+
+  int startWordIndex = 0;
+  int startPageIndex = 0;
 
   late AppSettings settings;
 
@@ -90,7 +96,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
     engine = ReaderEngine(
       words: words,
       wordsPerPage: 200,
-      wpm: settings.wpmSpeed,
+      wpm: settings.wpmSpeed, // SADECE RENDER SPEED
     );
 
     if (startWord != null) {
@@ -98,6 +104,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
     } else {
       engine!.jumpTo(book.wordIndex);
     }
+
+  startWordIndex = engine!.state.wordIndex;
+  startPageIndex = engine!.state.pageIndex;
+
+  sessionStartedAt = DateTime.now();
 
     setState(() => loading = false);
   }
@@ -122,7 +133,10 @@ class _ReaderScreenState extends State<ReaderScreen> {
       final book = await repo.getBook(bookId);
       if (book != null && !book.isCompleted) {
         await repo.updateBook(
-          book.copyWith(isCompleted: true),
+          book.copyWith(
+            isCompleted: true,
+            completedAt: DateTime.now(),
+          )
         );
       }
     }
@@ -209,9 +223,45 @@ class _ReaderScreenState extends State<ReaderScreen> {
     await repo.addBookmark(bookmark);
   }
 
+  Future<void> _saveStatistics() async {
+    if (engine == null) return;
+    if (sessionStartedAt == null) return;
+
+    final durationSeconds =
+        DateTime.now()
+            .difference(sessionStartedAt!)
+            .inSeconds;
+
+    final wordsRead =
+        (engine!.state.wordIndex -
+                startWordIndex)
+            .abs();
+
+    final pagesRead =
+        (engine!.state.pageIndex -
+                startPageIndex)
+            .abs();
+
+    if (durationSeconds < 10) return;
+
+    final repository =
+        StatisticsRepository();
+
+    await repository.updateSession(
+      bookId: bookId,
+      sessionDurationSeconds: durationSeconds,
+      wordsRead: wordsRead < 0 ? 0 : wordsRead,
+      pagesRead: pagesRead < 0 ? 0 : pagesRead,
+    );
+  }
+
   @override
   void dispose() {
-    _sync();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _sync();
+      await _saveStatistics();
+    });
+
     super.dispose();
   }
 
@@ -232,67 +282,77 @@ class _ReaderScreenState extends State<ReaderScreen> {
     final progress =
         engine!.state.wordIndex / engine!.words.length;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Reader"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.bookmark_add),
-            onPressed: _addBookmark,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          LinearProgressIndicator(value: progress),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: SingleChildScrollView(
-                child: Text(
-                  engine!.currentPageText,
-                  style: TextStyle(
-                    fontSize: settings.fontSize.toDouble(),
-                    height: 1.7,
+    return WillPopScope(
+      onWillPop: () async {
+        await _sync();
+        await _saveStatistics();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Reader"),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.bookmark_add),
+              onPressed: _addBookmark,
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            LinearProgressIndicator(value: progress),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: SingleChildScrollView(
+                  child: Text(
+                    engine!.currentPageText,
+                    style: TextStyle(
+                      fontSize: settings.fontSize.toDouble(),
+                      height: 1.7,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 10,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: _prev,
-                  child: const Text("Prev"),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    final repo = BookRepository();
-                    final book = await repo.getBook(bookId);
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 10,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: _prev,
+                    child: const Text("Prev"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final repo = BookRepository();
+                      final book = await repo.getBook(bookId);
 
-                    if (book != null) {
-                      await repo.updateBook(
-                        book.copyWith(isCompleted: true),
-                      );
-                    }
-                  },
-                  child: const Text("Done"),
-                ),
-                ElevatedButton(
-                  onPressed: _next,
-                  child: const Text("Next"),
-                ),
+                      if (book != null) {
+                        await repo.updateBook(
+                        book.copyWith(
+                          isCompleted: true,
+                          completedAt: DateTime.now(),
+                        )
+                        );
+                      }
+                    },
+                    child: const Text("Done"),
+                  ),
+                  ElevatedButton(
+                    onPressed: _next,
+                    child: const Text("Next"),
+                  ),
 
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

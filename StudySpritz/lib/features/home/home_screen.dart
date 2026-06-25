@@ -5,12 +5,12 @@ import 'package:file_picker/file_picker.dart';
 
 import '../../core/services/hive_service.dart';
 import '../../models/book.dart';
+import '../../models/reading_statistics.dart';
 import '../../repositories/book_repository.dart';
+import '../../repositories/statistics_repository.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  static const double _cardWidth = 160;
 
   @override
   Widget build(BuildContext context) {
@@ -27,145 +27,155 @@ class HomeScreen extends StatelessWidget {
         final favorites = books.where((b) => b.isFavorite).toList();
         final completed = books.where((b) => b.isCompleted).length;
 
-        final recentBookmarks = HiveService.bookmarksBox.values.toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        final recentBookmarks =
+            HiveService.bookmarksBox.values.toList()
+              ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
         return Scaffold(
-          appBar: AppBar(
-            title: const Text("Dashboard"),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () async {
-                  final result = await FilePicker.platform.pickFiles();
-                  if (result == null || result.files.single.path == null) return;
+          appBar: AppBar(title: const Text("Dashboard")),
 
-                  final file = result.files.single;
+          body: FutureBuilder<List<ReadingStatistics>>(
+            future: StatisticsRepository().getAll(),
+            builder: (context, snapshot) {
+              final statsList = snapshot.data ?? [];
 
-                  final repo = BookRepository();
+              final validStats =
+                  statsList.where((s) => s.sessionCount > 0).toList();
 
-                  final book = Book(
-                    bookId: DateTime.now().millisecondsSinceEpoch.toString(),
-                    bookName: file.name,
-                    filePath: file.path!,
-                    fileType: file.extension ?? "txt",
-                    pageCount: 0,
-                    wordCount: 0,
-                    pageNumber: 0,
-                    wordIndex: 0,
-                    isFavorite: false,
-                    isCompleted: false,
-                    addedAt: DateTime.now(),
-                    lastOpenedAt: DateTime.now(),
-                    completedAt: null,
-                  );
+              final totalReadingTime =
+                  validStats.fold<int>(0, (s, e) => s + e.totalReadingTime);
 
-                  await repo.addBook(book);
-                },
-              ),
-            ],
-          ),
+              final totalWords =
+                  validStats.fold<int>(0, (s, e) => s + e.totalWordsRead);
 
-          body: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              _SectionTitle("Son Okunanlar"),
-              const SizedBox(height: 10),
-              if (recent.isEmpty)
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text("Kütüphane boş"),
-                  ),
-                )
-              else
-              _HorizontalBookList(
-                items: recent.take(10).toList(),
-                cardBuilder: (book) => _BookCard(book: book),
-              ),
+              final totalPages =
+                  validStats.fold<int>(0, (s, e) => s + e.totalPagesRead);
 
-              const SizedBox(height: 24),
+              final avgWpm = validStats.isEmpty
+                  ? 0.0
+                  : validStats.fold<double>(0.0, (s, e) => s + e.averageWpm) /
+                      validStats.length;
 
-              _SectionTitle("Favoriler"),
-              const SizedBox(height: 10),
-              if (favorites.isEmpty)
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text("Henüz favoride kitap yok"),
-                  ),
-                )
-              else
-              _HorizontalBookList(
-                items: favorites,
-                cardBuilder: (book) => _BookCard(book: book),
-              ),
+              final peakWpm = statsList.isEmpty
+                  ? 0.0
+                  : statsList
+                      .map((e) => e.peakWpm)
+                      .reduce((a, b) => a > b ? a : b);
 
-              const SizedBox(height: 24),
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
 
-              _SectionTitle("Tüm Kitaplar"),
-              const SizedBox(height: 10),
-              if (books.isEmpty)
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text("Kütüphane boş"),
-                  ),
-                )
-              else
-              _HorizontalBookList(
-                items: books,
-                cardBuilder: (book) => _BookCard(book: book),
-              ),
+                  _SectionTitle("Son Okunanlar"),
+                  const SizedBox(height: 10),
 
-              const SizedBox(height: 24),
-
-              _SectionTitle("Son Yer İmleri"),
-              const SizedBox(height: 10),
-
-              if (recentBookmarks.isEmpty)
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text("Henüz yer imi yok"),
-                  ),
-                )
-              else
-                _HorizontalBookmarkList(
-                  items: recentBookmarks.take(10).toList(),
-                ),
-
-              const SizedBox(height: 24),
-
-              _SectionTitle("İstatistiklerim"),
-              const SizedBox(height: 10),
-
-              SizedBox(
-                height: 110,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _StatItem(
-                      value: books.length.toString(),
-                      label: "Toplam Kitap",
+                  if (recent.isEmpty)
+                    const _EmptyCard("Kütüphane boş")
+                  else
+                    _HorizontalBookList(
+                      items: recent.take(10).toList(),
+                      cardBuilder: (book) => _BookCard(book: book),
                     ),
-                    const SizedBox(width: 12),
-                    _StatItem(
-                      value: favorites.length.toString(),
-                      label: "Favori",
+
+                  const SizedBox(height: 24),
+
+                  _SectionTitle("Favoriler"),
+                  const SizedBox(height: 10),
+
+                  if (favorites.isEmpty)
+                    const _EmptyCard("Henüz favori yok")
+                  else
+                    _HorizontalBookList(
+                      items: favorites,
+                      cardBuilder: (book) => _BookCard(book: book),
                     ),
-                    const SizedBox(width: 12),
-                    _StatItem(
-                      value: completed.toString(),
-                      label: "Tamamlanan",
+
+                  const SizedBox(height: 24),
+
+                  _SectionTitle("Tüm Kitaplar"),
+                  const SizedBox(height: 10),
+
+                  if (books.isEmpty)
+                    const _EmptyCard("Kütüphane boş")
+                  else
+                    _HorizontalBookList(
+                      items: books,
+                      cardBuilder: (book) => _BookCard(book: book),
                     ),
-                  ],
-                ),
-              ),
-            ],
+
+                  const SizedBox(height: 24),
+
+                  _SectionTitle("İstatistikler"),
+
+                  const SizedBox(height: 10),
+
+                  SizedBox(
+                    height: 120,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        _StatItem(value: books.length.toString(), label: "Kitap"),
+                        const SizedBox(width: 12),
+                        _StatItem(value: favorites.length.toString(), label: "Favori"),
+                        const SizedBox(width: 12),
+                        _StatItem(value: completed.toString(), label: "Tamamlanan"),
+                        const SizedBox(width: 12),
+                        _StatItem(value: validStats.length.toString(), label: "Oturum"),
+                        const SizedBox(width: 12),
+                        _StatItem(value: totalReadingTime.toString(), label: "Süre"),
+                        const SizedBox(width: 12),
+                        _StatItem(value: totalWords.toString(), label: "Kelime"),
+                        const SizedBox(width: 12),
+                        _StatItem(value: totalPages.toString(), label: "Sayfa"),
+                        const SizedBox(width: 12),
+                        _StatItem(
+                          value: avgWpm.toStringAsFixed(1),
+                          label: "Avg WPM",
+                        ),
+                        const SizedBox(width: 12),
+                        _StatItem(
+                          value: peakWpm.toStringAsFixed(1),
+                          label: "Peak WPM",
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         );
       },
+    );
+  }
+}
+
+/* ================= UI COMPONENTS ================= */
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+    );
+  }
+}
+
+class _EmptyCard extends StatelessWidget {
+  final String text;
+  const _EmptyCard(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(text),
+      ),
     );
   }
 }
@@ -189,75 +199,11 @@ class _HorizontalBookList extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           return SizedBox(
-            width: HomeScreen._cardWidth,
+            width: 160,
             child: cardBuilder(items[index]),
           );
         },
       ),
-    );
-  }
-}
-
-class _HorizontalBookmarkList extends StatelessWidget {
-  final List<dynamic> items;
-
-  const _HorizontalBookmarkList({
-    required this.items,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 120,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          final bookmark = items[index];
-
-          return SizedBox(
-            width: 180,
-            child: Card(
-              child: ListTile(
-                contentPadding: const EdgeInsets.all(8),
-                leading: const Icon(Icons.bookmark),
-                title: Text(
-                  bookmark.markNote.isEmpty
-                      ? "Page ${bookmark.pageNumber}"
-                      : bookmark.markNote,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                subtitle: Text("Page ${bookmark.pageNumber}"),
-                onTap: () {
-                  context.push(
-                    '/reader',
-                    extra: {
-                      "bookId": bookmark.bookId,
-                      "wordIndex": bookmark.wordIndex,
-                      "pageIndex": bookmark.pageNumber,
-                    },
-                  );
-                },
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  final String text;
-  const _SectionTitle(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
     );
   }
 }
@@ -276,56 +222,25 @@ class _BookCard extends StatelessWidget {
     return Card(
       child: InkWell(
         onTap: () {
-          context.push(
-            '/reader',
-            extra: {
-              "bookId": book.bookId,
-              "wordIndex": book.wordIndex,
-              "pageIndex": book.pageNumber,
-            },
-          );
-        },
-        onLongPress: () async {
-          final shouldDelete = await showDialog<bool>(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text("Delete Book"),
-                content: Text("Delete '${book.bookName}' ?"),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text("Cancel"),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: const Text("Delete"),
-                  ),
-                ],
-              );
-            },
-          );
-
-          if (shouldDelete != true) return;
-
-          await BookRepository().deleteBook(book.bookId);
+          context.push('/reader', extra: {
+            "bookId": book.bookId,
+            "wordIndex": book.wordIndex,
+            "pageIndex": book.pageNumber,
+          });
         },
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.menu_book, size: 36),
+              const Icon(Icons.menu_book),
               const SizedBox(height: 8),
-              Text(
-                book.bookName,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+              Text(book.bookName,
+                  maxLines: 2, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 8),
               LinearProgressIndicator(value: progress),
               const SizedBox(height: 6),
-              Text("${(progress * 100).toStringAsFixed(1)}%"),
+              Text("%${(progress * 100).toStringAsFixed(1)}"),
             ],
           ),
         ),
@@ -349,8 +264,8 @@ class _StatItem extends StatelessWidget {
       width: 110,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
         color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -358,7 +273,7 @@ class _StatItem extends StatelessWidget {
           Text(
             value,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
