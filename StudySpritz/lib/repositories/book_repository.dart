@@ -21,9 +21,7 @@ class BookRepository {
         .toList();
 
     for (final bookmark in relatedBookmarks) {
-      await HiveService.bookmarksBox.delete(
-        bookmark.markId,
-      );
+      await HiveService.bookmarksBox.delete(bookmark.markId);
     }
 
     await _box.delete(bookId);
@@ -37,11 +35,14 @@ class BookRepository {
     return _box.values.toList();
   }
 
-  Future<void> updateProgress(
-    String bookId,
-    int wordIndex,
-    int pageIndex,
-  ) async {
+  /// ==============================
+  /// OTOMATİK OKUMA PROGRES KAYDI
+  /// ==============================
+  Future<void> saveReadingSession({
+    required String bookId,
+    required int wordIndex,
+    required int pageIndex,
+  }) async {
     final book = _box.get(bookId);
     if (book == null) return;
 
@@ -54,17 +55,21 @@ class BookRepository {
     await _box.put(bookId, updated);
   }
 
-  Future<void> saveReadingSession({
-    required String bookId,
-    required int wordIndex,
-    required int pageIndex,
-  }) async {
+  /// ==============================
+  /// DEVAM ETME SENARYOSU
+  /// ==============================
+  Future<int> getLastWordIndex(String bookId) async {
+    final book = _box.get(bookId);
+    return book?.wordIndex ?? 0;
+  }
+
+  Future<void> resetProgress(String bookId) async {
     final book = _box.get(bookId);
     if (book == null) return;
 
     final updated = book.copyWith(
-      wordIndex: wordIndex,
-      pageNumber: pageIndex,
+      wordIndex: 0,
+      pageNumber: 0,
       lastOpenedAt: DateTime.now(),
     );
 
