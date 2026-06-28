@@ -26,21 +26,26 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
   Timer? timer;
   bool isPlaying = false;
 
+  int wpm = 200;
+
   @override
   void initState() {
     super.initState();
     _loadBook();
+    _loadWpm();
+  }
+
+  void _loadWpm() {
+    final settings = context.read<SettingsState>().settings;
+    wpm = settings?.wpmSpeed ?? 200;
   }
 
   void _start() {
     if (words.isEmpty) return;
 
-    final settings = context.read<SettingsState>().settings;
-    final wpm = settings?.wpmSpeed ?? 200;
+    timer?.cancel();
 
     final intervalMs = (60000 / wpm).round();
-
-    timer?.cancel();
 
     timer = Timer.periodic(
       Duration(milliseconds: intervalMs),
@@ -72,6 +77,26 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
     });
   }
 
+  void _increaseWpm() {
+    setState(() {
+      wpm += 10;
+    });
+
+    if (isPlaying) {
+      _start();
+    }
+  }
+
+  void _decreaseWpm() {
+    setState(() {
+      if (wpm > 20) wpm -= 10;
+    });
+
+    if (isPlaying) {
+      _start();
+    }
+  }
+
   Future<void> _loadBook() async {
     final file = File(widget.book.filePath);
 
@@ -86,7 +111,6 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
     }
 
     final parser = ParserFactory.getParser(widget.book.filePath);
-
     final text = await parser.extract(widget.book.filePath);
 
     words = text.split(RegExp(r'\s+'));
@@ -104,10 +128,11 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final word =
-      (words.isEmpty || index >= words.length)
-          ? "-"
-          : words[index];
+    final safeIndex = index.clamp(0, words.isEmpty ? 0 : words.length - 1);
+    final word = words.isEmpty ? "-" : words[safeIndex];
+
+    final progress = words.isEmpty ? 0.0 : index / words.length;
+    final remaining = words.isEmpty ? 0 : (words.length - index);
 
     return Scaffold(
       appBar: AppBar(
@@ -117,6 +142,16 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          LinearProgressIndicator(value: progress),
+
+          const SizedBox(height: 10),
+
+          Text(
+            "%${(progress * 100).toStringAsFixed(1)}",
+          ),
+
+          const SizedBox(height: 30),
+
           Center(
             child: Text(
               word,
@@ -127,11 +162,27 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
             ),
           ),
 
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
+
+          Text("Kalan kelime: $remaining"),
+
+          const SizedBox(height: 20),
+
+          Text(
+            "WPM: $wpm",
+            style: const TextStyle(fontSize: 18),
+          ),
+
+          const SizedBox(height: 30),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              IconButton(
+                icon: const Icon(Icons.remove),
+                onPressed: _decreaseWpm,
+              ),
+
               IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: _reset,
@@ -144,13 +195,12 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
                 ),
                 onPressed: isPlaying ? _pause : _start,
               ),
+
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: _increaseWpm,
+              ),
             ],
-          ),
-
-          const SizedBox(height: 20),
-
-          Text(
-            "${index + 1} / ${words.length}",
           ),
         ],
       ),
