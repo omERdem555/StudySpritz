@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../settings/settings_screen.dart';
+import 'reader_fast_screen.dart';
+
 import '../../core/reading_engine/reader_engine.dart';
 import '../../core/parsers/parser_factory.dart';
 import '../../repositories/book_repository.dart';
@@ -8,6 +11,7 @@ import '../../core/state/settings_state.dart';
 
 import '../../models/app_settings.dart';
 import '../../models/bookmark.dart';
+import '../../models/book.dart';
 import '../../repositories/bookmark_repository.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
@@ -27,6 +31,7 @@ class ReaderScreen extends StatefulWidget {
 
 class _ReaderScreenState extends State<ReaderScreen> {
   ReaderEngine? engine;
+  Book? loadedBook;
   bool loading = true;
 
   DateTime? sessionStartedAt;
@@ -98,6 +103,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
       wordsPerPage: 200,
       wpm: settings.wpmSpeed, // SADECE RENDER SPEED
     );
+
+    loadedBook = book;
 
     if (startWord != null) {
       engine!.jumpTo(startWord);
@@ -321,12 +328,33 @@ class _ReaderScreenState extends State<ReaderScreen> {
                 vertical: 10,
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+
+                  IconButton(
+                    icon: const Icon(
+                      Icons.flash_on,
+                      size: 32,
+                    ),
+                    onPressed: () {
+                      if (loadedBook == null) return;
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ReaderFastScreen(
+                            book: loadedBook!,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
                   ElevatedButton(
                     onPressed: _prev,
                     child: const Text("Prev"),
                   ),
+
                   ElevatedButton(
                     onPressed: () async {
                       final repo = BookRepository();
@@ -334,22 +362,37 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
                       if (book != null) {
                         await repo.updateBook(
-                        book.copyWith(
-                          isCompleted: true,
-                          completedAt: DateTime.now(),
-                        )
+                          book.copyWith(
+                            isCompleted: true,
+                            completedAt: DateTime.now(),
+                          ),
                         );
                       }
                     },
                     child: const Text("Done"),
                   ),
+
                   ElevatedButton(
                     onPressed: _next,
                     child: const Text("Next"),
                   ),
 
+                  IconButton(
+                    icon: const Icon(
+                      Icons.settings,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
                 ],
-              ),
+              )
             ),
           ],
         ),
