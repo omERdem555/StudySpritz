@@ -1,19 +1,21 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../core/state/settings_state.dart';
-import '../../core/parsers/parser_factory.dart';
-import '../../models/book.dart';
-import '../../repositories/book_repository.dart';
+import '../../../core/state/settings_state.dart';
+import '../../../core/reading_engine/pagination_engine.dart';
+import '../../../models/book.dart';
+import '../../../repositories/book_repository.dart';
 
 class ReaderFastScreen extends StatefulWidget {
   final Book book;
+  final List<String> words;
+  final int initialWordIndex;
 
   const ReaderFastScreen({
     super.key,
     required this.book,
+    required this.words,
+    required this.initialWordIndex,
   });
 
   @override
@@ -21,13 +23,11 @@ class ReaderFastScreen extends StatefulWidget {
 }
 
 class _ReaderFastScreenState extends State<ReaderFastScreen> {
-  List<String> words = [];
   int index = 0;
-
   Timer? timer;
   bool isPlaying = false;
-
   int wpm = 200;
+  int fontSize = 16;
 
   late final BookRepository _repo;
 
@@ -35,68 +35,35 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
   void initState() {
     super.initState();
     _repo = BookRepository();
-    _loadBook();
+    index = widget.initialWordIndex.clamp(0, widget.words.isEmpty ? 0 : widget.words.length - 1);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     final settings = context.watch<SettingsState>().settings;
     if (settings != null) {
       wpm = settings.wpmSpeed;
+      fontSize = settings.fontSize;
     }
   }
 
-  // =========================
-  // OTURUM RESTORE
-  // =========================
-  Future<void> _loadBook() async {
-    final file = File(widget.book.filePath);
-
-    if (!await file.exists()) {
-      if (!mounted) return;
-
-      setState(() => words = []);
-      return;
-    }
-
-    final parser = ParserFactory.getParser(widget.book.filePath);
-    // Web ve Native uyumlu, isimlendirilmiş parametre kullanımı
-    final text = await parser.extract(
-      path: widget.book.filePath,
-      bytes: widget.book.bytes,
-    );
-
-    words = text.split(RegExp(r'\s+'));
-
-    final lastIndex = await _repo.getLastWordIndex(widget.book.bookId);
-
-    if (mounted) {
-      setState(() {
-        index = lastIndex.clamp(0, words.length - 1);
-      });
-    }
-  }
-
-  // =========================
-  // AUTO SAVE CORE
-  // =========================
   Future<void> _autoSave() async {
-    if (words.isEmpty) return;
+    if (widget.words.isEmpty) return;
+
+    // Gerçek dinamik sayfa indeksini hesapla (Düz mantık index eşitlemesi istatistikleri bozuyordu)
+    final calculatedPage = PaginationEngine.getPageIndexForWord(widget.words, index, fontSize);
 
     await _repo.saveReadingSession(
       bookId: widget.book.bookId,
       wordIndex: index,
-      pageIndex: index, // fast mode = word-based page
+      pageIndex: calculatedPage,
     );
   }
 
   void _start() {
-    if (words.isEmpty) return;
-
+    if (widget.words.isEmpty) return;
     timer?.cancel();
-
     _scheduleTick();
     setState(() => isPlaying = true);
   }
@@ -107,7 +74,7 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
     timer = Timer.periodic(
       Duration(milliseconds: intervalMs),
       (_) async {
-        if (index >= words.length - 1) {
+        if (index >= widget.words.length - 1) {
           await _autoSave();
           _pause();
           return;
@@ -115,46 +82,41 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
 
         setState(() => index++);
 
-        // auto persist
-        if (index % 5 == 0) {
+        if (index % 10 == 0) {
           _autoSave();
         }
 
-        _applyOrpDelay(words[index]);
+        _applyOrpDelay(widget.words[index]);
       },
     );
   }
 
   void _applyOrpDelay(String word) {
-    if (word.endsWith('.') ||
-        word.endsWith('!') ||
-        word.endsWith('?')) {
+    if (word.endsWith('.') || word.endsWith('!') || word.endsWith('?')) {
       _pause();
-      Future.delayed(const Duration(milliseconds: 120), _start);
+      Future.delayed(const Duration(milliseconds: 150), () {
+        if (mounted && isPlaying == false) _start();
+      });
     }
   }
 
   void _pause() {
     timer?.cancel();
     setState(() => isPlaying = false);
-
     _autoSave();
   }
 
   void _reset() async {
     timer?.cancel();
-
     setState(() {
       index = 0;
       isPlaying = false;
     });
-
     await _repo.resetProgress(widget.book.bookId);
   }
 
   void _increaseWpm() {
-    setState(() => wpm += 10);
-
+    setState(() => wpm += 25); // Daha hissedilir hız artışı
     if (isPlaying) {
       _pause();
       _start();
@@ -163,9 +125,8 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
 
   void _decreaseWpm() {
     setState(() {
-      if (wpm > 20) wpm -= 10;
+      if (wpm > 50) wpm -= 25;
     });
-
     if (isPlaying) {
       _pause();
       _start();
@@ -175,75 +136,103 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
   @override
   void dispose() {
     timer?.cancel();
-    _autoSave();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final safeIndex =
-        index.clamp(0, words.isEmpty ? 0 : words.length - 1);
+    final safeIndex = index.clamp(0, widget.words.isEmpty ? 0 : widget.words.length - 1);
+    final word = widget.words.isEmpty ? "-" : widget.words[safeIndex];
+    final progress = widget.words.isEmpty ? 0.0 : index / widget.words.length;
+    final remaining = widget.words.isEmpty ? 0 : (widget.words.length - index);
 
-    final word = words.isEmpty ? "-" : words[safeIndex];
-
-    final progress = words.isEmpty ? 0.0 : index / words.length;
-    final remaining = words.isEmpty ? 0 : (words.length - index);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Fast Reader"),
-      ),
-
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          LinearProgressIndicator(value: progress),
-
-          const SizedBox(height: 8),
-
-          Text("%${(progress * 100).toStringAsFixed(1)}"),
-          Text("Kalan: $remaining"),
-          Text("WPM: $wpm"),
-
-          const SizedBox(height: 40),
-
-          Expanded(
-            child: Center(
-              child: Text(
-                word,
-                style: const TextStyle(
-                  fontSize: 42,
-                  fontWeight: FontWeight.bold,
+    return WillPopScope(
+      onWillPop: () async {
+        timer?.cancel();
+        await _autoSave();
+        // Geri çıkarken Klasik Okuma ekranına güncel kelime indeksini teslim et
+        Navigator.pop(context, index);
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("RSVP Hızlı Okuma"),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () async {
+              timer?.cancel();
+              await _autoSave();
+              if (mounted) Navigator.pop(context, index);
+            },
+          ),
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            LinearProgressIndicator(value: progress),
+            const SizedBox(height: 12),
+            Text(
+              "%${(progress * 100).toStringAsFixed(1)} tamamlandı",
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 4),
+            Text("Kalan Kelime: $remaining  |  WPM: $wpm", style: TextStyle(color: Colors.grey[600])),
+            Expanded(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    word,
+                    style: TextStyle(
+                      fontSize: (fontSize + 20).toDouble(), // RSVP için optimize büyük font
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.remove),
-                onPressed: _decreaseWpm,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 40),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove_circle_outline, size: 32),
+                    onPressed: _decreaseWpm,
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: const Icon(Icons.refresh, size: 32),
+                    onPressed: _reset,
+                  ),
+                  const SizedBox(width: 16),
+                  GestureDetector(
+                    onTap: isPlaying ? _pause : _start,
+                    child: CircleAvatar(
+                      radius: 36,
+                      backgroundColor: Theme.of(context).primaryColor,
+                      child: Icon(
+                        isPlaying ? Icons.pause : Icons.play_arrow,
+                        size: 42,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline, size: 32),
+                    onPressed: _increaseWpm,
+                  ),
+                ],
               ),
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: _reset,
-              ),
-              IconButton(
-                icon: Icon(
-                  isPlaying ? Icons.pause : Icons.play_arrow,
-                  size: 40,
-                ),
-                onPressed: isPlaying ? _pause : _start,
-              ),
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: _increaseWpm,
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

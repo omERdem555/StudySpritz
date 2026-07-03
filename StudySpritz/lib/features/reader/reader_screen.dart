@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+import 'dart:io';
 
 import '../settings/settings_screen.dart';
 import 'reader_fast_screen.dart';
-
-import '../../core/reading_engine/reader_engine.dart';
-import '../../core/parsers/parser_factory.dart';
-import '../../repositories/book_repository.dart';
-import '../../repositories/statistics_repository.dart'; 
-import '../../core/state/settings_state.dart';
-
-import '../../models/app_settings.dart';
-import '../../models/bookmark.dart';
-import '../../models/book.dart';
-import '../../repositories/bookmark_repository.dart';
-import 'package:uuid/uuid.dart';
-import 'dart:io';
-import 'package:provider/provider.dart';
+import '../../../core/reading_engine/reader_engine.dart';
+import '../../../core/parsers/parser_factory.dart';
+import '../../../repositories/book_repository.dart';
+import '../../../repositories/statistics_repository.dart'; 
+import '../../../core/state/settings_state.dart';
+import '../../../models/app_settings.dart';
+import '../../../models/bookmark.dart';
+import '../../../models/book.dart';
+import '../../../repositories/bookmark_repository.dart';
 
 class ReaderScreen extends StatefulWidget {
   final dynamic extra;
@@ -33,17 +31,13 @@ class _ReaderScreenState extends State<ReaderScreen> {
   ReaderEngine? engine;
   Book? loadedBook;
   bool loading = true;
-
   DateTime? sessionStartedAt;
 
   int startWordIndex = 0;
   int startPageIndex = 0;
-
   late AppSettings settings;
 
-  String get bookId =>
-      widget.extra["bookId"] as String;
-
+  String get bookId => widget.extra["bookId"] as String;
 
   @override
   void initState() {
@@ -53,12 +47,9 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
   Future<void> _loadBook() async {
     final repo = BookRepository();
-
     final startWord = widget.extra["wordIndex"] as int?;
-    final startPage = widget.extra["pageIndex"] as int?;
 
     final book = await repo.getBook(bookId);
-
     if (book == null) {
       setState(() => loading = false);
       return;
@@ -66,28 +57,15 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
     await repo.markAsOpened(book.bookId);
     
-    final file = File(book.filePath);
-
-    if (!await file.exists()) {
-      if (!mounted) return;
-
-      await showDialog(
-        context: context,
-        builder: (_) {
-          return const AlertDialog(
-            title: Text("File Not Found"),
-            content: Text(
-              "The original file cannot be found on this device.",
-            ),
-          );
-        },
-      );
-
-      if (!mounted) return;
-
-      Navigator.pop(context);
-
-      return;
+    // Web platformu desteği için byte denetimi ekledik (Daha önce çöküyordu)
+    if (book.bytes == null || book.bytes!.isEmpty) {
+      final file = File(book.filePath);
+      if (!await file.exists()) {
+        if (!mounted) return;
+        await _showFileNotFoundDialog();
+        if (mounted) Navigator.pop(context);
+        return;
+      }
     }
 
     final parser = ParserFactory.getParser(book.filePath);
@@ -96,42 +74,39 @@ class _ReaderScreenState extends State<ReaderScreen> {
       bytes: book.bytes,
     );
 
-    final words = text.split(RegExp(r'\s+'));
-
+    final words = text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
     settings = context.read<SettingsState>().settings ?? AppSettings.defaults();
 
-
+    // Motoru yazı boyutuna duyarlı dinamik parametrelerle kuruyoruz
     engine = ReaderEngine(
       words: words,
-      wordsPerPage: 200,
-      wpm: settings.wpmSpeed, // SADECE RENDER SPEED
+      fontSize: settings.fontSize,
+      initialWordIndex: startWord ?? book.wordIndex,
     );
 
     loadedBook = book;
-
-    if (startWord != null) {
-      engine!.jumpTo(startWord);
-    } else {
-      engine!.jumpTo(book.wordIndex);
-    }
-
-  startWordIndex = engine!.state.wordIndex;
-  startPageIndex = engine!.state.pageIndex;
-
-  sessionStartedAt = DateTime.now();
+    startWordIndex = engine!.state.wordIndex;
+    startPageIndex = engine!.state.pageIndex;
+    sessionStartedAt = DateTime.now();
 
     setState(() => loading = false);
   }
 
+  Future<void> _showFileNotFoundDialog() {
+    return showDialog(
+      context: context,
+      builder: (_) => const AlertDialog(
+        title: Text("Dosya Bulunamadı"),
+        content: Text("Orijinal kitap dosyası bu cihazda mevcut değil."),
+      ),
+    );
+  }
+
   Future<void> _sync() async {
     if (engine == null) return;
-
     final repo = BookRepository();
-
     final currentWord = engine!.state.wordIndex;
-
-    final isFinished =
-        engine!.state.wordIndex >= engine!.words.length - 1;
+    final isFinished = currentWord >= engine!.words.length - 1;
 
     await repo.saveReadingSession(
       bookId: bookId,
@@ -139,11 +114,10 @@ class _ReaderScreenState extends State<ReaderScreen> {
       pageIndex: engine!.state.pageIndex,
     );
 
-    if (isFinished) {
-      final book = await repo.getBook(bookId);
-      if (book != null && !book.isCompleted) {
+    if (isFinished && loadedBook != null) {
+      if (!loadedBook!.isCompleted) {
         await repo.updateBook(
-          book.copyWith(
+          loadedBook!.copyWith(
             isCompleted: true,
             completedAt: DateTime.now(),
           )
@@ -152,75 +126,47 @@ class _ReaderScreenState extends State<ReaderScreen> {
     }
   }
 
-  Future<void> _next() async {
+  void _next() {
     if (engine == null) return;
-
     setState(() {
-      engine!.jumpTo(
-        engine!.state.wordIndex + engine!.wordsPerPage,
-      );
+      engine!.nextPage();
     });
-
-    await Future.delayed(
-      Duration(milliseconds: 250 ~/ settings.animationSpeed,)
-    );
-
-    await _sync();
+    _sync();
   }
 
-  Future<void> _prev() async {
+  void _prev() {
     if (engine == null) return;
-
-
     setState(() {
-      engine!.jumpTo(
-        engine!.state.wordIndex - engine!.wordsPerPage,
-      );
+      engine!.previousPage();
     });
-
-    await Future.delayed(
-      Duration(milliseconds: 250 ~/ settings.animationSpeed,)
-    );
-
-    await _sync();
+    _sync();
   }
 
   Future<void> _addBookmark() async {
     if (engine == null) return;
-
     final noteController = TextEditingController();
 
     final result = await showDialog<String>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Add Bookmark"),
-          content: TextField(
-            controller: noteController,
-            decoration: const InputDecoration(
-              hintText: "Optional note...",
-            ),
+      builder: (context) => AlertDialog(
+        title: const Text("Yer İmi Ekle"),
+        content: TextField(
+          controller: noteController,
+          decoration: const InputDecoration(hintText: "İsteğe bağlı not..."),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("İptal")),
+          TextButton(
+            onPressed: () => Navigator.pop(context, noteController.text),
+            child: const Text("Kaydet"),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, noteController.text);
-              },
-              child: const Text("Save"),
-            ),
-          ],
-        );
-      },
+        ],
+      ),
     );
 
     if (result == null) return;
 
     final repo = BookmarkRepository();
-
     final bookmark = Bookmark(
       markId: const Uuid().v4(),
       bookId: bookId,
@@ -231,66 +177,54 @@ class _ReaderScreenState extends State<ReaderScreen> {
     );
 
     await repo.addBookmark(bookmark);
+    if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Yer imi kaydedildi")));
   }
 
   Future<void> _saveStatistics() async {
-    if (engine == null) return;
-    if (sessionStartedAt == null) return;
+    if (engine == null || sessionStartedAt == null) return;
 
-    final durationSeconds =
-        DateTime.now()
-            .difference(sessionStartedAt!)
-            .inSeconds;
+    final durationSeconds = DateTime.now().difference(sessionStartedAt!).inSeconds;
+    final wordsRead = (engine!.state.wordIndex - startWordIndex).abs();
+    final pagesRead = (engine!.state.pageIndex - startPageIndex).abs();
 
-    final wordsRead =
-        (engine!.state.wordIndex -
-                startWordIndex)
-            .abs();
+    if (durationSeconds < 5) return; // Kısa giriş çıkışları yoksay
 
-    final pagesRead =
-        (engine!.state.pageIndex -
-                startPageIndex)
-            .abs();
-
-    if (durationSeconds < 10) return;
-
-    final repository =
-        StatisticsRepository();
-
+    final repository = StatisticsRepository();
     await repository.updateSession(
       bookId: bookId,
       sessionDurationSeconds: durationSeconds,
-      wordsRead: wordsRead < 0 ? 0 : wordsRead,
-      pagesRead: pagesRead < 0 ? 0 : pagesRead,
+      wordsRead: wordsRead,
+      pagesRead: pagesRead,
     );
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _sync();
-      await _saveStatistics();
-    });
-
+    _sync();
+    _saveStatistics();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (engine == null) {
-      return const Scaffold(
-        body: Center(child: Text("Book not found")),
-      );
+      return const Scaffold(body: Center(child: Text("Kitap yüklenemedi.")));
     }
 
-    final progress =
-        engine!.state.wordIndex / engine!.words.length;
+    // Kullanıcı ayarlardan fontu değiştirirse arayüzün dinamik olarak yeniden sayfa hesaplamasını sağlıyoruz
+    final currentSettings = context.watch<SettingsState>().settings ?? AppSettings.defaults();
+    if (currentSettings.fontSize != engine!.fontSize) {
+      final lastWord = engine!.state.wordIndex;
+      engine = ReaderEngine(
+        words: engine!.words,
+        fontSize: currentSettings.fontSize,
+        initialWordIndex: lastWord,
+      );
+    }
 
     return WillPopScope(
       onWillPop: () async {
@@ -300,102 +234,92 @@ class _ReaderScreenState extends State<ReaderScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Reader"),
+          title: Text(loadedBook?.bookName ?? "Okuyucu"),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.bookmark_add),
-              onPressed: _addBookmark,
-            ),
+            IconButton(icon: const Icon(Icons.bookmark_add), onPressed: _addBookmark),
           ],
         ),
         body: Column(
           children: [
-            LinearProgressIndicator(value: progress),
+            LinearProgressIndicator(value: engine!.progress),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                key: ValueKey(engine!.state.pageIndex), // Sayfa değiştiğinde scroll'u yukarı taşımak için unique key
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 child: SingleChildScrollView(
                   child: Text(
                     engine!.currentPageText,
                     style: TextStyle(
-                      fontSize: settings.fontSize.toDouble(),
+                      fontSize: currentSettings.fontSize.toDouble(),
                       height: 1.7,
+                      letterSpacing: 0.3,
                     ),
                   ),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 10,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-
-                  IconButton(
-                    icon: const Icon(
-                      Icons.flash_on,
-                      size: 32,
-                    ),
-                    onPressed: () {
-                      if (loadedBook == null) return;
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ReaderFastScreen(
-                            book: loadedBook!,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-
-                  ElevatedButton(
-                    onPressed: _prev,
-                    child: const Text("Prev"),
-                  ),
-
-                  ElevatedButton(
-                    onPressed: () async {
-                      final repo = BookRepository();
-                      final book = await repo.getBook(bookId);
-
-                      if (book != null) {
-                        await repo.updateBook(
-                          book.copyWith(
-                            isCompleted: true,
-                            completedAt: DateTime.now(),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.flash_on, size: 32, color: Colors.amber),
+                      onPressed: () async {
+                        if (loadedBook == null) return;
+                        
+                        // RSVP ekranına canlı kelime indeksini vererek geçiyoruz
+                        final updatedWordIndex = await Navigator.push<int>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ReaderFastScreen(
+                              book: loadedBook!,
+                              words: engine!.words,
+                              initialWordIndex: engine!.state.wordIndex,
+                            ),
                           ),
                         );
-                      }
-                    },
-                    child: const Text("Done"),
-                  ),
 
-                  ElevatedButton(
-                    onPressed: _next,
-                    child: const Text("Next"),
-                  ),
-
-                  IconButton(
-                    icon: const Icon(
-                      Icons.settings,
-                      size: 30,
+                        // RSVP'den dönen canlı kelime indeksiyle klasik okumayı anında eşle
+                        if (updatedWordIndex != null && mounted) {
+                          setState(() {
+                            engine!.jumpToWord(updatedWordIndex);
+                          });
+                        }
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const SettingsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              )
+                    ElevatedButton.icon(
+                      onPressed: _prev,
+                      icon: const Icon(Icons.arrow_back_ios, size: 16),
+                      label: const Text("Önceki"),
+                    ),
+                    Text(
+                      "${engine!.state.pageIndex + 1} / ${engine!.pages.length}",
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    ElevatedButton(
+                      onPressed: _next,
+                      child: Row(
+                        children: const [
+                          Text("Sonraki"),
+                          SizedBox(width: 4),
+                          Icon(Icons.arrow_forward_ios, size: 16),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.settings, size: 30),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
