@@ -1,0 +1,441 @@
+STUDYSPRITZ ROADMAP (MASTER PLAN)
+
+Projenin Amacı
+
+StudySpritz; PDF, TXT, EPUB gibi metin tabanlı kitapları okuyabilen, okuma hızını artırmayı hedefleyen ve klasik okuma ile RSVP (Rapid Serial Visual Presentation) yöntemini aynı uygulama içinde sunan, ilerleme takibi yapan, istatistik üreten ve çok platformlu çalışan bir Flutter uygulamasıdır.
+
+Desteklenen Platformlar
+
+- Android
+- iOS
+- Windows
+- Linux
+- macOS
+- Web
+
+Tek kod tabanından tüm platformlar desteklenecektir.
+
+==================================================
+ANA HEDEFLER
+==================================================
+
+1. Dijital Kütüphane
+
+Kullanıcı;
+
+- kitap ekleyebilir
+- kitap silebilir
+- favorilere ekleyebilir
+- kitapları listeleyebilir
+- kitap geçmişini görebilir
+
+--------------------------------------------------
+
+2. Normal Okuma
+
+Sayfa bazlı klasik okuma.
+
+Özellikler;
+
+- devam et
+- kaldığı sayfaya git
+- kaldığı kelimeye git
+- sayfa ilerlet
+- sayfa geri al
+- otomatik kayıt
+
+--------------------------------------------------
+
+3. RSVP Okuma
+
+Tek kelime gösterimli hızlı okuma.
+
+Özellikler;
+
+- WPM ayarı
+- pause
+- resume
+- ileri
+- geri
+- anchor kaydı
+- normal okumaya geri dönebilme
+
+--------------------------------------------------
+
+4. Bookmark Sistemi
+
+Kullanıcı;
+
+- bookmark ekleyebilir
+- not ekleyebilir
+- bookmark silebilir
+- bookmark listesi görebilir
+
+--------------------------------------------------
+
+5. İstatistik Sistemi
+
+Takip edilecek veriler;
+
+- toplam okuma süresi
+- toplam okunan kitap
+- toplam kelime
+- toplam sayfa
+- günlük kullanım
+- peak WPM
+- average WPM
+- oturum sayısı
+
+--------------------------------------------------
+
+6. Ayarlar
+
+Kullanıcı;
+
+- tema
+- font
+- font büyüklüğü
+- satır aralığı
+- animasyon
+- varsayılan WPM
+- varsayılan okuma modu
+
+ayarlarını değiştirebilir.
+
+--------------------------------------------------
+
+7. Çok Platform Desteği
+
+Platformlara özel dosya erişimleri.
+
+- Windows
+- Android
+- iOS
+- Linux
+- macOS
+- Web
+
+Ortak mimari ile çalışacaktır.
+
+==================================================
+MİMARİ
+==================================================
+
+Models
+
+- Book
+- Bookmark
+- ReadingStatistics
+- AppSettings
+
+Repository
+
+- BookRepository
+- BookmarkRepository
+- StatisticsRepository
+
+Services
+
+- HiveService
+- BookCreationService
+- SearchService
+
+Reading Engine
+
+- ReaderEngine
+- ReaderState
+- PaginationEngine
+
+Parser
+
+- TXT
+- PDF
+- EPUB
+
+Factory Pattern kullanılacaktır.
+
+==================================================
+GELİŞTİRME FAZLARI
+==================================================
+
+FAZ 1 - Proje Altyapısı
+
+Durum
+
+%100
+
+Tamamlanan
+
+- Flutter kurulumu
+- klasör yapısı
+- Router
+- Theme
+- Hive kurulumu
+- Provider kurulumu
+
+--------------------------------------------------
+
+FAZ 2 - Veri Katmanı
+
+Durum
+
+%95
+
+Tamamlanan
+
+- Book modeli
+- Bookmark modeli
+- Statistics modeli
+- Settings modeli
+- Hive Adapterları
+- Repository yapısı
+
+Eksik
+
+- Model versiyonlama stratejisi
+- Veri migrasyonu
+
+--------------------------------------------------
+
+FAZ 3 - Parser Sistemi
+
+Durum
+
+%80
+
+Tamamlanan
+
+- ParserFactory
+- TXT parser
+- PDF parser
+
+Başlandı
+
+- EPUB parser
+
+Eksik
+
+- parser optimizasyonu
+- büyük dosya performansı
+
+--------------------------------------------------
+
+FAZ 4 - Kütüphane
+
+Durum
+
+%70
+
+Tamamlanan
+
+- kitap listesi
+- favoriler
+- silme
+- son okunanlar
+
+Eksik
+
+- kitap ekleme akışının tüm platformlarda stabil hale getirilmesi
+- Web dosya yönetimi
+- platform bağımsız dosya erişim katmanı
+
+--------------------------------------------------
+
+FAZ 5 - Reader
+
+Durum
+
+%75
+
+Tamamlanan
+
+- ReaderEngine
+- sayfalama
+- devam et
+- otomatik kayıt
+- ilerleme
+
+Eksik
+
+- Web desteği
+- platform bağımsız dosya açma
+- büyük dosya optimizasyonu
+- reader lifecycle sadeleştirmesi
+
+--------------------------------------------------
+
+FAZ 6 - RSVP
+
+Durum
+
+%60
+
+Tamamlanan
+
+- temel RSVP
+- hız ayarı
+- anchor sistemi
+
+Eksik
+
+- tam senkronizasyon
+- animasyon optimizasyonu
+- kelime odaklama iyileştirmeleri
+
+Not:
+
+RSVP Highlight Color özelliği denendi ancak mimariyi bozduğu için tamamen geri alındı.
+
+Bundan sonraki tüm geliştirmeler bu özellik eklenmeden önceki stabil sürüm referans alınarak yapılacaktır.
+
+--------------------------------------------------
+
+FAZ 7 - Bookmark
+
+Durum
+
+%80
+
+Tamamlanan
+
+- ekleme
+- silme
+- not
+
+Eksik
+
+- bookmark ekranı UX geliştirmeleri
+
+--------------------------------------------------
+
+FAZ 8 - Statistics
+
+Durum
+
+%70
+
+Tamamlanan
+
+- toplam süre
+- toplam sayfa
+- toplam kelime
+- peak
+- average
+
+Eksik
+
+- grafikler
+- günlük istatistik
+- haftalık
+- aylık
+
+--------------------------------------------------
+
+FAZ 9 - Settings
+
+Durum
+
+%75
+
+Tamamlanan
+
+- tema
+- hız
+- font
+
+Eksik
+
+- import/export
+- varsayılan profil
+
+--------------------------------------------------
+
+FAZ 10 - Dashboard
+
+Durum
+
+%60
+
+Tamamlanan
+
+- son okunanlar
+- favoriler
+- istatistik kartları
+
+Eksik
+
+- kitap ekleme FAB (tekrar entegre edilecek)
+- uzun basınca silme (tekrar entegre edilecek)
+- dashboard düzenlemeleri
+
+--------------------------------------------------
+
+FAZ 11 - Platform Uyumluluğu
+
+Durum
+
+%40
+
+Android
+
+- iyi
+
+Windows
+
+- iyi (yerel dosya okuma)
+
+Web
+
+- kısmen çalışıyor
+
+Eksik
+
+- Web için dosya içeriğinin (bytes) saklanması veya platforma uygun erişim stratejisi
+- Platform bağımsız BookCreationService
+- Platform bağımsız ReaderScreen
+
+--------------------------------------------------
+
+FAZ 12 - Test
+
+Durum
+
+%10
+
+Eksik
+
+- Repository testleri
+- Reader testleri
+- Parser testleri
+- Widget testleri
+
+--------------------------------------------------
+
+FAZ 13 - Yayın Hazırlığı
+
+Durum
+
+%0
+
+Eksik
+
+- uygulama ikonları
+- splash
+- lisanslar
+- gizlilik politikası
+- mağaza görselleri
+- Play Store
+- App Store
+- Windows dağıtımı
+
+==================================================
+ŞU ANKİ DURUM
+==================================================
+
+Referans sürüm olarak kabul edilen durum;
+
+- Proje çalışıyor.
+- RSVP Highlight Color özelliği yok.
+- Bu özellikten sonraki tüm değişiklikler iptal edildi.
+- Bundan sonraki geliştirmeler bu stabil sürüm üzerinden ilerleyecek.
+- Özellikle Web desteği için dosya yönetimi yeniden ele alınacak; mevcut filePath yaklaşımı Web'de yeterli değil ve platforma özel bir çözüm gerektiriyor.

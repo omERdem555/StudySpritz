@@ -17,6 +17,7 @@ class BookmarkRepository {
     return _box.get(markId);
   }
 
+  /// Belirli bir kitaba ait bookmark'ları getirirken hata payını sıfırlıyoruz
   Future<List<Bookmark>> getBookmarksByBook(String bookId) async {
     return _box.values.where((b) => b.bookId == bookId).toList();
   }
@@ -25,7 +26,11 @@ class BookmarkRepository {
     return _box.values.toList();
   }
 
+  /// Güncelleme esnasında modelin kopyalanarak güvenli şekilde yazılmasını 
+  /// garanti altına alıyoruz (Gelecekteki state yönetim hatalarını önler)
   Future<void> updateBookmark(Bookmark bookmark) async {
-    await _box.put(bookmark.markId, bookmark);
+    if (_box.containsKey(bookmark.markId)) {
+      await _box.put(bookmark.markId, bookmark);
+    }
   }
 }

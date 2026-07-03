@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import '../core/extensions/hive_date_extensions.dart';
 import 'package:hive/hive.dart';
 import '../models/book.dart';
@@ -22,6 +23,7 @@ class BookAdapter extends TypeAdapter<Book> {
       addedAt: reader.readDateTimeSafe(),
       lastOpenedAt: reader.readDateTimeSafe(),
       completedAt: reader.readNullableDateTime(),
+      bytes: reader.availableBytes > 0 ? reader.readByteList() as Uint8List? : null,
     );
   }
 
@@ -40,5 +42,6 @@ class BookAdapter extends TypeAdapter<Book> {
     writer.writeDateTimeSafe(obj.addedAt);
     writer.writeDateTimeSafe(obj.lastOpenedAt);
     writer.writeNullableDateTime(obj.completedAt);
+    writer.writeByteList(obj.bytes ?? Uint8List(0));
   }
 }

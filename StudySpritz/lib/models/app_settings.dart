@@ -1,11 +1,9 @@
 class AppSettings {
   final String themeMode;
   final String language;
-
   final int wpmSpeed;
   final int animationSpeed;
   final int fontSize;
-
   final String rsvpHighlightColor;
 
   const AppSettings({
@@ -38,11 +36,11 @@ class AppSettings {
   factory AppSettings.defaults() {
     return const AppSettings(
       themeMode: "system",
-      language: "en",
-      wpmSpeed: 250,
-      animationSpeed: 3,
-      fontSize: 16,
-      rsvpHighlightColor: "yellow",
+      language: "tr", // Uygulama varsayılan dil politikasını tek merkezde topladık
+      wpmSpeed: 300,
+      animationSpeed: 1,
+      fontSize: 18,
+      rsvpHighlightColor: "blue",
     );
   }
 }

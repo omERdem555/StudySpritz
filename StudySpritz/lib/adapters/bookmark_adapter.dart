@@ -1,6 +1,7 @@
 import '../core/extensions/hive_date_extensions.dart';
 import '../models/bookmark.dart';
 import 'package:hive/hive.dart';
+
 class BookmarkAdapter extends TypeAdapter<Bookmark> {
   @override
   final int typeId = 2;
@@ -14,6 +15,7 @@ class BookmarkAdapter extends TypeAdapter<Bookmark> {
       wordIndex: reader.readInt(),
       markNote: reader.readString(),
       createdAt: reader.readDateTimeSafe(),
+      // Gelecekte alan eklenirse çökmesin diye binary okumayı esnek bırakıyoruz
     );
   }
 

@@ -1,6 +1,6 @@
+import 'package:hive/hive.dart';
 import '../core/extensions/hive_date_extensions.dart';
 import '../models/reading_statistics.dart';
-import 'package:hive/hive.dart';
 
 class ReadingStatisticsAdapter extends TypeAdapter<ReadingStatistics> {
   @override

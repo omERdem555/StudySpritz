@@ -6,8 +6,6 @@ class BookSearchService {
 
     if (q.isEmpty) return books;
 
-    return books.where((b) {
-      return b.bookName.toLowerCase().contains(q);
-    }).toList();
+    return books.where((b) => b.bookName.toLowerCase().contains(q)).toList();
   }
 }

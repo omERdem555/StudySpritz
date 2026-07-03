@@ -7,18 +7,28 @@ import '../../models/bookmark.dart';
 import '../../repositories/bookmark_repository.dart';
 
 class BookmarksScreen extends StatelessWidget {
-  const BookmarksScreen({super.key});
+  /// Eğer belirli bir kitabın bookmark'larını görmek istersek filtre ekleyebilmek için opsiyonel yaptık
+  final String? filterBookId;
+
+  const BookmarksScreen({super.key, this.filterBookId});
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: HiveService.bookmarksBox.listenable(),
       builder: (context, Box<Bookmark> box, _) {
-        final bookmarks = box.values.toList();
+        // Filtre varsa sadece o kitabın, yoksa hepsinin bookmark'larını listele
+        final bookmarks = filterBookId != null
+            ? box.values.where((b) => b.bookId == filterBookId).toList()
+            : box.values.toList();
+
+        // En son eklenen bookmark en üstte görünsün diye sıralıyoruz (UX Geliştirmesi)
+        bookmarks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
         if (bookmarks.isEmpty) {
-          return const Scaffold(
-            body: Center(child: Text("No bookmarks")),
+          return Scaffold(
+            appBar: AppBar(title: const Text("Bookmarks")),
+            body: const Center(child: Text("No bookmarks found.")),
           );
         }
 
@@ -31,11 +41,33 @@ class BookmarksScreen extends StatelessWidget {
               final b = bookmarks[index];
 
               return Card(
+                margin: const EdgeInsets.symmetric(vertical: 6),
+                elevation: 2,
                 child: ListTile(
-                  title: Text("Page ${b.pageNumber}"),
-                  subtitle: Text(b.markNote),
-                  trailing: const Icon(Icons.arrow_forward),
-                  onTap: () async {
+                  leading: const Icon(Icons.bookmark, color: Colors.blue),
+                  title: Text(
+                    "Page ${b.pageNumber}",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (b.markNote.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(b.markNote),
+                      ],
+                      const SizedBox(height: 4),
+                      Text(
+                        "${b.createdAt.day}/${b.createdAt.month}/${b.createdAt.year}",
+                        style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                    onPressed: () => _handleDelete(context, b.markId),
+                  ),
+                  onTap: () {
                     context.push(
                       '/reader',
                       extra: {
@@ -44,38 +76,6 @@ class BookmarksScreen extends StatelessWidget {
                         "pageIndex": b.pageNumber,
                       },
                     );
-                  },  
-                  onLongPress: () async {
-                    final shouldDelete = await showDialog<bool>(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text("Delete Bookmark"),
-                          content: const Text(
-                            "Are you sure you want to delete this bookmark?",
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context, false);
-                              },
-                              child: const Text("Cancel"),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context, true);
-                              },
-                              child: const Text("Delete"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-
-                    if (shouldDelete != true) return;
-
-                    final repo = BookmarkRepository();
-                    await repo.deleteBookmark(b.markId);
                   },
                 ),
               );
@@ -84,5 +84,31 @@ class BookmarksScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _handleDelete(BuildContext context, String markId) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Bookmark"),
+        content: const Text("Are you sure you want to delete this bookmark?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete == true) {
+      final repo = BookmarkRepository();
+      await repo.deleteBookmark(markId);
+    }
   }
 }

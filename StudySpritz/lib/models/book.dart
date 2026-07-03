@@ -1,22 +1,20 @@
+import 'dart:typed_data';
+
 class Book {
   final String bookId;
   final String bookName;
-
-  final String filePath;
+  final String filePath; 
   final String fileType;
-
   final int pageCount;
   final int wordCount;
-
   final int pageNumber;
   final int wordIndex;
-
   final bool isFavorite;
   final bool isCompleted;
-
   final DateTime addedAt;
   final DateTime lastOpenedAt;
   final DateTime? completedAt;
+  final Uint8List? bytes; 
 
   const Book({
     required this.bookId,
@@ -32,6 +30,7 @@ class Book {
     required this.addedAt,
     required this.lastOpenedAt,
     this.completedAt,
+    this.bytes,
   });
 
   Book copyWith({
@@ -47,6 +46,7 @@ class Book {
     DateTime? addedAt,
     DateTime? lastOpenedAt,
     DateTime? completedAt,
+    Uint8List? bytes,
   }) {
     return Book(
       bookId: bookId,
@@ -62,6 +62,7 @@ class Book {
       addedAt: addedAt ?? this.addedAt,
       lastOpenedAt: lastOpenedAt ?? this.lastOpenedAt,
       completedAt: completedAt ?? this.completedAt,
+      bytes: bytes ?? this.bytes,
     );
   }
 }

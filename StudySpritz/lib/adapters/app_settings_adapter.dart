@@ -1,5 +1,6 @@
-import '../models/app_settings.dart';
 import 'package:hive/hive.dart';
+import '../models/app_settings.dart';
+
 class AppSettingsAdapter extends TypeAdapter<AppSettings> {
   @override
   final int typeId = 3;
