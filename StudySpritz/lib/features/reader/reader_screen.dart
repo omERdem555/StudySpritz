@@ -91,7 +91,10 @@ class _ReaderScreenState extends State<ReaderScreen> {
     }
 
     final parser = ParserFactory.getParser(book.filePath);
-    final text = await parser.extract(book.filePath);
+    final text = await parser.extract(
+      path: book.filePath,
+      bytes: book.bytes,
+    );
 
     final words = text.split(RegExp(r'\s+'));
 

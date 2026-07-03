@@ -62,7 +62,11 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
     }
 
     final parser = ParserFactory.getParser(widget.book.filePath);
-    final text = await parser.extract(widget.book.filePath);
+    // Web ve Native uyumlu, isimlendirilmiş parametre kullanımı
+    final text = await parser.extract(
+      path: widget.book.filePath,
+      bytes: widget.book.bytes,
+    );
 
     words = text.split(RegExp(r'\s+'));
 
