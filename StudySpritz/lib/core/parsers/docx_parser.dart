@@ -3,16 +3,18 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
 import 'base_parser.dart';
-import 'package:xml/xml.dart'; // XML tag'lerini temizleyip saf metin almak için gerekli kütüphane
+import 'package:xml/xml.dart';
 
 class DocxParser implements BaseParser {
   @override
   Future<String> extract({String? path, Uint8List? bytes}) async {
+    // 1. WEB & HAZIR BYTE OPTİMİZASYONU
     if (bytes != null && bytes.isNotEmpty) {
       return await compute(_parseDocxBytes, bytes);
     }
 
-    if (path != null && path.isNotEmpty) {
+    // 2. NATIVE OPTİMİZASYONU
+    if (!kIsWeb && path != null && path.isNotEmpty) {
       final file = File(path);
       if (!await file.exists()) return '';
       final fileBytes = await file.readAsBytes();
@@ -22,6 +24,7 @@ class DocxParser implements BaseParser {
     return '';
   }
 
+  // Arka planda çalışan DOCX / XML parser motoru
   static String _parseDocxBytes(Uint8List bytes) {
     try {
       final archive = ZipDecoder().decodeBytes(bytes);

@@ -10,7 +10,8 @@ class ParserFactory {
 
     if (lower.endsWith('.pdf')) return PdfParser();
     if (lower.endsWith('.txt')) return TxtParser();
-    if (lower.endsWith('.docx')) return DocxParser(); // Yol haritasındaki eksik alan bağlandı
+    if (lower.endsWith('.docx')) return DocxParser();
+    
     throw UnsupportedError("Unsupported file type: $fileName");
   }
 }

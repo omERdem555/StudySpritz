@@ -7,11 +7,13 @@ import 'base_parser.dart';
 class PdfParser implements BaseParser {
   @override
   Future<String> extract({String? path, Uint8List? bytes}) async {
+    // 1. WEB & HAZIR BYTE OPTİMİZASYONU
     if (bytes != null && bytes.isNotEmpty) {
       return await compute(_parsePdfBytes, bytes);
     }
 
-    if (path != null && path.isNotEmpty) {
+    // 2. NATIVE OPTİMİZASYONU
+    if (!kIsWeb && path != null && path.isNotEmpty) {
       final file = File(path);
       if (!await file.exists()) return '';
       final fileBytes = await file.readAsBytes();
@@ -21,6 +23,7 @@ class PdfParser implements BaseParser {
     return '';
   }
 
+  // UI Thread'i kilitlemeden tamamen arka planda (Isolate) çalışan ayıklama motoru
   static String _parsePdfBytes(Uint8List bytes) {
     try {
       final document = PdfDocument(inputBytes: bytes);

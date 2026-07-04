@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
@@ -11,8 +12,8 @@ class TxtParser implements BaseParser {
       return await compute(_parseTxtBytes, bytes);
     }
     
-    // 2. NATIVE OPTİMİZASYONU: Dosya yolundan byte oku ve arka planda parse et
-    if (path != null && path.isNotEmpty) {
+    // 2. NATIVE OPTİMİZASYONU: Web'de değilsek ve dosya yolu varsa byte oku ve arka planda parse et
+    if (!kIsWeb && path != null && path.isNotEmpty) {
       final file = File(path);
       if (!await file.exists()) return '';
       final fileBytes = await file.readAsBytes();
@@ -24,7 +25,12 @@ class TxtParser implements BaseParser {
 
   // UI Thread'i bloke etmemek için compute() tarafından çalıştırılacak izole fonksiyon
   static String _parseTxtBytes(Uint8List bytes) {
-    // UTF-8 ve Latin-1 gibi yaygın kodlamaları korumak için en güvenli binary dönüştürücü
-    return String.fromCharCodes(bytes);
+    try {
+      // UTF-8 kodlamasını güvenli şekilde çözer, bozuk karakterlerde çökmez (allowMalformed)
+      return utf8.decode(bytes, allowMalformed: true);
+    } catch (e) {
+      // Eğer dosya Latin-1 veya farklı bir kodlamaysa char codes yapısına geri çekil
+      return String.fromCharCodes(bytes);
+    }
   }
 }
