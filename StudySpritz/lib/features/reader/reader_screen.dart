@@ -298,24 +298,19 @@ class _ReaderScreenState extends State<ReaderScreen> {
                         }
                       },
                     ),
-                    ElevatedButton.icon(
+                    // Önceki Butonu: Yazı kaldırıldı, sadece ikon kaldı
+                    ElevatedButton(
                       onPressed: _prev,
-                      icon: const Icon(Icons.arrow_back_ios, size: 16),
-                      label: const Text("Önceki"),
+                      child: const Icon(Icons.arrow_back_ios, size: 16),
                     ),
                     Text(
                       "${engine!.state.pageIndex + 1} / ${engine!.pages.length}",
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
+                    // Sonraki Butonu: Yazı ve Row kaldırıldı, sadece ikon kaldı
                     ElevatedButton(
                       onPressed: _next,
-                      child: Row(
-                        children: const [
-                          Text("Sonraki"),
-                          SizedBox(width: 4),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
-                      ),
+                      child: const Icon(Icons.arrow_forward_ios, size: 16),
                     ),
                     IconButton(
                       icon: const Icon(Icons.settings, size: 30),
