@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb; // Web kontrolü için eklendi
+import 'package:flutter/foundation.dart' show kIsWeb; 
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:io' as io; // dart:io çakışmasını engellemek için alias atandı
-import 'dart:typed_data'; // Uint8List için eklendi
+import 'dart:io' as io; 
+import 'dart:typed_data'; 
 
 import '../settings/settings_screen.dart';
 import 'reader_fast_screen.dart';
@@ -16,6 +16,7 @@ import '../../../models/app_settings.dart';
 import '../../../models/bookmark.dart';
 import '../../../models/book.dart';
 import '../../../repositories/bookmark_repository.dart';
+import '../../../core/reading_engine/pagination_engine.dart'; // PaginationEngine import edildi
 
 class ReaderScreen extends StatefulWidget {
   final dynamic extra;
@@ -59,11 +60,9 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
     await repo.markAsOpened(book.bookId);
     
-    // RAM Dostu Mimari: book.bytes yerine asenkron metot ile lazy-loading yapıyoruz
     Uint8List? bookBytes;
     
     if (!kIsWeb) {
-      // Native platformlar için yerel dosya kontrolü
       final file = io.File(book.filePath);
       if (!await file.exists()) {
         if (!mounted) return;
@@ -72,7 +71,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
         return;
       }
     } else {
-      // Web platformu: Bytes verisini lazy-box'tan asenkron yükle
       bookBytes = await repo.getBookBytes(book.bookId);
     }
 
@@ -85,7 +83,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
     final words = text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
     settings = context.read<SettingsState>().settings ?? AppSettings.defaults();
 
-    // Motoru yazı boyutuna duyarlı dinamik parametrelerle kuruyoruz
     engine = ReaderEngine(
       words: words,
       fontSize: settings.fontSize,
@@ -206,6 +203,31 @@ class _ReaderScreenState extends State<ReaderScreen> {
     );
   }
 
+  Future<void> _navigateToFastReader() async {
+    if (loadedBook == null || engine == null) return;
+    
+    await _sync();
+
+    if (!mounted) return;
+    final updatedWordIndex = await Navigator.push<int>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ReaderFastScreen(
+          book: loadedBook!,
+          words: engine!.words,
+          initialWordIndex: engine!.state.wordIndex,
+        ),
+      ),
+    );
+
+    if (updatedWordIndex != null && mounted) {
+      setState(() {
+        engine!.jumpToWord(updatedWordIndex);
+      });
+      _sync(); 
+    }
+  }
+
   @override
   void dispose() {
     _sync();
@@ -233,6 +255,15 @@ class _ReaderScreenState extends State<ReaderScreen> {
       );
     }
 
+    // Sayfanın ilk kelimesinin global kelime indeksini hesaplıyoruz
+    final int pageStartWordIndex = PaginationEngine.getFirstWordIndexForPage(
+      engine!.state.pageIndex, 
+      engine!.fontSize
+    );
+
+    // Sayfa metnini kelimelerine ayırıyoruz
+    final List<String> pageWords = engine!.currentPageText.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
@@ -255,13 +286,41 @@ class _ReaderScreenState extends State<ReaderScreen> {
                 key: ValueKey(engine!.state.pageIndex),
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 child: SingleChildScrollView(
-                  child: Text(
-                    engine!.currentPageText,
-                    style: TextStyle(
-                      fontSize: currentSettings.fontSize.toDouble(),
-                      height: 1.7,
-                      letterSpacing: 0.3,
-                    ),
+                  child: Wrap(
+                    spacing: 6.0, 
+                    runSpacing: 4.0, 
+                    children: List.generate(pageWords.length, (index) {
+                      final int globalIndex = pageStartWordIndex + index;
+                      final bool isHighlighted = globalIndex == engine!.state.wordIndex;
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            engine!.jumpToWord(globalIndex);
+                          });
+                          _sync();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: isHighlighted 
+                                ? Colors.amber.withOpacity(0.4) 
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            pageWords[index],
+                            style: TextStyle(
+                              fontSize: currentSettings.fontSize.toDouble(),
+                              height: 1.5,
+                              letterSpacing: 0.3,
+                              fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
+                              color: isHighlighted ? Colors.amber.shade900 : null,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
                   ),
                 ),
               ),
@@ -274,31 +333,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.flash_on, size: 32, color: Colors.amber),
-                      onPressed: () async {
-                        if (loadedBook == null) return;
-                        
-                        // RSVP ekranına canlı kelime indeksini vererek geçiyoruz
-                        final updatedWordIndex = await Navigator.push<int>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ReaderFastScreen(
-                              book: loadedBook!,
-                              words: engine!.words,
-                              initialWordIndex: engine!.state.wordIndex,
-                            ),
-                          ),
-                        );
-
-                        // RSVP'den dönen canlı kelime indeksiyle klasik okumayı anında eşle
-                        if (updatedWordIndex != null && mounted) {
-                          setState(() {
-                            engine!.jumpToWord(updatedWordIndex);
-                          });
-                          _sync(); // Zıplama anında veritabanı durumunu eşle
-                        }
-                      },
+                      onPressed: _navigateToFastReader,
                     ),
-                    // Önceki Butonu: Yazı kaldırıldı, sadece ikon kaldı
                     ElevatedButton(
                       onPressed: _prev,
                       child: const Icon(Icons.arrow_back_ios, size: 16),
@@ -307,7 +343,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
                       "${engine!.state.pageIndex + 1} / ${engine!.pages.length}",
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
-                    // Sonraki Butonu: Yazı ve Row kaldırıldı, sadece ikon kaldı
                     ElevatedButton(
                       onPressed: _next,
                       child: const Icon(Icons.arrow_forward_ios, size: 16),
