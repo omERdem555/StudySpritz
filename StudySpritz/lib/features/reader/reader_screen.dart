@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb; // Web kontrolü için eklendi
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:io';
+import 'dart:io' as io; // dart:io çakışmasını engellemek için alias atandı
+import 'dart:typed_data'; // Uint8List için eklendi
 
 import '../settings/settings_screen.dart';
 import 'reader_fast_screen.dart';
@@ -57,21 +59,27 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
     await repo.markAsOpened(book.bookId);
     
-    // Web platformu desteği için byte denetimi ekledik (Daha önce çöküyordu)
-    if (book.bytes == null || book.bytes!.isEmpty) {
-      final file = File(book.filePath);
+    // RAM Dostu Mimari: book.bytes yerine asenkron metot ile lazy-loading yapıyoruz
+    Uint8List? bookBytes;
+    
+    if (!kIsWeb) {
+      // Native platformlar için yerel dosya kontrolü
+      final file = io.File(book.filePath);
       if (!await file.exists()) {
         if (!mounted) return;
         await _showFileNotFoundDialog();
         if (mounted) Navigator.pop(context);
         return;
       }
+    } else {
+      // Web platformu: Bytes verisini lazy-box'tan asenkron yükle
+      bookBytes = await repo.getBookBytes(book.bookId);
     }
 
     final parser = ParserFactory.getParser(book.filePath);
     final text = await parser.extract(
       path: book.filePath,
-      bytes: book.bytes,
+      bytes: bookBytes,
     );
 
     final words = text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
@@ -187,7 +195,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
     final wordsRead = (engine!.state.wordIndex - startWordIndex).abs();
     final pagesRead = (engine!.state.pageIndex - startPageIndex).abs();
 
-    if (durationSeconds < 5) return; // Kısa giriş çıkışları yoksay
+    if (durationSeconds < 5) return;
 
     final repository = StatisticsRepository();
     await repository.updateSession(
@@ -215,7 +223,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
       return const Scaffold(body: Center(child: Text("Kitap yüklenemedi.")));
     }
 
-    // Kullanıcı ayarlardan fontu değiştirirse arayüzün dinamik olarak yeniden sayfa hesaplamasını sağlıyoruz
     final currentSettings = context.watch<SettingsState>().settings ?? AppSettings.defaults();
     if (currentSettings.fontSize != engine!.fontSize) {
       final lastWord = engine!.state.wordIndex;
@@ -226,6 +233,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
       );
     }
 
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
         await _sync();
@@ -244,7 +252,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
             LinearProgressIndicator(value: engine!.progress),
             Expanded(
               child: Padding(
-                key: ValueKey(engine!.state.pageIndex), // Sayfa değiştiğinde scroll'u yukarı taşımak için unique key
+                key: ValueKey(engine!.state.pageIndex),
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 child: SingleChildScrollView(
                   child: Text(
@@ -286,6 +294,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                           setState(() {
                             engine!.jumpToWord(updatedWordIndex);
                           });
+                          _sync(); // Zıplama anında veritabanı durumunu eşle
                         }
                       },
                     ),

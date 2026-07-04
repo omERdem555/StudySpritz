@@ -7,16 +7,18 @@ import 'file_validation_service.dart';
 class BookCreationService {
   static Future<Book?> createBook() async {
     final file = await FileService.pickFile();
-
     if (file == null) return null;
+
+    final String generatedId = DateTime.now().millisecondsSinceEpoch.toString();
+    final repo = BookRepository();
 
     if (kIsWeb) {
       if (file.bytes == null) return null;
 
       final book = Book(
-        bookId: DateTime.now().millisecondsSinceEpoch.toString(),
+        bookId: generatedId,
         bookName: file.name,
-        filePath: '', 
+        filePath: '', // Web platformunda yerel path olmaz
         fileType: file.extension ?? '',
         pageCount: 0,
         wordCount: 0,
@@ -27,22 +29,21 @@ class BookCreationService {
         addedAt: DateTime.now(),
         lastOpenedAt: DateTime.now(),
         completedAt: null,
-        bytes: file.bytes, 
       );
 
-      final repo = BookRepository();
-      await repo.addBook(book);
+      // Web performansı için byte'ları parametre olarak ayırıp gönderiyoruz
+      await repo.addBook(book, fileBytes: file.bytes);
       return book;
     } else {
       final path = file.path;
-
       if (path == null) return null;
 
+      // Native platform doğrulamaları
       if (!await FileValidationService.exists(path)) return null;
       if (!FileValidationService.isSupported(path)) return null;
 
       final book = Book(
-        bookId: DateTime.now().millisecondsSinceEpoch.toString(),
+        bookId: generatedId,
         bookName: file.name,
         filePath: path, 
         fileType: file.extension ?? '',
@@ -55,10 +56,9 @@ class BookCreationService {
         addedAt: DateTime.now(),
         lastOpenedAt: DateTime.now(),
         completedAt: null,
-        bytes: null, 
       );
 
-      final repo = BookRepository();
+      // Native cihazlarda dosya yerel disktedir, byte yazmaya gerek yoktur
       await repo.addBook(book);
       return book;
     }

@@ -1,4 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:typed_data';
 import '../../models/book.dart';
 import '../../models/bookmark.dart';
 import '../../models/app_settings.dart';
@@ -17,6 +18,7 @@ class HiveService {
   static const String _schemaVersionKey = 'schema_version';
 
   static late Box<Book> booksBox;
+  static late Box<Uint8List> booksBytesBox; // Adlandırma repository ile eşitlendi
   static late Box<Bookmark> bookmarksBox;
   static late Box<AppSettings> settingsBox;
   static late Box<ReadingStatistics> statisticsBox;
@@ -34,6 +36,7 @@ class HiveService {
 
     // 2. KUTULARIN AÇILMASI
     booksBox = await Hive.openBox<Book>('books');
+    booksBytesBox = await Hive.openBox<Uint8List>('books_bytes'); // Burası eklendi
     bookmarksBox = await Hive.openBox<Bookmark>('bookmarks');
     settingsBox = await Hive.openBox<AppSettings>('settings');
     statisticsBox = await Hive.openBox<ReadingStatistics>('statistics');
@@ -50,15 +53,14 @@ class HiveService {
   }
 
   static Future<void> _performMigration(int fromVersion, int toVersion) async {
-    // Gelecekte bir şema değişikliği yapıldığında (örn: v1'den v2'ye)
-    // verilerin patlamaması için migrasyon blokları buraya yazılır.
     if (fromVersion < 1) {
-      // İlk kurulum veya eski tanımsız veri durumunda kutuları temizleme/hazırlama
+      // İlk kurulum veya şema hazırlığı
     }
   }
 
   static Future<void> clearAllData() async {
     await booksBox.clear();
+    await booksBytesBox.clear();
     await bookmarksBox.clear();
     await settingsBox.clear();
     await statisticsBox.clear();

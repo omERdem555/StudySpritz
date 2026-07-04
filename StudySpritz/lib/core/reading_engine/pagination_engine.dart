@@ -1,37 +1,40 @@
 class PaginationEngine {
-  /// Kelime listesini, yazı boyutuna göre optimize edilmiş dinamik sayfalara böler.
-  /// İleride ekran boyutlarına göre de genişletilebilecek esnek altyapı sunar.
+  /// Font boyutuna göre bir sayfaya sığabilecek tahmini kelime sayısını hesaplar
+  static int _getWordsPerPage(int fontSize) {
+    // Büyük fontlarda sayfa başına daha az kelime düşer (Ters orantı)
+    if (fontSize <= 14) return 180;
+    if (fontSize <= 18) return 140;
+    if (fontSize <= 22) return 100;
+    if (fontSize <= 26) return 75;
+    return 50; 
+  }
+
+  /// Tüm kelimeleri font boyutuna göre dinamik olarak sayfalara böler
   static List<String> createPages(List<String> words, int fontSize) {
     if (words.isEmpty) return [];
-
-    // Yazı boyutu büyüdükçe sayfa başına düşen kelime sayısını dinamik olarak azaltıyoruz.
-    // Örn: FontSize 14 ise ~250 kelime, FontSize 28 ise ~125 kelime sığar.
-    final int wordsPerPage = (3500 / fontSize).round().clamp(50, 400);
-
-    final List<String> pages = [];
+    
+    final List<String> generatedPages = [];
+    final int wordsPerPage = _getWordsPerPage(fontSize);
+    
     for (int i = 0; i < words.length; i += wordsPerPage) {
       final end = (i + wordsPerPage < words.length) ? i + wordsPerPage : words.length;
-      final pageWords = words.sublist(i, end);
-      pages.add(pageWords.join(' '));
+      final pageContent = words.sublist(i, end).join(" ");
+      generatedPages.add(pageContent);
     }
-
-    return pages;
-  }
-
-  /// Belirli bir kelime indeksinin, verilen yazı boyutuna göre hangi sayfada olduğunu hesaplar
-  static int getPageIndexForWord(List<String> words, int wordIndex, int fontSize) {
-    if (words.isEmpty || wordIndex <= 0) return 0;
-    final int wordsPerPage = (3500 / fontSize).round().clamp(50, 400);
-    final page = wordIndex ~/ wordsPerPage;
     
-    // Güvenli aralık kontrolü
-    final totalPages = (words.length / wordsPerPage).ceil();
-    return page.clamp(0, totalPages == 0 ? 0 : totalPages - 1);
+    return generatedPages;
   }
 
-  /// Belirli bir sayfa indeksinin başladığı ilk kelime indeksini döner
+  /// Canlı okunan kelime indeksinin (wordIndex) hangi sayfa numarasına (pageIndex) ait olduğunu bulur
+  static int getPageIndexForWord(List<String> words, int wordIndex, int fontSize) {
+    if (words.isEmpty) return 0;
+    final int wordsPerPage = _getWordsPerPage(fontSize);
+    return (wordIndex / wordsPerPage).floor().clamp(0, (words.length / wordsPerPage).ceil() - 1);
+  }
+
+  /// Belirli bir sayfa indeksinin ilk kelimesinin global kelime indeksini döner
   static int getFirstWordIndexForPage(int pageIndex, int fontSize) {
-    final int wordsPerPage = (3500 / fontSize).round().clamp(50, 400);
+    final int wordsPerPage = _getWordsPerPage(fontSize);
     return pageIndex * wordsPerPage;
   }
 }

@@ -1,7 +1,6 @@
-import 'dart:typed_data';
-import '../core/extensions/hive_date_extensions.dart';
 import 'package:hive/hive.dart';
 import '../models/book.dart';
+import '../core/extensions/hive_date_extensions.dart';
 
 class BookAdapter extends TypeAdapter<Book> {
   @override
@@ -9,21 +8,40 @@ class BookAdapter extends TypeAdapter<Book> {
 
   @override
   Book read(BinaryReader reader) {
+    // Okuma sırası tam olarak yazma sırasıyla eşleşmelidir
+    final bookId = reader.readString();
+    final bookName = reader.readString();
+    final filePath = reader.readString();
+    final fileType = reader.readString();
+    final pageCount = reader.readInt();
+    final wordCount = reader.readInt();
+    final pageNumber = reader.readInt();
+    final wordIndex = reader.readInt();
+    final isFavorite = reader.readBool();
+    final isCompleted = reader.readBool();
+    final addedAt = reader.readDateTimeSafe();
+    final lastOpenedAt = reader.readDateTimeSafe();
+    final completedAt = reader.readNullableDateTime();
+    
+    // Eski şemadan kalan bytes alanı varsa veritabanının kaymaması için güvenli tüketim:
+    if (reader.availableBytes > 0) {
+      reader.readByteList();
+    }
+
     return Book(
-      bookId: reader.readString(),
-      bookName: reader.readString(),
-      filePath: reader.readString(),
-      fileType: reader.readString(),
-      pageCount: reader.readInt(),
-      wordCount: reader.readInt(),
-      pageNumber: reader.readInt(),
-      wordIndex: reader.readInt(),
-      isFavorite: reader.readBool(),
-      isCompleted: reader.readBool(),
-      addedAt: reader.readDateTimeSafe(),
-      lastOpenedAt: reader.readDateTimeSafe(),
-      completedAt: reader.readNullableDateTime(),
-      bytes: reader.availableBytes > 0 ? reader.readByteList() as Uint8List? : null,
+      bookId: bookId,
+      bookName: bookName,
+      filePath: filePath,
+      fileType: fileType,
+      pageCount: pageCount,
+      wordCount: wordCount,
+      pageNumber: pageNumber,
+      wordIndex: wordIndex,
+      isFavorite: isFavorite,
+      isCompleted: isCompleted,
+      addedAt: addedAt,
+      lastOpenedAt: lastOpenedAt,
+      completedAt: completedAt,
     );
   }
 
@@ -42,6 +60,5 @@ class BookAdapter extends TypeAdapter<Book> {
     writer.writeDateTimeSafe(obj.addedAt);
     writer.writeDateTimeSafe(obj.lastOpenedAt);
     writer.writeNullableDateTime(obj.completedAt);
-    writer.writeByteList(obj.bytes ?? Uint8List(0));
   }
 }
