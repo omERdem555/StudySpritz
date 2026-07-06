@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studyspritz/models/highlight.dart';
 import '../../../core/state/settings_state.dart';
 import '../../../core/reading_engine/pagination_engine.dart';
 import '../../../models/book.dart';
@@ -182,7 +183,10 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: //Burada highlight özelliği eklenebilir, örneğin: Colors.yellow[100],
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[800]
+                            : Colors.grey[200],
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(

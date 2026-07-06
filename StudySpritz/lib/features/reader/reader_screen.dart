@@ -83,19 +83,28 @@ class _ReaderScreenState extends State<ReaderScreen> {
     final words = text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
     settings = context.read<SettingsState>().settings ?? AppSettings.defaults();
 
+    if (book.wordCount != words.length) {
+          final updatedBook = book.copyWith(wordCount: words.length);
+          await repo.updateBook(updatedBook);
+          loadedBook = updatedBook;
+        } else {
+          loadedBook = book;
+        }
+
     engine = ReaderEngine(
       words: words,
       fontSize: settings.fontSize,
-      initialWordIndex: startWord ?? book.wordIndex,
+      initialWordIndex: startWord ?? loadedBook!.wordIndex,
     );
 
-    loadedBook = book;
     startWordIndex = engine!.state.wordIndex;
     startPageIndex = engine!.state.pageIndex;
     sessionStartedAt = DateTime.now();
 
     setState(() => loading = false);
   }
+
+
 
   Future<void> _showFileNotFoundDialog() {
     return showDialog(
@@ -108,29 +117,30 @@ class _ReaderScreenState extends State<ReaderScreen> {
   }
 
   Future<void> _sync() async {
-    if (engine == null) return;
+    if (engine == null || loadedBook == null) return; // loadedBook null kontrolü eklendi
     final repo = BookRepository();
     final currentWord = engine!.state.wordIndex;
+    final currentPage = engine!.state.pageIndex;
     final isFinished = currentWord >= engine!.words.length - 1;
 
+    // 1. Mevcut okuma oturumunu kaydet (istatistikler için)
     await repo.saveReadingSession(
       bookId: bookId,
       wordIndex: currentWord,
-      pageIndex: engine!.state.pageIndex,
+      pageIndex: currentPage,
     );
 
-    if (isFinished && loadedBook != null) {
-      if (!loadedBook!.isCompleted) {
-        await repo.updateBook(
-          loadedBook!.copyWith(
-            isCompleted: true,
-            completedAt: DateTime.now(),
-          )
-        );
-      }
-    }
+    // 2. Ana kitap nesnesinin ilerlemesini güncelle ve veritabanına yaz (Ana ekranı tetikler)
+    final updatedBook = loadedBook!.copyWith(
+      wordIndex: currentWord,
+      pageNumber: currentPage,
+      isCompleted: isFinished ? true : loadedBook!.isCompleted,
+      completedAt: isFinished ? DateTime.now() : loadedBook!.completedAt,
+    );
+    
+    await repo.updateBook(updatedBook);
+    loadedBook = updatedBook; // Ekranda da güncel nesneyi tutalım
   }
-
   void _next() {
     if (engine == null) return;
     setState(() {
@@ -304,7 +314,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
                           decoration: BoxDecoration(
                             color: isHighlighted 
-                                ? Colors.amber.withOpacity(0.4) 
+                                ? Colors.amber.withOpacity(0.4) // Vurgulanan kelimenin arka plan rengini ayarlayabilirsiniz
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(4),
                           ),
@@ -315,7 +325,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                               height: 1.5,
                               letterSpacing: 0.3,
                               fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
-                              color: isHighlighted ? Colors.amber.shade900 : null,
+                              color: isHighlighted ? Colors.amber.shade900 : null, //KELİMENİN KENDİ RENGİ
                             ),
                           ),
                         ),
