@@ -104,8 +104,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
     setState(() => loading = false);
   }
 
-
-
   Future<void> _showFileNotFoundDialog() {
     return showDialog(
       context: context,
@@ -117,20 +115,18 @@ class _ReaderScreenState extends State<ReaderScreen> {
   }
 
   Future<void> _sync() async {
-    if (engine == null || loadedBook == null) return; // loadedBook null kontrolü eklendi
+    if (engine == null || loadedBook == null) return; 
     final repo = BookRepository();
     final currentWord = engine!.state.wordIndex;
     final currentPage = engine!.state.pageIndex;
     final isFinished = currentWord >= engine!.words.length - 1;
 
-    // 1. Mevcut okuma oturumunu kaydet (istatistikler için)
     await repo.saveReadingSession(
       bookId: bookId,
       wordIndex: currentWord,
       pageIndex: currentPage,
     );
 
-    // 2. Ana kitap nesnesinin ilerlemesini güncelle ve veritabanına yaz (Ana ekranı tetikler)
     final updatedBook = loadedBook!.copyWith(
       wordIndex: currentWord,
       pageNumber: currentPage,
@@ -139,8 +135,9 @@ class _ReaderScreenState extends State<ReaderScreen> {
     );
     
     await repo.updateBook(updatedBook);
-    loadedBook = updatedBook; // Ekranda da güncel nesneyi tutalım
+    loadedBook = updatedBook; 
   }
+
   void _next() {
     if (engine == null) return;
     setState(() {
@@ -265,13 +262,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
       );
     }
 
-    // Sayfanın ilk kelimesinin global kelime indeksini hesaplıyoruz
     final int pageStartWordIndex = PaginationEngine.getFirstWordIndexForPage(
       engine!.state.pageIndex, 
       engine!.fontSize
     );
 
-    // Sayfa metnini kelimelerine ayırıyoruz
     final List<String> pageWords = engine!.currentPageText.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
 
     // ignore: deprecated_member_use
@@ -303,6 +298,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
                       final int globalIndex = pageStartWordIndex + index;
                       final bool isHighlighted = globalIndex == engine!.state.wordIndex;
 
+                      final Color baseColor = _getHighlightColor(currentSettings.rsvpHighlightColor);
+
                       return GestureDetector(
                         onTap: () {
                           setState(() {
@@ -314,7 +311,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
                           decoration: BoxDecoration(
                             color: isHighlighted 
-                                ? Colors.amber.withOpacity(0.4) // Vurgulanan kelimenin arka plan rengini ayarlayabilirsiniz
+                                ? baseColor.withOpacity(0.4) 
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(4),
                           ),
@@ -325,7 +322,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                               height: 1.5,
                               letterSpacing: 0.3,
                               fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
-                              color: isHighlighted ? Colors.amber.shade900 : null, //KELİMENİN KENDİ RENGİ
+                              color: isHighlighted ? _getHighlightColor(currentSettings.rsvpHighlightColor, isDark: Theme.of(context).brightness == Brightness.dark) : null,
                             ),
                           ),
                         ),
@@ -374,5 +371,20 @@ class _ReaderScreenState extends State<ReaderScreen> {
         ),
       ),
     );
+  }
+
+  // EKSİK OLAN YARDIMCI METOD EKLENDİ
+  Color _getHighlightColor(String colorName, {bool isDark = false}) {
+    switch (colorName) {
+      case 'yellow':
+        return isDark ? Colors.amber.shade700 : Colors.amber.shade300;
+      case 'green':
+        return isDark ? Colors.green.shade600 : Colors.green.shade300;
+      case 'red':
+        return isDark ? Colors.red.shade600 : Colors.red.shade300;
+      case 'blue':
+      default:
+        return isDark ? Colors.blue.shade600 : Colors.blue.shade300;
+    }
   }
 }

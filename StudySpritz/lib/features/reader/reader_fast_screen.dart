@@ -5,6 +5,7 @@ import 'package:studyspritz/models/highlight.dart';
 import '../../../core/state/settings_state.dart';
 import '../../../core/reading_engine/pagination_engine.dart';
 import '../../../models/book.dart';
+import '../../../models/app_settings.dart'; // AppSettings importu eklendi
 import '../../../repositories/book_repository.dart';
 
 class ReaderFastScreen extends StatefulWidget {
@@ -52,7 +53,6 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
   Future<void> _autoSave() async {
     if (widget.words.isEmpty) return;
 
-    // Gerçek dinamik sayfa indeksini hesapla (Düz mantık index eşitlemesi istatistikleri bozuyordu)
     final calculatedPage = PaginationEngine.getPageIndexForWord(widget.words, index, fontSize);
 
     await _repo.saveReadingSession(
@@ -117,7 +117,7 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
   }
 
   void _increaseWpm() {
-    setState(() => wpm += 25); // Daha hissedilir hız artışı
+    setState(() => wpm += 25); 
     if (isPlaying) {
       _pause();
       _start();
@@ -147,11 +147,16 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
     final progress = widget.words.isEmpty ? 0.0 : index / widget.words.length;
     final remaining = widget.words.isEmpty ? 0 : (widget.words.length - index);
 
+    final currentSettings = context.watch<SettingsState>().settings ?? AppSettings.defaults();
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    final highlightColor = _getHighlightColor(currentSettings.rsvpHighlightColor, isDark: isDarkMode);
+
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
         timer?.cancel();
         await _autoSave();
-        // Geri çıkarken Klasik Okuma ekranına güncel kelime indeksini teslim et
         Navigator.pop(context, index);
         return false;
       },
@@ -183,18 +188,18 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                   decoration: BoxDecoration(
-                    color: //Burada highlight özelliği eklenebilir, örneğin: Colors.yellow[100],
-                        Theme.of(context).brightness == Brightness.dark
-                            ? Colors.grey[800]
-                            : Colors.grey[200],
+                    color: highlightColor.withOpacity(isDarkMode ? 0.25 : 0.20),
                     borderRadius: BorderRadius.circular(16),
+                    // Hatalı 'Border.solidColor' ifadesi Border.all ile düzeltildi
+                    border: Border.all(color: highlightColor.withOpacity(0.5), width: 1.5),
                   ),
                   child: Text(
                     word,
                     style: TextStyle(
-                      fontSize: (fontSize + 20).toDouble(), // RSVP için optimize büyük font
+                      fontSize: (fontSize + 20).toDouble(),
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                 ),
@@ -239,5 +244,19 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
         ),
       ),
     );
+  }
+
+  Color _getHighlightColor(String colorName, {bool isDark = false}) {
+    switch (colorName) {
+      case 'yellow':
+        return isDark ? Colors.amber.shade700 : Colors.amber.shade300;
+      case 'green':
+        return isDark ? Colors.green.shade600 : Colors.green.shade300;
+      case 'red':
+        return isDark ? Colors.red.shade600 : Colors.red.shade300;
+      case 'blue':
+      default:
+        return isDark ? Colors.blue.shade600 : Colors.blue.shade300;
+    }
   }
 }
