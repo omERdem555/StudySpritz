@@ -202,13 +202,13 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.remove_circle_outline, size: 32),
-                    onPressed: _decreaseWpm,
+                    icon: const Icon(Icons.refresh, size: 32),
+                    onPressed: _reset,
                   ),
                   const SizedBox(width: 16),
                   IconButton(
-                    icon: const Icon(Icons.refresh, size: 32),
-                    onPressed: _reset,
+                    icon: const Icon(Icons.remove_circle_outline, size: 32),
+                    onPressed: _decreaseWpm,
                   ),
                   const SizedBox(width: 16),
                   GestureDetector(
