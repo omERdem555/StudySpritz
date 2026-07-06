@@ -326,32 +326,46 @@ class _StatItem extends StatelessWidget {
   final String value;
   final String label;
 
-  const _StatItem({
-    required this.value,
-    required this.label,
-  });
+  const _StatItem({required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) {
+    // Cihazın o anki karanlık mod durumunu kontrol ediyoruz
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      width: 110,
+      width: 100, // Kutuların genişliği düzgün dursun diye sabitlenebilir
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey.shade200,
+        // Karanlık moddaysa koyu gri, aydınlık moddaya açık gri yapar
+        color: isDarkMode ? Colors.grey[850] : Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+        ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 20,
+            style: TextStyle(
+              fontSize: 18,
               fontWeight: FontWeight.bold,
+              // Karanlık modda beyaz yazı, aydınlık modda siyah yazı
+              color: isDarkMode ? Colors.white : Colors.black87,
             ),
           ),
-          const SizedBox(height: 6),
-          Text(label, textAlign: TextAlign.center),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              // Karanlık modda açık gri yazı, aydınlık modda koyu gri yazı
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
