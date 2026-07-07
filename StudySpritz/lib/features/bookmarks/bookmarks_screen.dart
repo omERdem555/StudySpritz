@@ -4,6 +4,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../core/services/hive_service.dart';
 import '../../models/bookmark.dart';
+import '../../models/book.dart';
+import '../../repositories/book_repository.dart';
 import '../../repositories/bookmark_repository.dart';
 
 class BookmarksScreen extends StatelessWidget {
@@ -40,44 +42,86 @@ class BookmarksScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final b = bookmarks[index];
 
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                elevation: 2,
-                child: ListTile(
-                  leading: const Icon(Icons.bookmark, color: Colors.blue),
-                  title: Text(
-                    "Page ${b.pageNumber}",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (b.markNote.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(b.markNote),
-                      ],
-                      const SizedBox(height: 4),
-                      Text(
-                        "${b.createdAt.day}/${b.createdAt.month}/${b.createdAt.year}",
-                        style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+              return FutureBuilder<Book?>(
+                future: BookRepository().getBook(b.bookId),
+                builder: (context, snapshot) {
+                  final book = snapshot.data;
+
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    elevation: 2,
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.bookmark,
+                        color: Colors.blue,
                       ),
-                    ],
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                    onPressed: () => _handleDelete(context, b.markId),
-                  ),
-                  onTap: () {
-                    context.push(
-                      '/reader',
-                      extra: {
-                        "bookId": b.bookId,
-                        "wordIndex": b.wordIndex,
-                        "pageIndex": b.pageNumber,
+
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            book?.bookName ?? "Unknown Book",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Divider(height: 1),
+                          const SizedBox(height: 6),
+                          Text(
+                            "Page ${b.pageNumber}",
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (b.markNote.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              b.markNote,
+                              style: const TextStyle(fontSize: 15),
+                            ),
+                          ],
+
+                          const SizedBox(height: 8),
+
+                          Text(
+                            "${b.createdAt.day}/${b.createdAt.month}/${b.createdAt.year}",
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      trailing: IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.redAccent,
+                        ),
+                        onPressed: () => _handleDelete(context, b.markId),
+                      ),
+
+                      onTap: () {
+                        context.push(
+                          '/reader',
+                          extra: {
+                            "bookId": b.bookId,
+                            "wordIndex": b.wordIndex,
+                            "pageIndex": b.pageNumber,
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               );
             },
           ),
