@@ -146,6 +146,11 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
     final word = widget.words.isEmpty ? "-" : widget.words[safeIndex];
     final progress = widget.words.isEmpty ? 0.0 : index / widget.words.length;
     final remaining = widget.words.isEmpty ? 0 : (widget.words.length - index);
+    final remainingSeconds =
+        remaining == 0 ? 0 : ((remaining / wpm) * 60).ceil();
+
+    final remainingMinutes = remainingSeconds ~/ 60;
+    final remainingRemainderSeconds = remainingSeconds % 60;
 
     final currentSettings = context.watch<SettingsState>().settings ?? AppSettings.defaults();
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -162,7 +167,11 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("RSVP Hızlı Okuma"),
+          title: Text(
+            widget.book.bookName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () async {
@@ -182,7 +191,19 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 4),
-            Text("Kalan Kelime: $remaining  |  WPM: $wpm", style: TextStyle(color: Colors.grey[600])),
+            Text(
+              "Kalan Kelime: $remaining"
+              "  |  "
+              "WPM: $wpm"
+              "\nBitmesine Kalan Süre: "
+              "${remainingMinutes.toString().padLeft(2, '0')} dk "
+              "${remainingRemainderSeconds.toString().padLeft(2, '0')} sn",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             Expanded(
               child: Center(
                 child: Container(
