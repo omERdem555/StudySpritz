@@ -311,9 +311,25 @@ class _BookCard extends StatelessWidget {
               Text(book.bookName,
                   maxLines: 2, overflow: TextOverflow.ellipsis),
               const Spacer(),
-              LinearProgressIndicator(value: progress),
+
+              TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeOutCubic,
+                tween: Tween<double>(
+                  end: progress,
+                ),
+                builder: (context, value, child) {
+                  return LinearProgressIndicator(
+                    value: value,
+                  );
+                },
+              ),
+
               const SizedBox(height: 6),
-              Text("%${(progress * 100).toStringAsFixed(1)}"),
+
+              Text(
+                "%${(progress * 100).toStringAsFixed(1)}",
+              ),
             ],
           ),
         ),

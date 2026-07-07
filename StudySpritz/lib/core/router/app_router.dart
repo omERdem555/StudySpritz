@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
 
 import '../../features/home/home_screen.dart';
 import '../../features/library/library_screen.dart';
@@ -47,10 +48,38 @@ class AppRouter {
 
           GoRoute(
             path: '/reader',
-            builder: (context, state) {
+            pageBuilder: (context, state) {
               final extra = state.extra as Map;
 
-              return ReaderScreen(extra: extra);
+              return CustomTransitionPage(
+                key: state.pageKey,
+                child: ReaderScreen(extra: extra),
+
+                transitionDuration: const Duration(milliseconds: 300),
+                reverseTransitionDuration: const Duration(milliseconds: 250),
+
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  final fadeAnimation = CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  );
+
+                  final slideAnimation =
+                      Tween<Offset>(
+                        begin: const Offset(0.05, 0),
+                        end: Offset.zero,
+                      ).animate(fadeAnimation);
+
+                  return FadeTransition(
+                    opacity: fadeAnimation,
+                    child: SlideTransition(
+                      position: slideAnimation,
+                      child: child,
+                    ),
+                  );
+                },
+              );
             },
           ),
         ],

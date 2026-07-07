@@ -285,53 +285,107 @@ class _ReaderScreenState extends State<ReaderScreen> {
         ),
         body: Column(
           children: [
-            LinearProgressIndicator(value: engine!.progress),
-            Expanded(
-              child: Padding(
-                key: ValueKey(engine!.state.pageIndex),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                child: SingleChildScrollView(
-                  child: Wrap(
-                    spacing: 6.0, 
-                    runSpacing: 4.0, 
-                    children: List.generate(pageWords.length, (index) {
-                      final int globalIndex = pageStartWordIndex + index;
-                      final bool isHighlighted = globalIndex == engine!.state.wordIndex;
+            TweenAnimationBuilder<double>(
+              duration: Duration(
+                milliseconds: 350 ~/ currentSettings.animationSpeed,
+              ),
+              curve: Curves.easeOutCubic,
+              tween: Tween<double>(
+                end: engine!.progress,
+              ),
+              builder: (context, value, child) {
+                return LinearProgressIndicator(
+                  value: value,
+                );
+              },
+            ),
+              Expanded(
+                child: AnimatedSwitcher(
+                  duration: Duration(
+                    milliseconds: 350 ~/ currentSettings.animationSpeed,
+                  ),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, animation) {
+                    final offsetAnimation = Tween<Offset>(
+                      begin: const Offset(0.08, 0),
+                      end: Offset.zero,
+                    ).animate(animation);
 
-                      final Color baseColor = _getHighlightColor(currentSettings.rsvpHighlightColor);
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    key: ValueKey(engine!.state.pageIndex),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 20,
+                    ),
+                    child: SingleChildScrollView(
+                      child: Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: List.generate(pageWords.length, (index) {
+                          final globalIndex = pageStartWordIndex + index;
+                          final isHighlighted =
+                              globalIndex == engine!.state.wordIndex;
 
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            engine!.jumpToWord(globalIndex);
-                          });
-                          _sync();
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: isHighlighted 
-                                ? baseColor.withOpacity(0.4) 
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            pageWords[index],
-                            style: TextStyle(
-                              fontSize: currentSettings.fontSize.toDouble(),
-                              height: 1.5,
-                              letterSpacing: 0.3,
-                              fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
-                              color: isHighlighted ? _getHighlightColor(currentSettings.rsvpHighlightColor, isDark: Theme.of(context).brightness == Brightness.dark) : null,
+                          final baseColor = _getHighlightColor(
+                            currentSettings.rsvpHighlightColor,
+                          );
+
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                engine!.jumpToWord(globalIndex);
+                              });
+                              _sync();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 2,
+                                vertical: 1,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isHighlighted
+                                    ? baseColor.withOpacity(0.4)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                pageWords[index],
+                                style: TextStyle(
+                                  fontSize:
+                                      currentSettings.fontSize.toDouble(),
+                                  height: 1.5,
+                                  letterSpacing: 0.3,
+                                  fontWeight: isHighlighted
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: isHighlighted
+                                      ? _getHighlightColor(
+                                          currentSettings
+                                              .rsvpHighlightColor,
+                                          isDark: Theme.of(context)
+                                                  .brightness ==
+                                              Brightness.dark,
+                                        )
+                                      : null,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      );
-                    }),
+                          );
+                        }),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),

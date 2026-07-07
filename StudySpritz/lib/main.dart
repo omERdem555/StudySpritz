@@ -35,14 +35,24 @@ class _AppView extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<SettingsState>();
 
+    return AnimatedTheme(
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeInOutCubic,
+      data: _mapThemeData(state.settings?.themeMode),
 
-    return MaterialApp.router(
-      routerConfig: AppRouter.router,
-      themeMode: _mapTheme(state.settings?.themeMode),
+      child: Builder(
+        builder: (context) {
+          return MaterialApp.router(
+            routerConfig: AppRouter.router,
 
-      theme: ThemeData.light(),
+            themeMode: _mapTheme(state.settings?.themeMode),
 
-      darkTheme: ThemeData.dark(),
+            theme: ThemeData.light(),
+
+            darkTheme: ThemeData.dark(),
+          );
+        },
+      ),
     );
   }
 
@@ -50,10 +60,28 @@ class _AppView extends StatelessWidget {
     switch (mode) {
       case "dark":
         return ThemeMode.dark;
+
       case "light":
         return ThemeMode.light;
+
       default:
         return ThemeMode.system;
+    }
+  }
+
+  ThemeData _mapThemeData(String? mode) {
+    switch (mode) {
+      case "dark":
+        return ThemeData.dark();
+
+      case "light":
+        return ThemeData.light();
+
+      default:
+        return WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+                Brightness.dark
+            ? ThemeData.dark()
+            : ThemeData.light();
     }
   }
 }

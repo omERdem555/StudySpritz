@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 class Book {
   final String bookId;
   final String bookName;
