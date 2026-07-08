@@ -5,15 +5,17 @@ import '../../models/bookmark.dart';
 import '../../models/app_settings.dart';
 import '../../models/reading_statistics.dart';
 import '../../models/highlight.dart';
+import '../../models/app_statistics.dart';
 
 import '../../adapters/book_adapter.dart';
 import '../../adapters/bookmark_adapter.dart';
 import '../../adapters/app_settings_adapter.dart';
 import '../../adapters/reading_statistics_adapter.dart';
 import '../../adapters/highlight_adapter.dart';
+import '../../adapters/app_statistics_adapter.dart';
 
 class HiveService {
-  static const int _currentSchemaVersion = 1;
+  static const int _currentSchemaVersion = 2;
   static const String _metaBoxName = 'app_metadata';
   static const String _schemaVersionKey = 'schema_version';
 
@@ -22,6 +24,7 @@ class HiveService {
   static late Box<Bookmark> bookmarksBox;
   static late Box<AppSettings> settingsBox;
   static late Box<ReadingStatistics> statisticsBox;
+  static late Box<AppStatistics> appStatisticsBox;
   static late Box<Highlight> highlightsBox;
 
   static Future<void> init() async {
@@ -32,6 +35,7 @@ class HiveService {
     Hive.registerAdapter(BookmarkAdapter());
     Hive.registerAdapter(AppSettingsAdapter());
     Hive.registerAdapter(ReadingStatisticsAdapter());
+    Hive.registerAdapter(AppStatisticsAdapter());
     Hive.registerAdapter(HighlightAdapter());
 
     // 2. KUTULARIN AÇILMASI
@@ -40,6 +44,7 @@ class HiveService {
     bookmarksBox = await Hive.openBox<Bookmark>('bookmarks');
     settingsBox = await Hive.openBox<AppSettings>('settings');
     statisticsBox = await Hive.openBox<ReadingStatistics>('statistics');
+    appStatisticsBox = await Hive.openBox<AppStatistics>('app_statistics');
     highlightsBox = await Hive.openBox<Highlight>('highlights');
 
     // 3. ŞEMA VERSİYON & MİGRASYON KONTROLÜ
@@ -64,6 +69,7 @@ class HiveService {
     await bookmarksBox.clear();
     await settingsBox.clear();
     await statisticsBox.clear();
+    await appStatisticsBox.clear();
     await highlightsBox.clear();
   }
 }
