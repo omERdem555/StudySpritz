@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:studyspritz/models/highlight.dart';
 import '../../../core/state/settings_state.dart';
 import '../../../core/reading_engine/pagination_engine.dart';
 import '../../../models/book.dart';
