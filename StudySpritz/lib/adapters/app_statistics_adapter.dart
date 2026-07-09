@@ -5,7 +5,7 @@ import '../models/app_statistics.dart';
 
 class AppStatisticsAdapter extends TypeAdapter<AppStatistics> {
   @override
-  final int typeId = 5;
+  final int typeId = 6;
 
   @override
   AppStatistics read(BinaryReader reader) {
