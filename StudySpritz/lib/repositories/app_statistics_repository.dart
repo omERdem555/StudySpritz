@@ -40,6 +40,22 @@ class AppStatisticsRepository {
       (sum, item) => sum + item.sessionCount,
     );
 
+    final double averageWpm =
+    statistics.isEmpty
+        ? 0
+        : statistics
+                .map((e) => e.averageWpm)
+                .reduce((a, b) => a + b) /
+            statistics.length;
+
+    final double peakWpm =
+      statistics.isEmpty
+          ? 0
+          : statistics
+              .map((e) => e.peakWpm)
+              .reduce((a, b) => a > b ? a : b);
+    
+
     return AppStatistics(
       totalBooks: totalBooks,
       completedBooks: completedBooks,
@@ -58,6 +74,9 @@ class AppStatisticsRepository {
       currentStreak: 0,
       longestStreak: 0,
 
+      averageWpm: averageWpm,
+      peakWpm: peakWpm,
+      
       averageDailyReadingTime: 0,
 
       lastReadingDate: DateTime.now(),

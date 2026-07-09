@@ -4,10 +4,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../core/services/hive_service.dart';
 import '../../models/book.dart';
-import '../../models/reading_statistics.dart';
 import '../../repositories/book_repository.dart';
-import '../../repositories/statistics_repository.dart';
-import '../../core/services/book_creation_service.dart'; // Servis entegrasyonu için eklendi
+import '../../repositories/app_statistics_repository.dart';
+import '../../models/app_statistics.dart';
+import '../../core/services/book_creation_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -80,33 +80,10 @@ class HomeScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(title: const Text("Dashboard")),
           
-          body: FutureBuilder<List<ReadingStatistics>>(
-            future: StatisticsRepository().getAll(),
+          body: FutureBuilder<AppStatistics>(
+            future: AppStatisticsRepository().get(),
             builder: (context, snapshot) {
-              final statsList = snapshot.data ?? [];
-
-              final validStats =
-                  statsList.where((s) => s.sessionCount > 0).toList();
-
-              final totalReadingTime =
-                  validStats.fold<int>(0, (s, e) => s + e.totalReadingTime);
-
-              final totalWords =
-                  validStats.fold<int>(0, (s, e) => s + e.totalWordsRead);
-
-              final totalPages =
-                  validStats.fold<int>(0, (s, e) => s + e.totalPagesRead);
-
-              final avgWpm = validStats.isEmpty
-                  ? 0.0
-                  : validStats.fold<double>(0.0, (s, e) => s + e.averageWpm) /
-                      validStats.length;
-
-              final peakWpm = statsList.isEmpty
-                  ? 0.0
-                  : statsList
-                      .map((e) => e.peakWpm)
-                      .reduce((a, b) => a > b ? a : b);
+              final stats = snapshot.data ?? AppStatistics.empty();
 
               return ListView(
                 padding: const EdgeInsets.all(16),
@@ -167,27 +144,48 @@ class HomeScreen extends StatelessWidget {
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
-                        _StatItem(value: books.length.toString(), label: "Kitap"),
-                        const SizedBox(width: 12),
-                        _StatItem(value: favorites.length.toString(), label: "Favori"),
-                        const SizedBox(width: 12),
-                        _StatItem(value: completed.toString(), label: "Tamamlanan"),
-                        const SizedBox(width: 12),
-                        _StatItem(value: validStats.length.toString(), label: "Oturum"),
-                        const SizedBox(width: 12),
-                        _StatItem(value: totalReadingTime.toString(), label: "Süre"),
-                        const SizedBox(width: 12),
-                        _StatItem(value: totalWords.toString(), label: "Kelime"),
-                        const SizedBox(width: 12),
-                        _StatItem(value: totalPages.toString(), label: "Sayfa"),
+                        _StatItem(
+                          value: stats.totalBooks.toString(),
+                          label: "Kitap",
+                        ),
                         const SizedBox(width: 12),
                         _StatItem(
-                          value: avgWpm.toStringAsFixed(1),
+                          value: stats.favoriteBooks.toString(),
+                          label: "Favori",
+                        ),
+                        const SizedBox(width: 12),
+                        _StatItem(
+                          value: stats.completedBooks.toString(),
+                          label: "Tamamlanan",
+                        ),
+                        const SizedBox(width: 12),
+                        _StatItem(
+                          value: stats.totalSessions.toString(),
+                          label: "Oturum",
+                        ),
+                        const SizedBox(width: 12),
+                        _StatItem(
+                          value: stats.totalReadingTime.toString(),
+                          label: "Süre",
+                        ),
+                        const SizedBox(width: 12),
+                        _StatItem(
+                          value: stats.totalWordsRead.toString(),
+                          label: "Kelime",
+                        ),
+                        const SizedBox(width: 12),
+                        _StatItem(
+                          value: stats.totalPagesRead.toString(),
+                          label: "Sayfa",
+                        ),
+                        const SizedBox(width: 12),
+                        _StatItem(
+                          value: stats.averageWpm.toStringAsFixed(1),
                           label: "Avg WPM",
                         ),
                         const SizedBox(width: 12),
                         _StatItem(
-                          value: peakWpm.toStringAsFixed(1),
+                          value: stats.peakWpm.toStringAsFixed(1),
                           label: "Peak WPM",
                         ),
                       ],
@@ -354,10 +352,10 @@ class _StatItem extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         // Karanlık moddaysa koyu gri, aydınlık moddaya açık gri yapar
-        color: isDarkMode ? Colors.grey[850] : Colors.grey[100],
+        color: isDarkMode ? Color.fromRGBO(38, 36, 41, 1) : Color.fromRGBO(243, 236, 244, 1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+          color: isDarkMode ? Color.fromRGBO(22, 21, 23, 1) : Color.fromRGBO(225, 218, 226, 1),
         ),
       ),
       child: Column(

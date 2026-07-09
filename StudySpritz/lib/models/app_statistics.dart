@@ -17,6 +17,9 @@ class AppStatistics {
   final int currentStreak;
   final int longestStreak;
 
+  final double averageWpm;
+  final double peakWpm;
+
   final int averageDailyReadingTime;
 
   final DateTime lastReadingDate;
@@ -34,6 +37,8 @@ class AppStatistics {
     required this.monthReadingTime,
     required this.currentStreak,
     required this.longestStreak,
+    required this.averageWpm,
+    required this.peakWpm,
     required this.averageDailyReadingTime,
     required this.lastReadingDate,
   });
@@ -52,6 +57,8 @@ class AppStatistics {
       monthReadingTime: 0,
       currentStreak: 0,
       longestStreak: 0,
+      averageWpm: 0.0,
+      peakWpm: 0.0,
       averageDailyReadingTime: 0,
       lastReadingDate: DateTime.now(),
     );
@@ -70,6 +77,8 @@ class AppStatistics {
     int? monthReadingTime,
     int? currentStreak,
     int? longestStreak,
+    double? averageWpm,
+    double? peakWpm,
     int? averageDailyReadingTime,
     DateTime? lastReadingDate,
   }) {
@@ -86,8 +95,9 @@ class AppStatistics {
       monthReadingTime: monthReadingTime ?? this.monthReadingTime,
       currentStreak: currentStreak ?? this.currentStreak,
       longestStreak: longestStreak ?? this.longestStreak,
-      averageDailyReadingTime:
-          averageDailyReadingTime ?? this.averageDailyReadingTime,
+      averageWpm: averageWpm ?? this.averageWpm,
+      peakWpm: peakWpm ?? this.peakWpm,
+      averageDailyReadingTime: averageDailyReadingTime ?? this.averageDailyReadingTime,
       lastReadingDate: lastReadingDate ?? this.lastReadingDate,
     );
   }

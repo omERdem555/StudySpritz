@@ -22,6 +22,8 @@ class AppStatisticsAdapter extends TypeAdapter<AppStatistics> {
       monthReadingTime: reader.readInt(),
       currentStreak: reader.readInt(),
       longestStreak: reader.readInt(),
+      averageWpm: reader.readDouble(),
+      peakWpm: reader.readDouble(),
       averageDailyReadingTime: reader.readInt(),
       lastReadingDate: reader.readDateTimeSafe(),
     );
@@ -41,6 +43,8 @@ class AppStatisticsAdapter extends TypeAdapter<AppStatistics> {
     writer.writeInt(obj.monthReadingTime);
     writer.writeInt(obj.currentStreak);
     writer.writeInt(obj.longestStreak);
+    writer.writeDouble(obj.averageWpm);
+    writer.writeDouble(obj.peakWpm);
     writer.writeInt(obj.averageDailyReadingTime);
     writer.writeDateTimeSafe(obj.lastReadingDate);
   }
