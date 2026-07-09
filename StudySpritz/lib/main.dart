@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/state/settings_state.dart';
 import 'core/services/hive_service.dart';
@@ -7,6 +8,9 @@ import 'core/router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('tr_TR');
+  
   await HiveService.init();
 
   runApp(const MyApp());
