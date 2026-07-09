@@ -17,6 +17,7 @@ import '../../../models/bookmark.dart';
 import '../../../models/book.dart';
 import '../../../repositories/bookmark_repository.dart';
 import '../../../core/reading_engine/pagination_engine.dart'; // PaginationEngine import edildi
+import '../statistics/reading_statistics_screen.dart';
 
 class ReaderScreen extends StatefulWidget {
   final dynamic extra;
@@ -284,7 +285,14 @@ class _ReaderScreenState extends State<ReaderScreen> {
               icon: const Icon(Icons.bar_chart),
               tooltip: "İstatistikler",
               onPressed: () {
-                // Bir sonraki fazda ReadingStatisticsScreen açılacak.
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ReadingStatisticsScreen(
+                      bookId: bookId,
+                    ),
+                  ),
+                );
               },
             ),
             IconButton(
