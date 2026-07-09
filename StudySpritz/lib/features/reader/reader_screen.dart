@@ -280,7 +280,25 @@ class _ReaderScreenState extends State<ReaderScreen> {
         appBar: AppBar(
           title: Text(loadedBook?.bookName ?? "Okuyucu"),
           actions: [
-            IconButton(icon: const Icon(Icons.bookmark_add), onPressed: _addBookmark),
+            IconButton(
+              icon: const Icon(Icons.bar_chart),
+              tooltip: "İstatistikler",
+              onPressed: () {
+                // Bir sonraki fazda ReadingStatisticsScreen açılacak.
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings),
+              tooltip: "Ayarlar",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const SettingsScreen(),
+                  ),
+                );
+              },
+            ),
           ],
         ),
         body: Column(
@@ -409,13 +427,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
                       child: const Icon(Icons.arrow_forward_ios, size: 16),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.settings, size: 30),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                        );
-                      },
+                      icon: const Icon(Icons.bookmark_add, size: 30),
+                      onPressed: _addBookmark,
                     ),
                   ],
                 ),
