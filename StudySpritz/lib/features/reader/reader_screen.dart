@@ -81,16 +81,33 @@ class _ReaderScreenState extends State<ReaderScreen> {
       bytes: bookBytes,
     );
 
-    final words = text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
-    settings = context.read<SettingsState>().settings ?? AppSettings.defaults();
+    final words = text
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
 
-    if (book.wordCount != words.length) {
-          final updatedBook = book.copyWith(wordCount: words.length);
-          await repo.updateBook(updatedBook);
-          loadedBook = updatedBook;
-        } else {
-          loadedBook = book;
-        }
+    settings =
+        context.read<SettingsState>().settings ??
+        AppSettings.defaults();
+
+    final calculatedPageCount =
+        PaginationEngine.createPages(
+          words,
+          settings.fontSize,
+        ).length;
+
+    if (book.wordCount != words.length ||
+        book.pageCount != calculatedPageCount) {
+      final updatedBook = book.copyWith(
+        wordCount: words.length,
+        pageCount: calculatedPageCount,
+      );
+
+      await repo.updateBook(updatedBook);
+      loadedBook = updatedBook;
+    } else {
+      loadedBook = book;
+    }
 
     engine = ReaderEngine(
       words: words,

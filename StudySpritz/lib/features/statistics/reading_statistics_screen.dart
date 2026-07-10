@@ -43,6 +43,17 @@ class ReadingStatisticsScreen extends StatelessWidget {
     return DateFormat("d MMMM y", "tr_TR").format(date);
   }
 
+  String _formatProgress(Book book) {
+  if (book.wordCount <= 0) {
+    return "%0";
+  }
+
+  final progress =
+      (book.wordIndex / book.wordCount * 100).clamp(0, 100);
+
+  return "%${progress.toStringAsFixed(1)}";
+}
+
   Widget _statCard({
     required BuildContext context,
     required String title,
@@ -78,6 +89,29 @@ class ReadingStatisticsScreen extends StatelessWidget {
     );
   }
 
+
+  Widget _sectionTitle(
+    BuildContext context,
+    String title,
+    IconData icon,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Icon(icon),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     final statisticsRepository = StatisticsRepository();
@@ -144,65 +178,144 @@ class ReadingStatisticsScreen extends StatelessWidget {
             children: [
               Text(
                 book.bookName,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 28,
+                  fontSize: 30,
                   fontWeight: FontWeight.bold,
                 ),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
 
-              const Divider(),
+              const Divider(thickness: 1.4),
 
-              const SizedBox(height: 12),
-
-              _statCard(
-                context: context,
-                title: "Toplam okuma süresi",
-                value: _formatDuration(stats.totalReadingTime),
+              _sectionTitle(
+                context,
+                "Kitap Bilgileri",
+                Icons.menu_book,
               ),
 
               _statCard(
                 context: context,
-                title: "Toplam kelime",
-                value: _formatNumber(stats.totalWordsRead),
+                title: "Dosya",
+                value: book.fileType.toUpperCase(),
               ),
 
               _statCard(
                 context: context,
-                title: "Toplam sayfa",
-                value: _formatNumber(stats.totalPagesRead),
+                title: "Eklenme",
+                value: _formatDate(book.addedAt),
               ),
 
               _statCard(
                 context: context,
-                title: "Toplam oturum",
-                value: _formatNumber(stats.sessionCount),
+                title: "Son Açılış",
+                value: _formatDate(book.lastOpenedAt),
               ),
 
               _statCard(
                 context: context,
-                title: "Ortalama hız",
-                value: "${stats.averageWpm.toStringAsFixed(1)} WPM",
+                title: "Toplam Sayfa",
+                value: _formatNumber(book.pageCount),
               ),
 
               _statCard(
                 context: context,
-                title: "En yüksek hız",
-                value: "${stats.peakWpm.toStringAsFixed(1)} WPM",
+                title: "Toplam Kelime",
+                value: _formatNumber(book.wordCount),
               ),
 
               _statCard(
                 context: context,
-                title: "İlk okuma",
-                value: _formatDate(stats.firstReadAt),
+                title: "İlerleme",
+                value: _formatProgress(book),
               ),
 
               _statCard(
                 context: context,
-                title: "Son okuma",
-                value: _formatDate(stats.lastReadAt),
+                title: "Favori",
+                value: book.isFavorite ? "✓" : "✗",
               ),
+
+              _statCard(
+                context: context,
+                title: "Tamamlandı",
+                value: book.isCompleted ? "✓" : "✗",
+              ),
+
+              const SizedBox(height: 24),
+
+              const Divider(thickness: 1.4),
+
+              _sectionTitle(
+                context,
+                "Okuma İstatistikleri",
+                Icons.bar_chart,
+              ),
+
+              _statCard(
+                context: context,
+                title: "Toplam Okuma Süresi",
+                value: _formatDuration(
+                  stats.totalReadingTime,
+                ),
+              ),
+
+              _statCard(
+                context: context,
+                title: "Toplam Kelime Okundu",
+                value: _formatNumber(
+                  stats.totalWordsRead,
+                ),
+              ),
+
+              _statCard(
+                context: context,
+                title: "Toplam Sayfa Okundu",
+                value: _formatNumber(
+                  stats.totalPagesRead,
+                ),
+              ),
+
+              _statCard(
+                context: context,
+                title: "Toplam Oturum",
+                value: _formatNumber(
+                  stats.sessionCount,
+                ),
+              ),
+
+              _statCard(
+                context: context,
+                title: "Ortalama Hız",
+                value:
+                    "${stats.averageWpm.toStringAsFixed(1)} WPM",
+              ),
+
+              _statCard(
+                context: context,
+                title: "En Yüksek Hız",
+                value:
+                    "${stats.peakWpm.toStringAsFixed(1)} WPM",
+              ),
+
+              _statCard(
+                context: context,
+                title: "İlk Okuma",
+                value: _formatDate(
+                  stats.firstReadAt,
+                ),
+              ),
+
+              _statCard(
+                context: context,
+                title: "Son Okuma",
+                value: _formatDate(
+                  stats.lastReadAt,
+                ),
+              ),
+
+              const SizedBox(height: 24),
             ],
           );
         },
