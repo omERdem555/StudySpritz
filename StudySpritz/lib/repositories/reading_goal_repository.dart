@@ -6,7 +6,28 @@ import '../models/reading_goal.dart';
 class ReadingGoalRepository {
   static const String todayGoalKey = 'today_goal';
 
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year &&
+        a.month == b.month &&
+        a.day == b.day;
+  }
+
+  Future<void> validateTodayGoal() async {
+    final ReadingGoal? goal =
+        HiveService.readingGoalsBox.get(todayGoalKey);
+
+    if (goal == null) return;
+
+    if (_isSameDay(goal.createdAt, DateTime.now())) {
+      return;
+    }
+
+    await deleteGoal();
+  }
+
   Future<ReadingGoal?> getTodayGoal() async {
+    await validateTodayGoal();
+
     return HiveService.readingGoalsBox.get(todayGoalKey);
   }
 
