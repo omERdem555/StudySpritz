@@ -6,7 +6,9 @@ import '../../models/app_settings.dart';
 import '../../models/reading_statistics.dart';
 import '../../models/highlight.dart';
 import '../../models/app_statistics.dart';
+import '../../models/reading_goal.dart';
 
+import '../../adapters/reading_goal_adapter.dart';
 import '../../adapters/book_adapter.dart';
 import '../../adapters/bookmark_adapter.dart';
 import '../../adapters/app_settings_adapter.dart';
@@ -26,6 +28,7 @@ class HiveService {
   static late Box<ReadingStatistics> statisticsBox;
   static late Box<AppStatistics> appStatisticsBox;
   static late Box<Highlight> highlightsBox;
+  static late Box<ReadingGoal> readingGoalsBox;
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -37,6 +40,7 @@ class HiveService {
     Hive.registerAdapter(ReadingStatisticsAdapter());
     Hive.registerAdapter(AppStatisticsAdapter());
     Hive.registerAdapter(HighlightAdapter());
+    Hive.registerAdapter(ReadingGoalAdapter());
 
     // 2. KUTULARIN AÇILMASI
     booksBox = await Hive.openBox<Book>('books');
@@ -46,6 +50,7 @@ class HiveService {
     statisticsBox = await Hive.openBox<ReadingStatistics>('statistics');
     appStatisticsBox = await Hive.openBox<AppStatistics>('app_statistics');
     highlightsBox = await Hive.openBox<Highlight>('highlights');
+    readingGoalsBox = await Hive.openBox<ReadingGoal>('reading_goals');
 
     // 3. ŞEMA VERSİYON & MİGRASYON KONTROLÜ
     final metaBox = await Hive.openBox(_metaBoxName);
@@ -71,5 +76,6 @@ class HiveService {
     await statisticsBox.clear();
     await appStatisticsBox.clear();
     await highlightsBox.clear();
+    await readingGoalsBox.clear();
   }
 }
