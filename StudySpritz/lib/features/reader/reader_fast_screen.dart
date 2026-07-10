@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../repositories/book_repository.dart';
+import '../../../repositories/reading_goal_repository.dart';
 import '../../../core/state/settings_state.dart';
 import '../../../core/reading_engine/pagination_engine.dart';
-import '../../../models/book.dart';
+import '../../../models/reading_goal.dart';
 import '../../../models/app_settings.dart'; // AppSettings importu eklendi
-import '../../../repositories/book_repository.dart';
+import '../../../models/book.dart';
 
 class ReaderFastScreen extends StatefulWidget {
   final Book book;
@@ -29,6 +31,10 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
   bool isPlaying = false;
   int wpm = 200;
   int fontSize = 16;
+  DateTime? sessionStartedAt;
+
+  int startWordIndex = 0;
+  int startPageIndex = 0;
 
   late final BookRepository _repo;
 
@@ -36,16 +42,36 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
   void initState() {
     super.initState();
     _repo = BookRepository();
-    index = widget.initialWordIndex.clamp(0, widget.words.isEmpty ? 0 : widget.words.length - 1);
+    index = widget.initialWordIndex.clamp(
+      0,
+      widget.words.isEmpty ? 0 : widget.words.length - 1,
+    );
+
+    startWordIndex = index;
+
+    startPageIndex = PaginationEngine.getPageIndexForWord(
+      widget.words,
+      index,
+      fontSize,
+    );
+
+    sessionStartedAt = DateTime.now();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     final settings = context.watch<SettingsState>().settings;
     if (settings != null) {
       wpm = settings.wpmSpeed;
       fontSize = settings.fontSize;
+
+      startPageIndex = PaginationEngine.getPageIndexForWord(
+        widget.words,
+        startWordIndex,
+        fontSize,
+      );
     }
   }
 
@@ -58,6 +84,90 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
       bookId: widget.book.bookId,
       wordIndex: index,
       pageIndex: calculatedPage,
+    );
+
+    await _updateGoalProgress();
+  }
+
+  Future<void> _updateGoalProgress() async {
+    if (sessionStartedAt == null) return;
+
+    final durationSeconds =
+        DateTime.now().difference(sessionStartedAt!).inSeconds;
+
+    if (durationSeconds < 5) return;
+
+    final goalRepository = ReadingGoalRepository();
+    final goal = await goalRepository.getTodayGoal();
+
+    if (goal == null) return;
+
+    bool completedNow = false;
+
+    switch (goal.goalType) {
+      case GoalType.minutes:
+        completedNow = await goalRepository.updateProgress(
+          (durationSeconds / 60).floor(),
+        );
+        break;
+
+      case GoalType.pages:
+        final currentPage = PaginationEngine.getPageIndexForWord(
+          widget.words,
+          index,
+          fontSize,
+        );
+
+        final pagesRead =
+            (currentPage - startPageIndex).abs();
+
+        completedNow = await goalRepository.updateProgress(
+          pagesRead,
+        );
+        break;
+
+      case GoalType.words:
+        final wordsRead =
+            (index - startWordIndex).abs();
+
+        completedNow = await goalRepository.updateProgress(
+          wordsRead,
+        );
+        break;
+    }
+
+    startWordIndex = index;
+
+    startPageIndex = PaginationEngine.getPageIndexForWord(
+      widget.words,
+      index,
+      fontSize,
+    );
+
+    sessionStartedAt = DateTime.now();
+
+    if (!mounted || !completedNow) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+        content: Row(
+          children: [
+            Icon(
+              Icons.celebration,
+              color: Colors.white,
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "🎉 Tebrikler! Bugünkü okuma hedefini tamamladın.",
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

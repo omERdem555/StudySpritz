@@ -241,25 +241,51 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
     if (goal == null) return;
 
+    bool completedNow = false;
+
     switch (goal.goalType) {
       case GoalType.minutes:
-        await goalRepository.updateProgress(
+        completedNow = await goalRepository.updateProgress(
           (durationSeconds / 60).floor(),
         );
         break;
 
       case GoalType.pages:
-        await goalRepository.updateProgress(
+        completedNow = await goalRepository.updateProgress(
           pagesRead,
         );
         break;
 
       case GoalType.words:
-        await goalRepository.updateProgress(
+        completedNow = await goalRepository.updateProgress(
           wordsRead,
         );
         break;
     }
+
+    if (!mounted || !completedNow) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+        content: Row(
+          children: [
+            Icon(
+              Icons.celebration,
+              color: Colors.white,
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "🎉 Tebrikler! Bugünkü okuma hedefini tamamladın.",
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _navigateToFastReader() async {

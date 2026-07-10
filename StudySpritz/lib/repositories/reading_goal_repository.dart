@@ -51,12 +51,12 @@ class ReadingGoalRepository {
     );
   }
 
-  Future<void> updateProgress(int value) async {
+  Future<bool> updateProgress(int value) async {
     final goal = await getTodayGoal();
 
-    if (goal == null) return;
+    if (goal == null) return false;
 
-    if (goal.isCompleted) return;
+    if (goal.isCompleted) return false;
 
     final progress = goal.currentValue + value;
 
@@ -70,8 +70,9 @@ class ReadingGoalRepository {
         completedAt: completed ? DateTime.now() : null,
       ),
     );
-  }
 
+    return completed;
+  }
   Future<void> resetForNextDay() async {
     await HiveService.readingGoalsBox.delete(todayGoalKey);
   }
