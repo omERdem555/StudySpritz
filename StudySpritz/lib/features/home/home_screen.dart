@@ -8,6 +8,7 @@ import '../../repositories/book_repository.dart';
 import '../../repositories/app_statistics_repository.dart';
 import '../../models/app_statistics.dart';
 import '../../core/services/book_creation_service.dart';
+import '../goals/reading_goals_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -133,6 +134,10 @@ class HomeScreen extends StatelessWidget {
                         onLongPress: () => _showDeleteDialog(context, book),
                       ),
                     ),
+
+                  const SizedBox(height: 24),
+
+                  const ReadingGoalsCard(),
 
                   const SizedBox(height: 24),
 

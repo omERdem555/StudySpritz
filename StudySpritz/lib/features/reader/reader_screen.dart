@@ -7,16 +7,18 @@ import 'dart:typed_data';
 
 import '../settings/settings_screen.dart';
 import 'reader_fast_screen.dart';
+import '../../../core/reading_engine/pagination_engine.dart'; // PaginationEngine import edildi
 import '../../../core/reading_engine/reader_engine.dart';
 import '../../../core/parsers/parser_factory.dart';
-import '../../../repositories/book_repository.dart';
-import '../../../repositories/statistics_repository.dart'; 
 import '../../../core/state/settings_state.dart';
+import '../../../repositories/book_repository.dart';
+import '../../../repositories/statistics_repository.dart';
+import '../../../repositories/reading_goal_repository.dart';
+import '../../../models/reading_goal.dart'; 
 import '../../../models/app_settings.dart';
 import '../../../models/bookmark.dart';
 import '../../../models/book.dart';
 import '../../../repositories/bookmark_repository.dart';
-import '../../../core/reading_engine/pagination_engine.dart'; // PaginationEngine import edildi
 import '../statistics/reading_statistics_screen.dart';
 
 class ReaderScreen extends StatefulWidget {
@@ -213,19 +215,51 @@ class _ReaderScreenState extends State<ReaderScreen> {
   Future<void> _saveStatistics() async {
     if (engine == null || sessionStartedAt == null) return;
 
-    final durationSeconds = DateTime.now().difference(sessionStartedAt!).inSeconds;
-    final wordsRead = (engine!.state.wordIndex - startWordIndex).abs();
-    final pagesRead = (engine!.state.pageIndex - startPageIndex).abs();
+    final durationSeconds =
+        DateTime.now().difference(sessionStartedAt!).inSeconds;
+
+    final wordsRead =
+        (engine!.state.wordIndex - startWordIndex).abs();
+
+    final pagesRead =
+        (engine!.state.pageIndex - startPageIndex).abs();
 
     if (durationSeconds < 5) return;
 
     final repository = StatisticsRepository();
+
     await repository.updateSession(
       bookId: bookId,
       sessionDurationSeconds: durationSeconds,
       wordsRead: wordsRead,
       pagesRead: pagesRead,
     );
+
+    final goalRepository = ReadingGoalRepository();
+
+    final goal = await goalRepository.getTodayGoal();
+
+    if (goal == null) return;
+
+    switch (goal.goalType) {
+      case GoalType.minutes:
+        await goalRepository.updateProgress(
+          (durationSeconds / 60).floor(),
+        );
+        break;
+
+      case GoalType.pages:
+        await goalRepository.updateProgress(
+          pagesRead,
+        );
+        break;
+
+      case GoalType.words:
+        await goalRepository.updateProgress(
+          wordsRead,
+        );
+        break;
+    }
   }
 
   Future<void> _navigateToFastReader() async {
