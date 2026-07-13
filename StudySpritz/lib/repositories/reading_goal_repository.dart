@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 
 import '../core/services/hive_service.dart';
+import '../models/reading_goal_history.dart';
 import '../models/reading_goal.dart';
 
 class ReadingGoalRepository {
@@ -13,7 +14,7 @@ class ReadingGoalRepository {
   }
 
   Future<void> validateTodayGoal() async {
-    final ReadingGoal? goal =
+    final goal =
         HiveService.readingGoalsBox.get(todayGoalKey);
 
     if (goal == null) return;
@@ -21,6 +22,8 @@ class ReadingGoalRepository {
     if (_isSameDay(goal.createdAt, DateTime.now())) {
       return;
     }
+
+    await _archiveGoal(goal);
 
     await deleteGoal();
   }
@@ -73,11 +76,31 @@ class ReadingGoalRepository {
 
     return completed;
   }
+
   Future<void> resetForNextDay() async {
+    final goal =
+        HiveService.readingGoalsBox.get(todayGoalKey);
+
+    if (goal != null) {
+      await _archiveGoal(goal);
+    }
+
     await HiveService.readingGoalsBox.delete(todayGoalKey);
   }
 
   Future<void> deleteGoal() async {
     await HiveService.readingGoalsBox.delete(todayGoalKey);
   }
+
+  Future<void> _archiveGoal(
+  ReadingGoal goal,
+) async {
+  final history =
+      ReadingGoalHistory.fromGoal(goal);
+
+  await HiveService.readingGoalHistoryBox.put(
+    history.historyId,
+    history,
+  );
+}
 }

@@ -7,7 +7,9 @@ import '../../models/reading_statistics.dart';
 import '../../models/highlight.dart';
 import '../../models/app_statistics.dart';
 import '../../models/reading_goal.dart';
+import '../../models/reading_goal_history.dart';
 
+import '../../adapters/reading_goal_history_adapter.dart';
 import '../../adapters/reading_goal_adapter.dart';
 import '../../adapters/book_adapter.dart';
 import '../../adapters/bookmark_adapter.dart';
@@ -22,13 +24,14 @@ class HiveService {
   static const String _schemaVersionKey = 'schema_version';
 
   static late Box<Book> booksBox;
-  static late Box<Uint8List> booksBytesBox; // Adlandırma repository ile eşitlendi
+  static late Box<Uint8List> booksBytesBox;
   static late Box<Bookmark> bookmarksBox;
   static late Box<AppSettings> settingsBox;
   static late Box<ReadingStatistics> statisticsBox;
   static late Box<AppStatistics> appStatisticsBox;
   static late Box<Highlight> highlightsBox;
   static late Box<ReadingGoal> readingGoalsBox;
+  static late Box<ReadingGoalHistory> readingGoalHistoryBox;
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -41,16 +44,18 @@ class HiveService {
     Hive.registerAdapter(AppStatisticsAdapter());
     Hive.registerAdapter(HighlightAdapter());
     Hive.registerAdapter(ReadingGoalAdapter());
+    Hive.registerAdapter(ReadingGoalHistoryAdapter());
 
     // 2. KUTULARIN AÇILMASI
     booksBox = await Hive.openBox<Book>('books');
-    booksBytesBox = await Hive.openBox<Uint8List>('books_bytes'); // Burası eklendi
+    booksBytesBox = await Hive.openBox<Uint8List>('books_bytes');
     bookmarksBox = await Hive.openBox<Bookmark>('bookmarks');
     settingsBox = await Hive.openBox<AppSettings>('settings');
     statisticsBox = await Hive.openBox<ReadingStatistics>('statistics');
     appStatisticsBox = await Hive.openBox<AppStatistics>('app_statistics');
     highlightsBox = await Hive.openBox<Highlight>('highlights');
     readingGoalsBox = await Hive.openBox<ReadingGoal>('reading_goals');
+    readingGoalHistoryBox = await Hive.openBox<ReadingGoalHistory>('reading_goal_history');
 
     // 3. ŞEMA VERSİYON & MİGRASYON KONTROLÜ
     final metaBox = await Hive.openBox(_metaBoxName);
@@ -77,5 +82,6 @@ class HiveService {
     await appStatisticsBox.clear();
     await highlightsBox.clear();
     await readingGoalsBox.clear();
+    await readingGoalHistoryBox.clear();
   }
 }

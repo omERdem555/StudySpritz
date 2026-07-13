@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/state/settings_state.dart';
-
+import '../../features/goals/reading_goal_history_screen.dart';
+import '../../repositories/reading_goal_repository.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -119,6 +120,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
             divisions: 50,
             label: settings.wpmSpeed.toString(),
             onChanged: (v) => state.setWpm(v.toInt()),
+          ),
+
+          /////////////////
+          const SizedBox(height: 24),
+
+          ElevatedButton.icon(
+            icon: const Icon(Icons.bug_report),
+            label: const Text("DEBUG - Next Day"),
+            onPressed: () async {
+              final repository = ReadingGoalRepository();
+
+              await repository.resetForNextDay();
+
+              if (!context.mounted) return;
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Goal archived. New day simulated."),
+                ),
+              );
+            },
+          ),
+          /////////////////
+
+          const SizedBox(height: 30),
+
+          const Divider(),
+
+          ListTile(
+            leading: const Icon(Icons.history),
+            title: const Text("Reading Goal History"),
+            subtitle: const Text(
+              "View completed and previous daily goals",
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ReadingGoalHistoryScreen(),
+                ),
+              );
+            },
           ),
         ],
       ),
