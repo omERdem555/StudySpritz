@@ -122,28 +122,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onChanged: (v) => state.setWpm(v.toInt()),
           ),
 
-          /////////////////
-          const SizedBox(height: 24),
-
-          ElevatedButton.icon(
-            icon: const Icon(Icons.bug_report),
-            label: const Text("DEBUG - Next Day"),
-            onPressed: () async {
-              final repository = ReadingGoalRepository();
-
-              await repository.resetForNextDay();
-
-              if (!context.mounted) return;
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Goal archived. New day simulated."),
-                ),
-              );
-            },
-          ),
-          /////////////////
-
           const SizedBox(height: 30),
 
           const Divider(),
