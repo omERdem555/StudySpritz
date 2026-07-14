@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io' as io; 
 import 'dart:typed_data'; 
+import '../../l10n/app_localizations.dart';
 
 import '../settings/settings_screen.dart';
 import 'reader_fast_screen.dart';
@@ -125,11 +126,15 @@ class _ReaderScreenState extends State<ReaderScreen> {
   }
 
   Future<void> _showFileNotFoundDialog() {
+    final l10n = AppLocalizations.of(context)!;
+
     return showDialog(
       context: context,
-      builder: (_) => const AlertDialog(
-        title: Text("Dosya Bulunamadı"),
-        content: Text("Orijinal kitap dosyası bu cihazda mevcut değil."),
+      builder: (_) => AlertDialog(
+        title: Text(l10n.fileNotFound),
+        content: Text(
+          l10n.fileNotFoundMessage,
+        ),
       ),
     );
   }
@@ -177,20 +182,21 @@ class _ReaderScreenState extends State<ReaderScreen> {
   Future<void> _addBookmark() async {
     if (engine == null) return;
     final noteController = TextEditingController();
+    final l10n = AppLocalizations.of(context)!;
 
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Yer İmi Ekle"),
+        title: Text(l10n.addBookmark),
         content: TextField(
           controller: noteController,
-          decoration: const InputDecoration(hintText: "İsteğe bağlı not..."),
+          decoration: InputDecoration(hintText: l10n.optionalNote),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("İptal")),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, noteController.text),
-            child: const Text("Kaydet"),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -209,12 +215,14 @@ class _ReaderScreenState extends State<ReaderScreen> {
     );
 
     await repo.addBookmark(bookmark);
-    if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Yer imi kaydedildi")));
+    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.bookmarkSaved)));
   }
 
   Future<void> _saveStatistics() async {
     if (engine == null || sessionStartedAt == null) return;
 
+    final l10n = AppLocalizations.of(context)!;
+    
     final durationSeconds =
         DateTime.now().difference(sessionStartedAt!).inSeconds;
 
@@ -266,7 +274,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
     if (!mounted || !completedNow) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.green,
         duration: Duration(seconds: 3),
@@ -279,8 +287,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
             SizedBox(width: 12),
             Expanded(
               child: Text(
-                "🎉 Tebrikler! Bugünkü okuma hedefini tamamladın.",
-              ),
+              l10n.goalCompleted,
+              )
             ),
           ],
         ),
@@ -322,12 +330,14 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (engine == null) {
-      return const Scaffold(body: Center(child: Text("Kitap yüklenemedi.")));
+      return Scaffold(body: Center(child: Text(l10n.bookLoadFailed)));
     }
 
     final currentSettings = context.watch<SettingsState>().settings ?? AppSettings.defaults();
@@ -356,11 +366,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(loadedBook?.bookName ?? "Okuyucu"),
+          title: Text(loadedBook?.bookName ?? l10n.reader),
           actions: [
             IconButton(
               icon: const Icon(Icons.bar_chart),
-              tooltip: "İstatistikler",
+              tooltip: l10n.statistics,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -374,7 +384,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.settings),
-              tooltip: "Ayarlar",
+              tooltip: l10n.settings,
               onPressed: () {
                 Navigator.push(
                   context,

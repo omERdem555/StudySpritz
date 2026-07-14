@@ -164,4 +164,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String bookAddError(Object error) {
     return 'Error while adding book: $error';
   }
+
+  @override
+  String get reader => 'Reader';
+
+  @override
+  String get fileNotFound => 'File Not Found';
+
+  @override
+  String get fileNotFoundMessage =>
+      'The original book file is not available on this device.';
+
+  @override
+  String get bookLoadFailed => 'Failed to load book.';
+
+  @override
+  String get addBookmark => 'Add Bookmark';
+
+  @override
+  String get optionalNote => 'Optional note...';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get bookmarkSaved => 'Bookmark saved.';
+
+  @override
+  String get goalCompleted =>
+      '🎉 Congratulations! You completed today\'s reading goal.';
 }

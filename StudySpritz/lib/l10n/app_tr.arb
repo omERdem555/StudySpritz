@@ -112,5 +112,23 @@
     "placeholders": {
       "error": {}
     }
-  }
+  },
+
+  "reader": "Okuyucu",
+
+  "fileNotFound": "Dosya Bulunamadı",
+
+  "fileNotFoundMessage": "Orijinal kitap dosyası bu cihazda mevcut değil.",
+
+  "bookLoadFailed": "Kitap yüklenemedi.",
+
+  "addBookmark": "Yer İmi Ekle",
+
+  "optionalNote": "İsteğe bağlı not...",
+
+  "save": "Kaydet",
+
+  "bookmarkSaved": "Yer imi kaydedildi.",
+
+  "goalCompleted": "🎉 Tebrikler! Bugünkü okuma hedefini tamamladın."
 }

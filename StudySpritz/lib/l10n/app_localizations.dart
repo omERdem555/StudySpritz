@@ -391,6 +391,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error while adding book: {error}'**
   String bookAddError(Object error);
+
+  /// No description provided for @reader.
+  ///
+  /// In en, this message translates to:
+  /// **'Reader'**
+  String get reader;
+
+  /// No description provided for @fileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'File Not Found'**
+  String get fileNotFound;
+
+  /// No description provided for @fileNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The original book file is not available on this device.'**
+  String get fileNotFoundMessage;
+
+  /// No description provided for @bookLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load book.'**
+  String get bookLoadFailed;
+
+  /// No description provided for @addBookmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Bookmark'**
+  String get addBookmark;
+
+  /// No description provided for @optionalNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional note...'**
+  String get optionalNote;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @bookmarkSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark saved.'**
+  String get bookmarkSaved;
+
+  /// No description provided for @goalCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'🎉 Congratulations! You completed today\'s reading goal.'**
+  String get goalCompleted;
 }
 
 class _AppLocalizationsDelegate

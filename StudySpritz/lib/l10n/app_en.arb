@@ -112,5 +112,23 @@
     "placeholders": {
       "error": {}
     }
-  }
+  },
+
+  "reader": "Reader",
+
+  "fileNotFound": "File Not Found",
+
+  "fileNotFoundMessage": "The original book file is not available on this device.",
+
+  "bookLoadFailed": "Failed to load book.",
+
+  "addBookmark": "Add Bookmark",
+
+  "optionalNote": "Optional note...",
+
+  "save": "Save",
+
+  "bookmarkSaved": "Bookmark saved.",
+
+  "goalCompleted": "🎉 Congratulations! You completed today's reading goal."
 }

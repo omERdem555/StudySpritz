@@ -164,4 +164,33 @@ class AppLocalizationsTr extends AppLocalizations {
   String bookAddError(Object error) {
     return 'Kitap eklenirken hata oluştu: $error';
   }
+
+  @override
+  String get reader => 'Okuyucu';
+
+  @override
+  String get fileNotFound => 'Dosya Bulunamadı';
+
+  @override
+  String get fileNotFoundMessage =>
+      'Orijinal kitap dosyası bu cihazda mevcut değil.';
+
+  @override
+  String get bookLoadFailed => 'Kitap yüklenemedi.';
+
+  @override
+  String get addBookmark => 'Yer İmi Ekle';
+
+  @override
+  String get optionalNote => 'İsteğe bağlı not...';
+
+  @override
+  String get save => 'Kaydet';
+
+  @override
+  String get bookmarkSaved => 'Yer imi kaydedildi.';
+
+  @override
+  String get goalCompleted =>
+      '🎉 Tebrikler! Bugünkü okuma hedefini tamamladın.';
 }
