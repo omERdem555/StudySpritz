@@ -59,4 +59,38 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get noBookmarks => 'Yer imi bulunamadı.';
+
+  @override
+  String get readingGoalHistory => 'Okuma Hedefi Geçmişi';
+
+  @override
+  String get readingGoalHistorySubtitle =>
+      'Tamamlanan ve önceki günlük hedefleri görüntüle';
+
+  @override
+  String get english => 'İngilizce';
+
+  @override
+  String get turkish => 'Türkçe';
+
+  @override
+  String get yellow => 'Sarı';
+
+  @override
+  String get green => 'Yeşil';
+
+  @override
+  String get blue => 'Mavi';
+
+  @override
+  String get red => 'Kırmızı';
+
+  @override
+  String get light => 'Açık';
+
+  @override
+  String get dark => 'Koyu';
+
+  @override
+  String get system => 'Sistem';
 }

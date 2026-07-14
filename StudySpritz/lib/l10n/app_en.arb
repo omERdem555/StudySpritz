@@ -33,5 +33,20 @@
 
   "deleteBookmarkMessage": "Are you sure you want to delete this bookmark?",
 
-  "noBookmarks": "No bookmarks found."
+  "noBookmarks": "No bookmarks found.",
+
+  "readingGoalHistory": "Reading Goal History",
+  "readingGoalHistorySubtitle": "View completed and previous daily goals",
+
+  "english": "English",
+  "turkish": "Turkish",
+
+  "yellow": "Yellow",
+  "green": "Green",
+  "blue": "Blue",
+  "red": "Red",
+
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System"
 }

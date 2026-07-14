@@ -59,4 +59,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noBookmarks => 'No bookmarks found.';
+
+  @override
+  String get readingGoalHistory => 'Reading Goal History';
+
+  @override
+  String get readingGoalHistorySubtitle =>
+      'View completed and previous daily goals';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get turkish => 'Turkish';
+
+  @override
+  String get yellow => 'Yellow';
+
+  @override
+  String get green => 'Green';
+
+  @override
+  String get blue => 'Blue';
+
+  @override
+  String get red => 'Red';
+
+  @override
+  String get light => 'Light';
+
+  @override
+  String get dark => 'Dark';
+
+  @override
+  String get system => 'System';
 }

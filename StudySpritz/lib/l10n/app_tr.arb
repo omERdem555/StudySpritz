@@ -33,5 +33,20 @@
 
   "deleteBookmarkMessage": "Bu yer işaretini silmek istediğinize emin misiniz?",
 
-  "noBookmarks": "Yer imi bulunamadı."
+  "noBookmarks": "Yer imi bulunamadı.",
+  
+  "readingGoalHistory": "Okuma Hedefi Geçmişi",
+  "readingGoalHistorySubtitle": "Tamamlanan ve önceki günlük hedefleri görüntüle",
+
+  "english": "İngilizce",
+  "turkish": "Türkçe",
+
+  "yellow": "Sarı",
+  "green": "Yeşil",
+  "blue": "Mavi",
+  "red": "Kırmızı",
+
+  "light": "Açık",
+  "dark": "Koyu",
+  "system": "Sistem"
 }

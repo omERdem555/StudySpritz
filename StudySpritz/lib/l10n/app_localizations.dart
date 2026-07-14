@@ -199,6 +199,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No bookmarks found.'**
   String get noBookmarks;
+
+  /// No description provided for @readingGoalHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading Goal History'**
+  String get readingGoalHistory;
+
+  /// No description provided for @readingGoalHistorySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View completed and previous daily goals'**
+  String get readingGoalHistorySubtitle;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @turkish.
+  ///
+  /// In en, this message translates to:
+  /// **'Turkish'**
+  String get turkish;
+
+  /// No description provided for @yellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow'**
+  String get yellow;
+
+  /// No description provided for @green.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get green;
+
+  /// No description provided for @blue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get blue;
+
+  /// No description provided for @red.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get red;
+
+  /// No description provided for @light.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get light;
+
+  /// No description provided for @dark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get dark;
+
+  /// No description provided for @system.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get system;
 }
 
 class _AppLocalizationsDelegate
