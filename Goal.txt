@@ -1,0 +1,168 @@
+FAZ 2 — Okuma Hedefleri
+Bu bence StudySpritz için oyunlaştırma tarafında en değerli özelliklerden biri.
+Ama bunu mevcut modellere ekleyerek değil, ayrı bir domain olarak tasarlamak daha doğru olur.
+Amaç
+Kullanıcının günlük okuma hedefleri oluşturmasını ve tamamlamasını sağlamak.
+
+Örneğin
+Bugün
+☐ 20 dakika oku
+☑ 35 sayfa oku
+☐ 5000 kelime oku
+
+veya
+Bugün
+%60
+██████░░░░
+12 / 20 dakika
+
+Yeni Domain
+Mevcut mimariye göre yeni model:
+Book
+ReadingStatistics
+AppStatistics
+ReadingGoal   <-- yeni
+
+ReadingGoal
+goalId
+goalType
+targetValue
+currentValue
+isCompleted
+createdAt
+completedAt
+goalType
+minutes
+pages
+words
+
+Örnek
+20 dakika oku
+goalType = minutes
+targetValue = 20
+currentValue = 12
+isCompleted = false
+35 sayfa oku
+
+goalType = pages
+targetValue = 35
+currentValue = 35
+isCompleted = true
+
+Repository
+ReadingGoalRepository
+
+Görevleri
+getTodayGoal()
+createGoal()
+updateProgress()
+completeGoal()
+resetForNextDay()
+
+ReaderScreen
+Şu anda zaten burada elimizde var
+durationSeconds
+pagesRead
+wordsRead
+
+Yani
+_saveStatistics()
+çalışırken aynı anda
+ReadingGoalRepository.updateProgress(...)
+çağrılabilir. Ekstra parser yazmaya gerek yok.
+
+HomeScreen
+
+Tüm Kitaplar ve İstatistikler arasına
+
+Hedef
+███████░░░░
+14 / 20 dakika
+veya
+27 / 35 sayfa
+kartı gelir.
+İleride
+Bu yapı sayesinde
+7 gün üst üste hedef tamamlandı 🔥
+gibi şeyler de eklenebilir.
+
+Ben olsam modeli biraz daha geleceğe hazırlardım
+Şöyle yapardım.
+
+ReadingGoal
+goalId
+goalType
+targetValue
+currentValue
+goalDate
+isCompleted
+completedAt
+goalDate  alanı çok önemli.
+
+Çünkü daha sonra
+bugün 
+dün
+geçmiş hedefler
+aylık başarı oranı
+takvim görünümü
+gibi özellikleri eklemek için modeli değiştirmek zorunda kalmazsın.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FAZ 2.1 — ReadingGoal Domain
+
+Amaç
+Yeni hedef modelini ve Hive altyapısını oluşturmak.
+
+Değişecek dosyalar
+lib/core/services/hive_service.dart
+
+Yeni eklenecek dosyalar
+lib/models/reading_goal.dart
+lib/adapters/reading_goal_adapter.dart
+lib/repositories/reading_goal_repository.dart
+
+Güncellenecek dosyalar
+lib/core/services/hive_service.dart
+
+
+FAZ 2.2 — Reader Entegrasyonu
+ReaderScreen, _saveStatistics() çalıştığında hedef ilerlemesini de güncelleyecek.
+Bundan sonra
+Ben olsam sırayı şöyle götürürdüm:
+
+FAZ 2.5
+Reader entegrasyonu
+Okuma bittikçe hedef ilerlesin
+↓
+FAZ 2.6
+Gün değişince otomatik reset
+(şu an manuel delete var)
+↓
+FAZ 2.7
+Hedef tamamlanınca animasyon / Snackbar / kutlama
+↓
+FAZ 2.8
+İleride geçmiş günlük hedefler (History)
+Bu sıralama mevcut mimariyi bozmadan ilerler.

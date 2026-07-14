@@ -1,0 +1,167 @@
+Faz 3
+Yer imi geliştirmeleri (filtre + arama)
+Hepsi
+↓
+Suç ve Ceza
+↓
+1984
+↓
+Hayvan Çiftliği
+
+Yer imi arama
+not ara...
+
+Not içinde arama
+Örneğin "özgürlük" yazınca bütün notlardan bulsun.
+
+
+
+
+
+
+
+
+
+FAZ 3.1
+✅ Kitaba göre filtre
+
+Hepsi
+↓
+Suç ve Ceza
+↓
+1984
+↓
+Hayvan Çiftliği
+
+
+FAZ 3.2
+🔍 Yer imi arama
+
+özgürlük
+↓
+başlık
+↓
+alıntı
+
+
+FAZ 3.3
+📝 Not içinde arama
+
+"özgürlük"
+↓
+yalnızca note alanında ara
+
+
+FAZ 3.4
+İkisini birlikte kullanabilme
+
+Kitap = 1984
++
+Arama = özgürlük
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FAZ 3.1 — Kitaba Göre Filtre
+Amaç Bookmarks ekranında:
+
+Hepsi
+▼ Suç ve Ceza
+▼ 1984
+▼ Hayvan Çiftliği
+şeklinde filtreleme yapmak.
+
+Değişecek dosyalar
+lib/screens/bookmarks/bookmarks_screen.dart
+Kullanılacak mevcut dosyalar
+lib/repositories/book_repository.dart
+lib/models/book.dart
+Yeni dosya Yok.
+Bu faz tamamen mevcut repository ile yapılabilir.
+
+
+
+FAZ 3.2 — Yer İmi Arama
+Amaç:
+🔍
+özgürlük
+yazınca
+kitap adı
+not
+içerisinde arama yapmak.
+Değişecek dosyalar
+lib/screens/bookmarks/bookmarks_screen.dart
+Yeni dosya gerekmiyor.
+Repository değişmeyecek.
+
+
+
+FAZ 3.3 — Sadece Not İçinde Arama
+Bunun için küçük bir seçenek yeterli.
+Örneğin
+☑ Search only notes
+aktifse
+yalnızca
+bookmark.markNote
+aranacak. Yine yalnızca
+BookmarksScreen değişecek.
+
+
+
+FAZ 3.4 — Filtreleri Birleştirme
+En güzel kısmı bu.
+Aynı anda
+Book = 1984
+Search = özgürlük
+olabilecek.
+Yani filtre sırası
+Bütün Bookmarklar
+↓
+Kitaba göre filtre
+↓
+Metin araması
+↓
+Liste olacak. Bu da yine yalnızca BookmarksScreen'de yapılacak.
+
+
+Sonuç
+Bu faz için düşündüğünden de az dosya değişecek.
+Sadece
+bookmarks_screen.dart
+değişecek.
+Hiçbir model,
+hiçbir adapter,
+hiçbir repository,
+hiçbir Hive kutusu değişmeyecek.
+Bu da bu fazın oldukça düşük riskli olmasını sağlıyor.
+Ben olsam bu ekranı şu sırayla tasarlardım:
+
+Bookmarks
+────────────────────────
+[ All Books ▼ ]
+────────────────────────
+🔍 Search bookmarks...
+────────────────────────
+☐ Search only notes
+────────────────────────
+Bookmark List
+Bu yerleşim hem filtreleme hem de ileride yeni filtreler (favoriler, tarihe göre sıralama vb.) eklemek için ölçeklenebilir olacaktır.

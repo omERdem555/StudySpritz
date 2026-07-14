@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'dart:ui';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:studyspritz/l10n/app_localizations.dart';
 
 import 'core/state/settings_state.dart';
 import 'core/services/hive_service.dart';
@@ -9,7 +12,7 @@ import 'core/router/app_router.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await initializeDateFormatting('tr_TR');
+  await initializeDateFormatting();
   
   await HiveService.init();
 
@@ -54,6 +57,19 @@ class _AppView extends StatelessWidget {
             theme: ThemeData.light(),
 
             darkTheme: ThemeData.dark(),
+
+            locale: Locale(
+              state.settings?.language ?? "en",
+            ),
+
+            supportedLocales: AppLocalizations.supportedLocales,
+
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
           );
         },
       ),

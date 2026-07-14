@@ -1,0 +1,37 @@
+{
+  "@@locale": "tr",
+
+  "appName": "StudySpritz",
+
+  "settings": "Ayarlar",
+
+  "language": "Dil",
+
+  "theme": "Tema",
+
+  "fontSize": "Yazı Boyutu",
+
+  "wpm": "Kelime / Dakika",
+
+  "animationSpeed": "Animasyon Hızı",
+
+  "highlightColor": "RSVP Vurgu Rengi",
+
+  "bookmarks": "Yer İşaretleri",
+
+  "allBooks": "Tüm Kitaplar",
+
+  "searchBookmarks": "Yer imlerinde ara...",
+
+  "page": "Sayfa",
+
+  "delete": "Sil",
+
+  "cancel": "İptal",
+
+  "deleteBookmark": "Yer İşaretini Sil",
+
+  "deleteBookmarkMessage": "Bu yer işaretini silmek istediğinize emin misiniz?",
+
+  "noBookmarks": "Yer imi bulunamadı."
+}

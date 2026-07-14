@@ -1,0 +1,223 @@
+FAZ 1 — AppStatistics Altyapısı
+
+Amaç
+
+Mevcut Book ve ReadingStatistics modellerine dokunmadan, uygulama geneli istatistiklerini yönetecek yeni AppStatistics katmanını eklemek.
+
+Değişecek dosyalar
+lib/core/services/hive_service.dart
+Yeni eklenecek dosyalar
+lib/models/app_statistics.dart
+lib/adapters/app_statistics_adapter.dart
+lib/repositories/app_statistics_repository.dart
+Güncellenecek dosyalar
+lib/core/services/hive_service.dart
+
+Not: Bu fazda StatisticsRepository'ni değiştirmeyelim. O yalnızca kitap bazlı (ReadingStatistics) repository olarak kalsın. Böylece iki repository'nin sorumluluğu tamamen ayrılmış olur.
+
+
+
+FAZ 2 — Dashboard'ı AppStatistics'a geçirmek
+
+Bu fazda HomeScreen artık onlarca fold() işlemi yapmayacak.
+
+Yerine:
+
+final stats = await AppStatisticsRepository().get();
+
+ile tek model okuyacak.
+
+HomeScreen sadece ekrana basacak.
+
+Bütün hesaplamalar repository içerisinde olacak.
+
+
+
+
+FAZ 2A — Repository hesaplama motoru
+
+Amaç AppStatisticsRepository uygulamadaki bütün kitapları ve ReadingStatistics kayıtlarını okuyarak tek bir AppStatistics nesnesi oluşturacak.
+Bu fazda:
+
+BooksBox okunacak.
+StatisticsBox okunacak.
+Toplam kitap
+Favori kitap
+Tamamlanan kitap
+Toplam kelime
+Toplam sayfa
+Toplam süre
+Toplam oturum
+
+hesaplanacak. Henüz HomeScreen değişmeyecek.
+
+
+FAZ 2B — Dashboard
+İşte bundan sonra HomeScreen şu hale gelecek:
+final stats = await AppStatisticsRepository().get();
+
+ve
+
+stats.totalBooks
+stats.favoriteBooks
+stats.completedBooks
+...
+gösterecek. Artık hiçbir
+fold(...)
+kalmayacak.
+
+
+
+
+
+FAZ 3 — ReadingStatistics Sayfası
+
+Bu tamamen kitap bazlı olacak.
+
+Örneğin:
+
+Suç ve Ceza
+
+━━━━━━━━━━━━━━
+
+Toplam okuma süresi
+18 saat
+
+Toplam kelime
+312.540
+
+Toplam sayfa
+674
+
+Oturum
+41
+
+Ortalama hız
+320 WPM
+
+En yüksek hız
+510 WPM
+
+İlk okuma
+12 Haziran
+
+Son okuma
+8 Temmuz
+
+Bu sayfa yalnızca ReadingStatisticsRepository kullanacak.
+
+
+
+FAZ 4 — Book Detail
+
+Bu sayfa yalnızca Book modelini gösterecek.
+
+Örneğin:
+
+Suç ve Ceza
+
+Dosya
+suç_ve_ceza.epub
+
+Eklenme
+12 Haziran
+
+Son Açılış
+8 Temmuz
+
+Toplam Sayfa
+672
+
+Toplam Kelime
+312.540
+
+İlerleme
+%74
+
+Favori
+✓
+
+Tamamlandı
+✗
+
+Altında ise
+
+📊 Reading Statistics
+
+kartı bulunacak.
+
+Yani Book Detail, ReadingStatistics sayfasına geçiş noktası olacak.
+
+Son mimari
+Book
+│
+├── bookId
+├── bookName
+├── filePath
+├── fileType
+├── pageCount
+├── wordCount
+├── pageNumber
+├── wordIndex
+├── isFavorite
+├── isCompleted
+├── addedAt
+├── lastOpenedAt
+└── completedAt
+
+↓
+
+ReadingStatistics
+│
+├── totalReadingTime
+├── sessionCount
+├── lastSessionDuration
+├── averageWpm
+├── peakWpm
+├── totalPagesRead
+├── totalWordsRead
+├── firstReadAt
+└── lastReadAt
+
+↓
+
+AppStatistics
+│
+├── totalBooks
+├── completedBooks
+├── favoriteBooks
+├── totalReadingTime
+├── totalPages
+├── totalWords
+├── totalSessions
+├── todayReadingTime
+├── weekReadingTime
+├── monthReadingTime
+├── currentStreak
+├── longestStreak
+├── averageDailyReadingTime
+└── lastReadingDate
+Küçük ama önemli bir öneri
+
+İlk mesajda AppStatistics içinde yalnızca:
+
+totalBooks
+totalPages
+totalWords
+totalReadingTime
+today
+week
+month
+streak
+
+bulunuyordu.
+
+Ben buna üç alan daha eklemeyi öneriyorum:
+
+completedBooks
+favoriteBooks
+totalSessions
+
+Çünkü bunların tamamını şu anda Dashboard'da zaten hesaplıyorsun. Başlangıçta modele eklenirse ileride modeli yeniden değiştirmek zorunda kalmazsın.
+
+Bu yüzden AppStatistics modelini ilk seferde biraz daha kapsamlı tasarlamak, ileride yapılacak ek geliştirmeleri kolaylaştıracaktır.
