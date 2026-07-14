@@ -22,6 +22,7 @@ class BookmarksScreen extends StatefulWidget {
 
 class _BookmarksScreenState extends State<BookmarksScreen> {
   String? selectedBookId;
+  String searchText = "";
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +46,25 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
         bookmarks.sort(
           (a, b) => b.createdAt.compareTo(a.createdAt),
         );
+
+        if (searchText.trim().isNotEmpty) {
+          final query = searchText.toLowerCase();
+
+          bookmarks = bookmarks.where((bookmark) {
+            final note =
+                bookmark.markNote.toLowerCase();
+
+            final book = HiveService.booksBox.get(
+              bookmark.bookId,
+            );
+
+            final bookName =
+                book?.bookName.toLowerCase() ?? "";
+
+            return note.contains(query) ||
+                bookName.contains(query);
+          }).toList();
+        }
 
         return Scaffold(
           appBar: AppBar(
@@ -87,8 +107,27 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                           selectedBookId = value;
                         });
                       },
+                    ),  
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        hintText: "Search bookmarks...",
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          searchText = value;
+                        });
+                      },
                     ),
                   ),
+                  const SizedBox(height: 8),
                   Expanded(
                     child: bookmarks.isEmpty
                         ? const Center(
