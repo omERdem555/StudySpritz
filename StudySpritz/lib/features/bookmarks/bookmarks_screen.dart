@@ -85,6 +85,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                       8,
                     ),
                     child: DropdownButtonFormField<String?>(
+                      isExpanded: true,
                       value: selectedBookId,
                       decoration: const InputDecoration(
                         labelText: "Book",
@@ -98,7 +99,14 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                         ...books.map(
                           (book) => DropdownMenuItem<String?>(
                             value: book.bookId,
-                            child: Text(book.bookName),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                book.bookName,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
                           ),
                         ),
                       ],
