@@ -99,4 +99,69 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get unknownBook => 'Bilinmeyen Kitap';
+
+  @override
+  String get dashboard => 'Ana Sayfa';
+
+  @override
+  String get recentBooks => 'Son Okunanlar';
+
+  @override
+  String get emptyLibrary => 'Kütüphane boş';
+
+  @override
+  String get favoriteBooks => 'Favoriler';
+
+  @override
+  String get noFavorites => 'Henüz favori yok';
+
+  @override
+  String get statistics => 'İstatistikler';
+
+  @override
+  String get favorite => 'Favori';
+
+  @override
+  String get completed => 'Tamamlanan';
+
+  @override
+  String get session => 'Oturum';
+
+  @override
+  String get duration => 'Süre';
+
+  @override
+  String get words => 'Kelime';
+
+  @override
+  String get averageWpm => 'Ort. WPM';
+
+  @override
+  String get peakWpm => 'Maks. WPM';
+
+  @override
+  String get addBook => 'Yeni Kitap Ekle';
+
+  @override
+  String get deleteBook => 'Kitabı Sil';
+
+  @override
+  String deleteBookMessage(Object bookName) {
+    return '\"$bookName\" kütüphanenizden ve tüm ilerleme geçmişinizden silinecektir. Emin misiniz?';
+  }
+
+  @override
+  String bookDeleted(Object bookName) {
+    return '\"$bookName\" başarıyla silindi.';
+  }
+
+  @override
+  String bookAdded(Object bookName) {
+    return '\"$bookName\" kütüphaneye eklendi.';
+  }
+
+  @override
+  String bookAddError(Object error) {
+    return 'Kitap eklenirken hata oluştu: $error';
+  }
 }

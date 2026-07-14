@@ -60,5 +60,57 @@
 
   "@unknownBook": {
     "description": "Kitap bulunamadığında gösterilecek metin"
+  },
+
+  "dashboard": "Ana Sayfa",
+  "recentBooks": "Son Okunanlar",
+  "emptyLibrary": "Kütüphane boş",
+  "favoriteBooks": "Favoriler",
+  "noFavorites": "Henüz favori yok",
+  "statistics": "İstatistikler",
+
+  "favorite": "Favori",
+  "completed": "Tamamlanan",
+  "session": "Oturum",
+  "duration": "Süre",
+  "words": "Kelime",
+
+  "averageWpm": "Ort. WPM",
+  "peakWpm": "Maks. WPM",
+
+  "addBook": "Yeni Kitap Ekle",
+
+  "deleteBook": "Kitabı Sil",
+
+  "deleteBookMessage": "\"{bookName}\" kütüphanenizden ve tüm ilerleme geçmişinizden silinecektir. Emin misiniz?",
+
+  "@deleteBookMessage": {
+    "placeholders": {
+      "bookName": {}
+    }
+  },
+
+  "bookDeleted": "\"{bookName}\" başarıyla silindi.",
+
+  "@bookDeleted": {
+    "placeholders": {
+      "bookName": {}
+    }
+  },
+
+  "bookAdded": "\"{bookName}\" kütüphaneye eklendi.",
+
+  "@bookAdded": {
+    "placeholders": {
+      "bookName": {}
+    }
+  },
+
+  "bookAddError": "Kitap eklenirken hata oluştu: {error}",
+
+  "@bookAddError": {
+    "placeholders": {
+      "error": {}
+    }
   }
 }

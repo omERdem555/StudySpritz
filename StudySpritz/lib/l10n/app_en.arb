@@ -60,5 +60,57 @@
 
   "@unknownBook": {
     "description": "Unknown book placeholder"
+  },
+
+  "dashboard": "Dashboard",
+  "recentBooks": "Recently Read",
+  "emptyLibrary": "Library is empty",
+  "favoriteBooks": "Favorites",
+  "noFavorites": "No favorite books yet",
+  "statistics": "Statistics",
+
+  "favorite": "Favorite",
+  "completed": "Completed",
+  "session": "Session",
+  "duration": "Duration",
+  "words": "Words",
+
+  "averageWpm": "Avg WPM",
+  "peakWpm": "Peak WPM",
+
+  "addBook": "Add Book",
+
+  "deleteBook": "Delete Book",
+
+  "deleteBookMessage": "\"{bookName}\" will be removed from your library together with all progress. Are you sure?",
+
+  "@deleteBookMessage": {
+    "placeholders": {
+      "bookName": {}
+    }
+  },
+
+  "bookDeleted": "\"{bookName}\" deleted successfully.",
+
+  "@bookDeleted": {
+    "placeholders": {
+      "bookName": {}
+    }
+  },
+
+  "bookAdded": "\"{bookName}\" added to library.",
+
+  "@bookAdded": {
+    "placeholders": {
+      "bookName": {}
+    }
+  },
+
+  "bookAddError": "Error while adding book: {error}",
+
+  "@bookAddError": {
+    "placeholders": {
+      "error": {}
+    }
   }
 }

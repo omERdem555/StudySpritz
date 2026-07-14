@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../l10n/app_localizations.dart';
 
 import '../../core/services/hive_service.dart';
 import '../../models/book.dart';
@@ -15,20 +16,24 @@ class HomeScreen extends StatelessWidget {
 
   /// Kitap silme onay diyalog motoru
   Future<void> _showDeleteDialog(BuildContext context, Book book) async {
+    final l10n = AppLocalizations.of(context)!;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Kitabı Sil"),
-        content: Text('"${book.bookName}" kütüphanenizden ve tüm ilerleme geçmişinizden silinecektir. Emin misiniz?'),
+        title: Text(l10n.deleteBook),
+        content: Text(
+          l10n.deleteBookMessage(book.bookName),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text("Vazgeç"),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text("Sil"),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -39,7 +44,11 @@ class HomeScreen extends StatelessWidget {
       await repo.deleteBook(book.bookId);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('"${book.bookName}" başarıyla silindi.')),
+          SnackBar(
+            content: Text(
+              l10n.bookDeleted(book.bookName),
+            ),
+          )
         );
       }
     }
@@ -47,17 +56,26 @@ class HomeScreen extends StatelessWidget {
 
   /// FAB Butonu tetikleyicisi - BookCreationService üzerinden kütüphaneye kitap ekler
   Future<void> _pickAndCreateBook(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final newBook = await BookCreationService.createBook();
       if (newBook != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('"${newBook.bookName}" kütüphaneye eklendi.')),
+          SnackBar(
+            content: Text(
+              l10n.bookAdded(newBook.bookName),
+            ),
+          )
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Kitap eklenirken hata oluştu: $e')),
+          SnackBar(
+            content: Text(
+              l10n.bookAddError(e.toString()),
+            ),
+          )
         );
       }
     }
@@ -65,6 +83,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ValueListenableBuilder(
       valueListenable: HiveService.booksBox.listenable(),
       builder: (context, box, _) {
@@ -79,7 +98,9 @@ class HomeScreen extends StatelessWidget {
         final completed = books.where((b) => b.isCompleted).length;
 
         return Scaffold(
-          appBar: AppBar(title: const Text("Dashboard")),
+          appBar: AppBar(
+            title: Text(l10n.dashboard),
+          ),
           
           body: FutureBuilder<AppStatistics>(
             future: AppStatisticsRepository().get(),
@@ -89,11 +110,11 @@ class HomeScreen extends StatelessWidget {
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  _SectionTitle("Son Okunanlar"),
+                  _SectionTitle(l10n.recentBooks),
                   const SizedBox(height: 10),
 
                   if (recent.isEmpty)
-                    const _EmptyCard("Kütüphane boş")
+                    _EmptyCard(l10n.emptyLibrary)
                   else
                     _HorizontalBookList(
                       items: recent.take(10).toList(),
@@ -105,11 +126,11 @@ class HomeScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  _SectionTitle("Favoriler"),
+                  _SectionTitle(l10n.favoriteBooks),
                   const SizedBox(height: 10),
 
                   if (favorites.isEmpty)
-                    const _EmptyCard("Henüz favori yok")
+                    _EmptyCard(l10n.noFavorites)
                   else
                     _HorizontalBookList(
                       items: favorites,
@@ -121,11 +142,11 @@ class HomeScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  _SectionTitle("Tüm Kitaplar"),
+                  _SectionTitle(l10n.allBooks),
                   const SizedBox(height: 10),
 
                   if (books.isEmpty)
-                    const _EmptyCard("Kütüphane boş")
+                    _EmptyCard(l10n.emptyLibrary)
                   else
                     _HorizontalBookList(
                       items: books,
@@ -141,7 +162,7 @@ class HomeScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  _SectionTitle("İstatistikler"),
+                  _SectionTitle(l10n.statistics),
                   const SizedBox(height: 10),
 
                   SizedBox(
@@ -151,47 +172,47 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         _StatItem(
                           value: stats.totalBooks.toString(),
-                          label: "Kitap",
+                          label: l10n.book,
                         ),
                         const SizedBox(width: 12),
                         _StatItem(
                           value: stats.favoriteBooks.toString(),
-                          label: "Favori",
+                          label: l10n.favorite,
                         ),
                         const SizedBox(width: 12),
                         _StatItem(
                           value: stats.completedBooks.toString(),
-                          label: "Tamamlanan",
+                          label: l10n.completed,
                         ),
                         const SizedBox(width: 12),
                         _StatItem(
                           value: stats.totalSessions.toString(),
-                          label: "Oturum",
+                          label: l10n.session,
                         ),
                         const SizedBox(width: 12),
                         _StatItem(
                           value: stats.totalReadingTime.toString(),
-                          label: "Süre",
+                          label: l10n.duration,
                         ),
                         const SizedBox(width: 12),
                         _StatItem(
                           value: stats.totalWordsRead.toString(),
-                          label: "Kelime",
+                          label: l10n.words,
                         ),
                         const SizedBox(width: 12),
                         _StatItem(
                           value: stats.totalPagesRead.toString(),
-                          label: "Sayfa",
+                          label: l10n.page,
                         ),
                         const SizedBox(width: 12),
                         _StatItem(
                           value: stats.averageWpm.toStringAsFixed(1),
-                          label: "Avg WPM",
+                          label: l10n.averageWpm,
                         ),
                         const SizedBox(width: 12),
                         _StatItem(
                           value: stats.peakWpm.toStringAsFixed(1),
-                          label: "Peak WPM",
+                          label: l10n.peakWpm,
                         ),
                       ],
                     ),
@@ -204,7 +225,7 @@ class HomeScreen extends StatelessWidget {
           // FAZ 10 - Sağ alttaki FAB Kitap Ekleme Butonu Kuruldu
           floatingActionButton: FloatingActionButton(
             onPressed: () => _pickAndCreateBook(context),
-            tooltip: "Yeni Kitap Ekle",
+            tooltip: l10n.addBook,
             child: const Icon(Icons.add),
           ),
         );
@@ -221,6 +242,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Text(
       text,
       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
@@ -234,6 +256,7 @@ class _EmptyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -254,6 +277,7 @@ class _HorizontalBookList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: 220,
       child: ListView.separated(
@@ -282,6 +306,7 @@ class _BookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final progress = book.wordCount == 0
         ? 0.0
         : (book.wordIndex / book.wordCount).clamp(0.0, 1.0);
@@ -349,6 +374,7 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Cihazın o anki karanlık mod durumunu kontrol ediyoruz
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 

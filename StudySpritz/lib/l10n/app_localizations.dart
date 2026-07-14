@@ -277,6 +277,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown Book'**
   String get unknownBook;
+
+  /// No description provided for @dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get dashboard;
+
+  /// No description provided for @recentBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently Read'**
+  String get recentBooks;
+
+  /// No description provided for @emptyLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Library is empty'**
+  String get emptyLibrary;
+
+  /// No description provided for @favoriteBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favoriteBooks;
+
+  /// No description provided for @noFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorite books yet'**
+  String get noFavorites;
+
+  /// No description provided for @statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statistics;
+
+  /// No description provided for @favorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite'**
+  String get favorite;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @session.
+  ///
+  /// In en, this message translates to:
+  /// **'Session'**
+  String get session;
+
+  /// No description provided for @duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get duration;
+
+  /// No description provided for @words.
+  ///
+  /// In en, this message translates to:
+  /// **'Words'**
+  String get words;
+
+  /// No description provided for @averageWpm.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg WPM'**
+  String get averageWpm;
+
+  /// No description provided for @peakWpm.
+  ///
+  /// In en, this message translates to:
+  /// **'Peak WPM'**
+  String get peakWpm;
+
+  /// No description provided for @addBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Book'**
+  String get addBook;
+
+  /// No description provided for @deleteBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Book'**
+  String get deleteBook;
+
+  /// No description provided for @deleteBookMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{bookName}\" will be removed from your library together with all progress. Are you sure?'**
+  String deleteBookMessage(Object bookName);
+
+  /// No description provided for @bookDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{bookName}\" deleted successfully.'**
+  String bookDeleted(Object bookName);
+
+  /// No description provided for @bookAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{bookName}\" added to library.'**
+  String bookAdded(Object bookName);
+
+  /// No description provided for @bookAddError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error while adding book: {error}'**
+  String bookAddError(Object error);
 }
 
 class _AppLocalizationsDelegate

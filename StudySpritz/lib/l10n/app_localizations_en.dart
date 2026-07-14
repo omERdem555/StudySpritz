@@ -99,4 +99,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownBook => 'Unknown Book';
+
+  @override
+  String get dashboard => 'Dashboard';
+
+  @override
+  String get recentBooks => 'Recently Read';
+
+  @override
+  String get emptyLibrary => 'Library is empty';
+
+  @override
+  String get favoriteBooks => 'Favorites';
+
+  @override
+  String get noFavorites => 'No favorite books yet';
+
+  @override
+  String get statistics => 'Statistics';
+
+  @override
+  String get favorite => 'Favorite';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get session => 'Session';
+
+  @override
+  String get duration => 'Duration';
+
+  @override
+  String get words => 'Words';
+
+  @override
+  String get averageWpm => 'Avg WPM';
+
+  @override
+  String get peakWpm => 'Peak WPM';
+
+  @override
+  String get addBook => 'Add Book';
+
+  @override
+  String get deleteBook => 'Delete Book';
+
+  @override
+  String deleteBookMessage(Object bookName) {
+    return '\"$bookName\" will be removed from your library together with all progress. Are you sure?';
+  }
+
+  @override
+  String bookDeleted(Object bookName) {
+    return '\"$bookName\" deleted successfully.';
+  }
+
+  @override
+  String bookAdded(Object bookName) {
+    return '\"$bookName\" added to library.';
+  }
+
+  @override
+  String bookAddError(Object error) {
+    return 'Error while adding book: $error';
+  }
 }
