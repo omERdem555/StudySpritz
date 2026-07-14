@@ -48,5 +48,17 @@
 
   "light": "Light",
   "dark": "Dark",
-  "system": "System"
+  "system": "System",
+
+  "book": "Book",
+
+  "unknownBook": "Unknown Book",
+
+  "@book": {
+    "description": "Book filter label"
+  },
+
+  "@unknownBook": {
+    "description": "Unknown book placeholder"
+  }
 }

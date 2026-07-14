@@ -93,4 +93,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get system => 'Sistem';
+
+  @override
+  String get book => 'Kitap';
+
+  @override
+  String get unknownBook => 'Bilinmeyen Kitap';
 }

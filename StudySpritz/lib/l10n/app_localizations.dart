@@ -265,6 +265,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System'**
   String get system;
+
+  /// Book filter label
+  ///
+  /// In en, this message translates to:
+  /// **'Book'**
+  String get book;
+
+  /// Unknown book placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Book'**
+  String get unknownBook;
 }
 
 class _AppLocalizationsDelegate

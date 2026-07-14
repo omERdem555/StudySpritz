@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../l10n/app_localizations.dart';
 
 import '../../core/services/hive_service.dart';
 import '../../models/book.dart';
@@ -26,6 +27,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ValueListenableBuilder(
       valueListenable: HiveService.bookmarksBox.listenable(),
       builder: (context, Box<Bookmark> box, _) {
@@ -68,7 +70,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text("Bookmarks"),
+            title: Text(l10n.bookmarks),
           ),
           body: FutureBuilder<List<Book>>(
             future: BookRepository().getAllBooks(),
@@ -87,14 +89,14 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                     child: DropdownButtonFormField<String?>(
                       isExpanded: true,
                       value: selectedBookId,
-                      decoration: const InputDecoration(
-                        labelText: "Book",
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.book,
+                        border: const OutlineInputBorder(),
                       ),
                       items: [
-                        const DropdownMenuItem<String?>(
+                        DropdownMenuItem<String?>(
                           value: null,
-                          child: Text("All Books"),
+                          child: Text(l10n.allBooks),
                         ),
                         ...books.map(
                           (book) => DropdownMenuItem<String?>(
@@ -123,10 +125,10 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: TextField(
-                      decoration: const InputDecoration(
-                        hintText: "Search bookmarks...",
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        hintText: l10n.searchBookmarks,
+                        prefixIcon: const Icon(Icons.search),
+                        border: const OutlineInputBorder(),
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -138,11 +140,11 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                   const SizedBox(height: 8),
                   Expanded(
                     child: bookmarks.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No bookmarks found.",
-                            ),
-                          )
+                        ? Center(
+                          child: Text(
+                            l10n.noBookmarks,
+                          ),
+                        )
                         : ListView.builder(
                             padding: const EdgeInsets.all(12),
                             itemCount: bookmarks.length,
@@ -171,8 +173,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            book?.bookName ??
-                                                "Unknown Book",
+                                            book?.bookName ?? l10n.unknownBook,
                                             style:
                                                 const TextStyle(
                                               fontSize: 16,
@@ -184,7 +185,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                                           const Divider(height: 1),
                                           const SizedBox(height: 6),
                                           Text(
-                                            "Page ${b.pageNumber}",
+                                            "${l10n.page} ${b.pageNumber}",
                                             style: TextStyle(
                                               color:
                                                   Colors.grey[700],
@@ -266,12 +267,13 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
     BuildContext context,
     String markId,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Delete Bookmark"),
-        content: const Text(
-          "Are you sure you want to delete this bookmark?",
+        title: Text(l10n.deleteBookmark),
+        content: Text(
+          l10n.deleteBookmarkMessage,
         ),
         actions: [
           TextButton(
@@ -279,7 +281,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
               context,
               false,
             ),
-            child: const Text("Cancel"),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(
@@ -289,7 +291,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
             ),
-            child: const Text("Delete"),
+            child: Text(l10n.delete),
           ),
         ],
       ),

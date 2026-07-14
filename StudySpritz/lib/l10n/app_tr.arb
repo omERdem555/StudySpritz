@@ -48,5 +48,17 @@
 
   "light": "Açık",
   "dark": "Koyu",
-  "system": "Sistem"
+  "system": "Sistem",
+
+  "book": "Kitap",
+
+  "unknownBook": "Bilinmeyen Kitap",
+
+  "@book": {
+    "description": "Kitap filtresi etiketi"
+  },
+
+  "@unknownBook": {
+    "description": "Kitap bulunamadığında gösterilecek metin"
+  }
 }
