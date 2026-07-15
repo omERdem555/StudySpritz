@@ -469,6 +469,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'sec'**
   String get secondShort;
+
+  /// No description provided for @library.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get library;
+
+  /// No description provided for @searchBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Search books...'**
+  String get searchBooks;
+
+  /// No description provided for @libraryDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{bookName}\"? This action cannot be undone.'**
+  String libraryDeleteMessage(Object bookName);
 }
 
 class _AppLocalizationsDelegate

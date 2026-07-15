@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../l10n/app_localizations.dart';
 
 import '../../core/services/hive_service.dart';
 import '../../core/search/book_search_service.dart';
@@ -21,20 +22,23 @@ class _LibraryScreenState extends State<LibraryScreen> {
     String bookId,
     String bookName,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Delete Book"),
-          content: Text("Delete '$bookName'? This cannot be undone."),
+          title: Text(l10n.deleteBook),
+          content: Text(
+            l10n.libraryDeleteMessage(bookName),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text("Cancel"),
+              child: Text(l10n.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text("Delete"),
+              child: Text(l10n.delete),
             ),
           ],
         );
@@ -48,6 +52,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ValueListenableBuilder(
       valueListenable: HiveService.booksBox.listenable(),
       builder: (context, box, _) {
@@ -56,7 +61,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text("Library"),
+            title: Text(l10n.library),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(56),
               child: Padding(
@@ -67,8 +72,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       _query = value;
                     });
                   },
-                  decoration: const InputDecoration(
-                    hintText: "Search books...",
+                  decoration: InputDecoration(
+                    hintText: l10n.searchBooks,
                     prefixIcon: Icon(Icons.search),
                     border: OutlineInputBorder(),
                     isDense: true,

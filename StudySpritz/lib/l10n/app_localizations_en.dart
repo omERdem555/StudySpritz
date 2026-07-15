@@ -205,4 +205,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get secondShort => 'sec';
+
+  @override
+  String get library => 'Library';
+
+  @override
+  String get searchBooks => 'Search books...';
+
+  @override
+  String libraryDeleteMessage(Object bookName) {
+    return 'Delete \"$bookName\"? This action cannot be undone.';
+  }
 }

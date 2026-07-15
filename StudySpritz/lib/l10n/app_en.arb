@@ -136,5 +136,17 @@
   "remainingTime": "Remaining Time",
 
   "minuteShort": "min",
-  "secondShort": "sec"
+  "secondShort": "sec",
+  
+  "library": "Library",
+
+  "searchBooks": "Search books...",
+
+  "libraryDeleteMessage": "Delete \"{bookName}\"? This action cannot be undone.",
+
+  "@libraryDeleteMessage": {
+    "placeholders": {
+      "bookName": {}
+    }
+  }
 }

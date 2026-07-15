@@ -205,4 +205,15 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get secondShort => 'sn';
+
+  @override
+  String get library => 'Kütüphane';
+
+  @override
+  String get searchBooks => 'Kitaplarda ara...';
+
+  @override
+  String libraryDeleteMessage(Object bookName) {
+    return '\"$bookName\" silinsin mi? Bu işlem geri alınamaz.';
+  }
 }
