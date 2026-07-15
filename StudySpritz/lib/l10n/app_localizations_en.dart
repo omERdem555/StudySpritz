@@ -36,6 +36,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarks => 'Bookmarks';
 
   @override
+  String get home => 'Home';
+
+  @override
   String get allBooks => 'All Books';
 
   @override

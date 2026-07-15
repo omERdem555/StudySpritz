@@ -36,6 +36,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get bookmarks => 'Yer İşaretleri';
 
   @override
+  String get home => 'Ana Sayfa';
+
+  @override
   String get allBooks => 'Tüm Kitaplar';
 
   @override

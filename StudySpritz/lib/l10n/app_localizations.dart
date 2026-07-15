@@ -152,6 +152,12 @@ abstract class AppLocalizations {
   /// **'Bookmarks'**
   String get bookmarks;
 
+  /// No description provided for @home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
   /// No description provided for @allBooks.
   ///
   /// In en, this message translates to:

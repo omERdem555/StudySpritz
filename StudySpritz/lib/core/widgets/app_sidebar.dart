@@ -1,32 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../l10n/app_localizations.dart';
 
 class AppSidebar extends StatelessWidget {
   const AppSidebar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Drawer(
       child: ListView(
         children: [
           ListTile(
-            title: const Text("Home"),
+            title: Text(l10n.home),
             onTap: () => context.go('/'),
           ),
           ListTile(
-            title: const Text("Library"),
+            title: Text(l10n.library),
             onTap: () => context.go('/library'),
           ),
           ListTile(
-            title: const Text("Favorites"),
+            title: Text(l10n.favorites),
             onTap: () => context.go('/favorites'),
           ),
           ListTile(
-            title: const Text("Bookmarks"),
+            title: Text(l10n.bookmarks),
             onTap: () => context.go('/bookmarks'),
           ),
           ListTile(
-            title: const Text("Settings"),
+            title: Text(l10n.settings),
             onTap: () => context.go('/settings'),
           ),
         ],
