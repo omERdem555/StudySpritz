@@ -137,7 +137,7 @@
 
   "minuteShort": "dk",
   "secondShort": "sn",
-  
+
   "library": "Kütüphane",
 
   "searchBooks": "Kitaplarda ara...",
@@ -148,5 +148,7 @@
     "placeholders": {
       "bookName": {}
     }
-  }
+  },
+
+  "favorites": "Favoriler"
 }

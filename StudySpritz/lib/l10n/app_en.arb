@@ -137,7 +137,7 @@
 
   "minuteShort": "min",
   "secondShort": "sec",
-  
+
   "library": "Library",
 
   "searchBooks": "Search books...",
@@ -148,5 +148,7 @@
     "placeholders": {
       "bookName": {}
     }
-  }
+  },
+  
+  "favorites": "Favorites"
 }

@@ -487,6 +487,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete \"{bookName}\"? This action cannot be undone.'**
   String libraryDeleteMessage(Object bookName);
+
+  /// No description provided for @favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites;
 }
 
 class _AppLocalizationsDelegate

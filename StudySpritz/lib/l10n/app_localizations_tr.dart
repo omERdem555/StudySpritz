@@ -216,4 +216,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String libraryDeleteMessage(Object bookName) {
     return '\"$bookName\" silinsin mi? Bu işlem geri alınamaz.';
   }
+
+  @override
+  String get favorites => 'Favoriler';
 }

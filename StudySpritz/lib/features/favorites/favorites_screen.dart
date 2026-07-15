@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../l10n/app_localizations.dart';
 
 import '../../core/services/hive_service.dart';
 import '../../repositories/book_repository.dart';
@@ -10,6 +11,7 @@ class FavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ValueListenableBuilder(
       valueListenable: HiveService.booksBox.listenable(),
       builder: (context, box, _) {
@@ -20,10 +22,12 @@ class FavoritesScreen extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text("Favorites"),
+            title: Text(l10n.favorites),
           ),
           body: favorites.isEmpty
-              ? const Center(child: Text("No favorite books"))
+              ? Center(
+                  child: Text(l10n.noFavorites),
+                )
               : ListView.builder(
                   itemCount: favorites.length,
                   itemBuilder: (context, index) {
@@ -46,22 +50,22 @@ class FavoritesScreen extends StatelessWidget {
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              title: const Text("Delete Book"),
+                              title: Text(l10n.deleteBook),
                               content: Text(
-                                "Delete '${book.bookName}' ?",
+                                l10n.libraryDeleteMessage(book.bookName),
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pop(context, false);
                                   },
-                                  child: const Text("Cancel"),
+                                  child: Text(l10n.cancel),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pop(context, true);
                                   },
-                                  child: const Text("Delete"),
+                                  child: Text(l10n.delete),
                                 ),
                               ],
                             );

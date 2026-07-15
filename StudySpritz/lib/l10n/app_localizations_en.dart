@@ -216,4 +216,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String libraryDeleteMessage(Object bookName) {
     return 'Delete \"$bookName\"? This action cannot be undone.';
   }
+
+  @override
+  String get favorites => 'Favorites';
 }
