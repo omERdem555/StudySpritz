@@ -277,4 +277,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get lastRead => 'Son Okuma';
+
+  @override
+  String get noReadingGoalHistory => 'Henüz okuma hedefi geçmişi bulunmuyor.';
 }

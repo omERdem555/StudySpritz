@@ -277,4 +277,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lastRead => 'Last Read';
+
+  @override
+  String get noReadingGoalHistory => 'No reading goal history yet.';
 }

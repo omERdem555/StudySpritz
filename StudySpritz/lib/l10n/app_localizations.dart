@@ -607,6 +607,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last Read'**
   String get lastRead;
+
+  /// No description provided for @noReadingGoalHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No reading goal history yet.'**
+  String get noReadingGoalHistory;
 }
 
 class _AppLocalizationsDelegate

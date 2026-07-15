@@ -187,5 +187,7 @@
 
 "firstRead": "First Read",
 
-"lastRead": "Last Read"
+"lastRead": "Last Read",
+
+"noReadingGoalHistory": "No reading goal history yet."
 }

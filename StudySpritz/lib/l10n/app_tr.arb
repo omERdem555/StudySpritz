@@ -187,5 +187,7 @@
 
 "firstRead": "İlk Okuma",
 
-"lastRead": "Son Okuma"
+"lastRead": "Son Okuma",
+
+"noReadingGoalHistory": "Henüz okuma hedefi geçmişi bulunmuyor."
 }

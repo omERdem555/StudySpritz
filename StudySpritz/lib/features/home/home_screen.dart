@@ -242,7 +242,6 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return Text(
       text,
       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
@@ -256,7 +255,6 @@ class _EmptyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -277,7 +275,6 @@ class _HorizontalBookList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: 220,
       child: ListView.separated(
@@ -306,7 +303,6 @@ class _BookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final progress = book.wordCount == 0
         ? 0.0
         : (book.wordIndex / book.wordCount).clamp(0.0, 1.0);
@@ -374,7 +370,6 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     // Cihazın o anki karanlık mod durumunu kontrol ediyoruz
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 

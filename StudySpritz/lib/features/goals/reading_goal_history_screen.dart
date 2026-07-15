@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
 import '../../core/services/hive_service.dart';
 import '../../models/reading_goal_history.dart';
 import '../../core/widgets/reading_goal_tile.dart';
+import '../../l10n/app_localizations.dart';
 
 class ReadingGoalHistoryScreen extends StatelessWidget {
   const ReadingGoalHistoryScreen({
@@ -11,6 +11,7 @@ class ReadingGoalHistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final List<ReadingGoalHistory> history =
         HiveService.readingGoalHistoryBox.values.toList()
           ..sort(
@@ -19,14 +20,14 @@ class ReadingGoalHistoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Reading Goal History"),
+        title: Text(l10n.readingGoalHistory),
       ),
       body: history.isEmpty
-          ? const Center(
-              child: Text(
-                "No history yet.",
-              ),
-            )
+          ? Center(
+            child: Text(
+              l10n.noReadingGoalHistory,
+            ),
+          )
           : ListView.builder(
               itemCount: history.length,
               itemBuilder: (context, index) {
