@@ -193,4 +193,16 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get goalCompleted =>
       '🎉 Tebrikler! Bugünkü okuma hedefini tamamladın.';
+
+  @override
+  String get remainingWords => 'Kalan Kelime';
+
+  @override
+  String get remainingTime => 'Bitmesine Kalan Süre';
+
+  @override
+  String get minuteShort => 'dk';
+
+  @override
+  String get secondShort => 'sn';
 }

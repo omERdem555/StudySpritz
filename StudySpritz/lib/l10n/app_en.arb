@@ -130,5 +130,11 @@
 
   "bookmarkSaved": "Bookmark saved.",
 
-  "goalCompleted": "🎉 Congratulations! You completed today's reading goal."
+  "goalCompleted": "🎉 Congratulations! You completed today's reading goal.",
+  
+  "remainingWords": "Remaining Words",
+  "remainingTime": "Remaining Time",
+
+  "minuteShort": "min",
+  "secondShort": "sec"
 }

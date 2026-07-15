@@ -130,5 +130,11 @@
 
   "bookmarkSaved": "Yer imi kaydedildi.",
 
-  "goalCompleted": "🎉 Tebrikler! Bugünkü okuma hedefini tamamladın."
+  "goalCompleted": "🎉 Tebrikler! Bugünkü okuma hedefini tamamladın.",
+
+  "remainingWords": "Kalan Kelime",
+  "remainingTime": "Bitmesine Kalan Süre",
+
+  "minuteShort": "dk",
+  "secondShort": "sn"
 }

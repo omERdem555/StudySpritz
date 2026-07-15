@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../l10n/app_localizations.dart';
+
 import '../../../repositories/book_repository.dart';
 import '../../../repositories/reading_goal_repository.dart';
 import '../../../core/state/settings_state.dart';
@@ -90,6 +92,8 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
   }
 
   Future<void> _updateGoalProgress() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (sessionStartedAt == null) return;
 
     final durationSeconds =
@@ -149,7 +153,7 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
     if (!mounted || !completedNow) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.green,
         duration: Duration(seconds: 3),
@@ -162,8 +166,8 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
             SizedBox(width: 12),
             Expanded(
               child: Text(
-                "🎉 Tebrikler! Bugünkü okuma hedefini tamamladın.",
-              ),
+                l10n.goalCompleted,
+              )
             ),
           ],
         ),
@@ -251,6 +255,8 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     final safeIndex = index.clamp(0, widget.words.isEmpty ? 0 : widget.words.length - 1);
     final word = widget.words.isEmpty ? "-" : widget.words[safeIndex];
     final progress = widget.words.isEmpty ? 0.0 : index / widget.words.length;
@@ -296,17 +302,17 @@ class _ReaderFastScreenState extends State<ReaderFastScreen> {
             LinearProgressIndicator(value: progress),
             const SizedBox(height: 12),
             Text(
-              "%${(progress * 100).toStringAsFixed(1)} tamamlandı",
+              "${(progress * 100).toStringAsFixed(1)}%",
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 4),
             Text(
-              "Kalan Kelime: $remaining"
+              "${l10n.remainingWords}: $remaining"
               "  |  "
-              "WPM: $wpm"
-              "\nBitmesine Kalan Süre: "
-              "${remainingMinutes.toString().padLeft(2, '0')} dk "
-              "${remainingRemainderSeconds.toString().padLeft(2, '0')} sn",
+              "${l10n.wpm}: $wpm"
+              "\n${l10n.remainingTime}: "
+              "${remainingMinutes.toString().padLeft(2, '0')} ${l10n.minuteShort} "
+              "${remainingRemainderSeconds.toString().padLeft(2, '0')} ${l10n.secondShort}",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey[600],

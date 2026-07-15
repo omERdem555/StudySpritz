@@ -193,4 +193,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get goalCompleted =>
       '🎉 Congratulations! You completed today\'s reading goal.';
+
+  @override
+  String get remainingWords => 'Remaining Words';
+
+  @override
+  String get remainingTime => 'Remaining Time';
+
+  @override
+  String get minuteShort => 'min';
+
+  @override
+  String get secondShort => 'sec';
 }

@@ -445,6 +445,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'🎉 Congratulations! You completed today\'s reading goal.'**
   String get goalCompleted;
+
+  /// No description provided for @remainingWords.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining Words'**
+  String get remainingWords;
+
+  /// No description provided for @remainingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining Time'**
+  String get remainingTime;
+
+  /// No description provided for @minuteShort.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get minuteShort;
+
+  /// No description provided for @secondShort.
+  ///
+  /// In en, this message translates to:
+  /// **'sec'**
+  String get secondShort;
 }
 
 class _AppLocalizationsDelegate
