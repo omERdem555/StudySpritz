@@ -201,6 +201,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get remainingTime => 'Bitmesine Kalan Süre';
 
   @override
+  String get hourShort => 'sa';
+
+  @override
   String get minuteShort => 'dk';
 
   @override
@@ -219,4 +222,59 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get favorites => 'Favoriler';
+
+  @override
+  String get readingStatistics => 'Okuma İstatistikleri';
+
+  @override
+  String get bookInformation => 'Kitap Bilgileri';
+
+  @override
+  String get bookNotFound => 'Kitap bulunamadı.';
+
+  @override
+  String get noReadingStatistics =>
+      'Henüz bu kitap için herhangi bir okuma istatistiği oluşmadı.';
+
+  @override
+  String get file => 'Dosya';
+
+  @override
+  String get addedDate => 'Eklenme';
+
+  @override
+  String get lastOpened => 'Son Açılış';
+
+  @override
+  String get totalPages => 'Toplam Sayfa';
+
+  @override
+  String get totalWords => 'Toplam Kelime';
+
+  @override
+  String get progress => 'İlerleme';
+
+  @override
+  String get totalReadingTime => 'Toplam Okuma Süresi';
+
+  @override
+  String get totalWordsRead => 'Toplam Kelime Okundu';
+
+  @override
+  String get totalPagesRead => 'Toplam Sayfa Okundu';
+
+  @override
+  String get totalSessions => 'Toplam Oturum';
+
+  @override
+  String get averageSpeed => 'Ortalama Hız';
+
+  @override
+  String get peakSpeed => 'En Yüksek Hız';
+
+  @override
+  String get firstRead => 'İlk Okuma';
+
+  @override
+  String get lastRead => 'Son Okuma';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../l10n/app_localizations.dart';
 
 import '../../models/book.dart';
 import '../../models/reading_statistics.dart';
@@ -14,9 +15,14 @@ class ReadingStatisticsScreen extends StatelessWidget {
     required this.bookId,
   });
 
-  String _formatDuration(int seconds) {
+  String _formatDuration(
+    BuildContext context,
+    int seconds,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (seconds <= 0) {
-      return "0 dk";
+      return "0 ${l10n.minuteShort}";
     }
 
     final duration = Duration(seconds: seconds);
@@ -25,22 +31,32 @@ class ReadingStatisticsScreen extends StatelessWidget {
     final minutes = duration.inMinutes.remainder(60);
 
     if (hours == 0) {
-      return "$minutes dk";
+      return "$minutes ${l10n.minuteShort}";
     }
 
     if (minutes == 0) {
-      return "$hours saat";
+      return "$hours ${l10n.hourShort}";
     }
 
-    return "$hours saat $minutes dk";
+    return "$hours ${l10n.hourShort} $minutes ${l10n.minuteShort}";
+  }
+    
+  String _formatNumber(
+    BuildContext context,
+    int value,
+  ) {
+    final locale = Localizations.localeOf(context).toString();
+
+    return NumberFormat.decimalPattern(locale).format(value);
   }
 
-  String _formatNumber(int value) {
-    return NumberFormat.decimalPattern('tr_TR').format(value);
-  }
+  String _formatDate(
+    BuildContext context,
+    DateTime date,
+  ) {
+    final locale = Localizations.localeOf(context).toString();
 
-  String _formatDate(DateTime date) {
-    return DateFormat("d MMMM y", "tr_TR").format(date);
+    return DateFormat.yMMMMd(locale).format(date);
   }
 
   String _formatProgress(Book book) {
@@ -114,12 +130,13 @@ class ReadingStatisticsScreen extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final statisticsRepository = StatisticsRepository();
     final bookRepository = BookRepository();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Okuma İstatistikleri"),
+        title: Text(l10n.readingStatistics),
       ),
       body: FutureBuilder(
         future: Future.wait([
@@ -137,8 +154,8 @@ class ReadingStatisticsScreen extends StatelessWidget {
           final stats = snapshot.data![1] as ReadingStatistics?;
 
           if (book == null) {
-            return const Center(
-              child: Text("Kitap bulunamadı."),
+            return Center(
+              child: Text(l10n.bookNotFound),
             );
           }
 
@@ -163,8 +180,8 @@ class ReadingStatisticsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      "Henüz bu kitap için herhangi bir okuma istatistiği oluşmadı.",
+                    Text(
+                        l10n.noReadingStatistics,
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -191,55 +208,55 @@ class ReadingStatisticsScreen extends StatelessWidget {
 
               _sectionTitle(
                 context,
-                "Kitap Bilgileri",
+                l10n.bookInformation,
                 Icons.menu_book,
               ),
 
               _statCard(
                 context: context,
-                title: "Dosya",
+                title: l10n.file,
                 value: book.fileType.toUpperCase(),
               ),
 
               _statCard(
                 context: context,
-                title: "Eklenme",
-                value: _formatDate(book.addedAt),
+                title: l10n.addedDate,
+                value: _formatDate(context, book.addedAt),
               ),
 
               _statCard(
                 context: context,
-                title: "Son Açılış",
-                value: _formatDate(book.lastOpenedAt),
+                title: l10n.lastOpened,
+                value: _formatDate(context, book.lastOpenedAt),
               ),
 
               _statCard(
                 context: context,
-                title: "Toplam Sayfa",
-                value: _formatNumber(book.pageCount),
+                title: l10n.totalPages,
+                value: _formatNumber(context, book.pageCount),
               ),
 
               _statCard(
                 context: context,
-                title: "Toplam Kelime",
-                value: _formatNumber(book.wordCount),
+                title: l10n.totalWords,
+                value: _formatNumber(context, book.wordCount),
               ),
 
               _statCard(
                 context: context,
-                title: "İlerleme",
+                title: l10n.progress,
                 value: _formatProgress(book),
               ),
 
               _statCard(
                 context: context,
-                title: "Favori",
+                title: l10n.favorite,
                 value: book.isFavorite ? "✓" : "✗",
               ),
 
               _statCard(
                 context: context,
-                title: "Tamamlandı",
+                title: l10n.completed,
                 value: book.isCompleted ? "✓" : "✗",
               ),
 
@@ -249,68 +266,74 @@ class ReadingStatisticsScreen extends StatelessWidget {
 
               _sectionTitle(
                 context,
-                "Okuma İstatistikleri",
+                l10n.readingStatistics,
                 Icons.bar_chart,
               ),
 
               _statCard(
                 context: context,
-                title: "Toplam Okuma Süresi",
+                title: l10n.totalReadingTime,
                 value: _formatDuration(
+                  context,
                   stats.totalReadingTime,
                 ),
               ),
 
               _statCard(
                 context: context,
-                title: "Toplam Kelime Okundu",
+                title: l10n.totalWordsRead,
                 value: _formatNumber(
+                  context,
                   stats.totalWordsRead,
                 ),
               ),
 
               _statCard(
                 context: context,
-                title: "Toplam Sayfa Okundu",
+                title: l10n.totalPagesRead,
                 value: _formatNumber(
+                  context,
                   stats.totalPagesRead,
                 ),
               ),
 
               _statCard(
                 context: context,
-                title: "Toplam Oturum",
+                title: l10n.totalSessions,
                 value: _formatNumber(
+                  context,
                   stats.sessionCount,
                 ),
               ),
 
               _statCard(
                 context: context,
-                title: "Ortalama Hız",
+                title: l10n.averageSpeed,
                 value:
                     "${stats.averageWpm.toStringAsFixed(1)} WPM",
               ),
 
               _statCard(
                 context: context,
-                title: "En Yüksek Hız",
+                title: l10n.peakSpeed,
                 value:
                     "${stats.peakWpm.toStringAsFixed(1)} WPM",
               ),
 
               _statCard(
                 context: context,
-                title: "İlk Okuma",
+                title: l10n.firstRead,
                 value: _formatDate(
+                  context,
                   stats.firstReadAt,
                 ),
               ),
 
               _statCard(
                 context: context,
-                title: "Son Okuma",
+                title: l10n.lastRead,
                 value: _formatDate(
+                  context,
                   stats.lastReadAt,
                 ),
               ),

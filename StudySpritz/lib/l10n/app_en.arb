@@ -135,6 +135,7 @@
   "remainingWords": "Remaining Words",
   "remainingTime": "Remaining Time",
 
+  "hourShort": "hr",
   "minuteShort": "min",
   "secondShort": "sec",
 
@@ -149,6 +150,42 @@
       "bookName": {}
     }
   },
-  
-  "favorites": "Favorites"
+
+  "favorites": "Favorites",
+
+  "readingStatistics": "Reading Statistics",
+
+"bookInformation": "Book Information",
+
+"bookNotFound": "Book not found.",
+
+"noReadingStatistics": "No reading statistics are available for this book yet.",
+
+"file": "File",
+
+"addedDate": "Added",
+
+"lastOpened": "Last Opened",
+
+"totalPages": "Total Pages",
+
+"totalWords": "Total Words",
+
+"progress": "Progress",
+
+"totalReadingTime": "Total Reading Time",
+
+"totalWordsRead": "Total Words Read",
+
+"totalPagesRead": "Total Pages Read",
+
+"totalSessions": "Total Sessions",
+
+"averageSpeed": "Average Speed",
+
+"peakSpeed": "Peak Speed",
+
+"firstRead": "First Read",
+
+"lastRead": "Last Read"
 }

@@ -201,6 +201,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remainingTime => 'Remaining Time';
 
   @override
+  String get hourShort => 'hr';
+
+  @override
   String get minuteShort => 'min';
 
   @override
@@ -219,4 +222,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get favorites => 'Favorites';
+
+  @override
+  String get readingStatistics => 'Reading Statistics';
+
+  @override
+  String get bookInformation => 'Book Information';
+
+  @override
+  String get bookNotFound => 'Book not found.';
+
+  @override
+  String get noReadingStatistics =>
+      'No reading statistics are available for this book yet.';
+
+  @override
+  String get file => 'File';
+
+  @override
+  String get addedDate => 'Added';
+
+  @override
+  String get lastOpened => 'Last Opened';
+
+  @override
+  String get totalPages => 'Total Pages';
+
+  @override
+  String get totalWords => 'Total Words';
+
+  @override
+  String get progress => 'Progress';
+
+  @override
+  String get totalReadingTime => 'Total Reading Time';
+
+  @override
+  String get totalWordsRead => 'Total Words Read';
+
+  @override
+  String get totalPagesRead => 'Total Pages Read';
+
+  @override
+  String get totalSessions => 'Total Sessions';
+
+  @override
+  String get averageSpeed => 'Average Speed';
+
+  @override
+  String get peakSpeed => 'Peak Speed';
+
+  @override
+  String get firstRead => 'First Read';
+
+  @override
+  String get lastRead => 'Last Read';
 }

@@ -458,6 +458,12 @@ abstract class AppLocalizations {
   /// **'Remaining Time'**
   String get remainingTime;
 
+  /// No description provided for @hourShort.
+  ///
+  /// In en, this message translates to:
+  /// **'hr'**
+  String get hourShort;
+
   /// No description provided for @minuteShort.
   ///
   /// In en, this message translates to:
@@ -493,6 +499,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Favorites'**
   String get favorites;
+
+  /// No description provided for @readingStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading Statistics'**
+  String get readingStatistics;
+
+  /// No description provided for @bookInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Information'**
+  String get bookInformation;
+
+  /// No description provided for @bookNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Book not found.'**
+  String get bookNotFound;
+
+  /// No description provided for @noReadingStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'No reading statistics are available for this book yet.'**
+  String get noReadingStatistics;
+
+  /// No description provided for @file.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get file;
+
+  /// No description provided for @addedDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Added'**
+  String get addedDate;
+
+  /// No description provided for @lastOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Opened'**
+  String get lastOpened;
+
+  /// No description provided for @totalPages.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Pages'**
+  String get totalPages;
+
+  /// No description provided for @totalWords.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Words'**
+  String get totalWords;
+
+  /// No description provided for @progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get progress;
+
+  /// No description provided for @totalReadingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Reading Time'**
+  String get totalReadingTime;
+
+  /// No description provided for @totalWordsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Words Read'**
+  String get totalWordsRead;
+
+  /// No description provided for @totalPagesRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Pages Read'**
+  String get totalPagesRead;
+
+  /// No description provided for @totalSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Sessions'**
+  String get totalSessions;
+
+  /// No description provided for @averageSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Speed'**
+  String get averageSpeed;
+
+  /// No description provided for @peakSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Peak Speed'**
+  String get peakSpeed;
+
+  /// No description provided for @firstRead.
+  ///
+  /// In en, this message translates to:
+  /// **'First Read'**
+  String get firstRead;
+
+  /// No description provided for @lastRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Read'**
+  String get lastRead;
 }
 
 class _AppLocalizationsDelegate

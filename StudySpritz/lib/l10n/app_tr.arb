@@ -135,6 +135,7 @@
   "remainingWords": "Kalan Kelime",
   "remainingTime": "Bitmesine Kalan Süre",
 
+  "hourShort": "sa",
   "minuteShort": "dk",
   "secondShort": "sn",
 
@@ -150,5 +151,41 @@
     }
   },
 
-  "favorites": "Favoriler"
+  "favorites": "Favoriler",
+
+  "readingStatistics": "Okuma İstatistikleri",
+
+"bookInformation": "Kitap Bilgileri",
+
+"bookNotFound": "Kitap bulunamadı.",
+
+"noReadingStatistics": "Henüz bu kitap için herhangi bir okuma istatistiği oluşmadı.",
+
+"file": "Dosya",
+
+"addedDate": "Eklenme",
+
+"lastOpened": "Son Açılış",
+
+"totalPages": "Toplam Sayfa",
+
+"totalWords": "Toplam Kelime",
+
+"progress": "İlerleme",
+
+"totalReadingTime": "Toplam Okuma Süresi",
+
+"totalWordsRead": "Toplam Kelime Okundu",
+
+"totalPagesRead": "Toplam Sayfa Okundu",
+
+"totalSessions": "Toplam Oturum",
+
+"averageSpeed": "Ortalama Hız",
+
+"peakSpeed": "En Yüksek Hız",
+
+"firstRead": "İlk Okuma",
+
+"lastRead": "Son Okuma"
 }
