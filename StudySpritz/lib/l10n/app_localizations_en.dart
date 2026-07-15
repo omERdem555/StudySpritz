@@ -283,4 +283,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noReadingGoalHistory => 'No reading goal history yet.';
+
+  @override
+  String get todayGoal => 'Today\'s Goal';
+
+  @override
+  String get newGoal => 'New Goal';
+
+  @override
+  String get editGoal => 'Edit Goal';
+
+  @override
+  String get goalType => 'Goal Type';
+
+  @override
+  String get goal => 'Goal';
+
+  @override
+  String get createGoal => 'Create Goal';
+
+  @override
+  String get goalCompletedLabel => 'Goal completed';
+
+  @override
+  String get minutes => 'Minutes';
+
+  @override
+  String get pages => 'Pages';
+
+  @override
+  String get noGoalCreated => 'No goal has been created yet.';
 }

@@ -191,5 +191,18 @@
 
 "lastRead": "Last Read",
 
-"noReadingGoalHistory": "No reading goal history yet."
+"noReadingGoalHistory": "No reading goal history yet.",
+
+"todayGoal": "Today's Goal",
+"newGoal": "New Goal",
+"editGoal": "Edit Goal",
+"goalType": "Goal Type",
+"goal": "Goal",
+"createGoal": "Create Goal",
+"goalCompletedLabel": "Goal completed",
+
+"minutes": "Minutes",
+"pages": "Pages",
+
+"noGoalCreated": "No goal has been created yet."
 }

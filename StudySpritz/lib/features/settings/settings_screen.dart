@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../core/state/settings_state.dart';
 import '../../features/goals/reading_goal_history_screen.dart';
-import '../../repositories/reading_goal_repository.dart';
 
 import '../../l10n/app_localizations.dart';
 

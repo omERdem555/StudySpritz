@@ -619,6 +619,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No reading goal history yet.'**
   String get noReadingGoalHistory;
+
+  /// No description provided for @todayGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Goal'**
+  String get todayGoal;
+
+  /// No description provided for @newGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'New Goal'**
+  String get newGoal;
+
+  /// No description provided for @editGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Goal'**
+  String get editGoal;
+
+  /// No description provided for @goalType.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Type'**
+  String get goalType;
+
+  /// No description provided for @goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal'**
+  String get goal;
+
+  /// No description provided for @createGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Goal'**
+  String get createGoal;
+
+  /// No description provided for @goalCompletedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal completed'**
+  String get goalCompletedLabel;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes'**
+  String get minutes;
+
+  /// No description provided for @pages.
+  ///
+  /// In en, this message translates to:
+  /// **'Pages'**
+  String get pages;
+
+  /// No description provided for @noGoalCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'No goal has been created yet.'**
+  String get noGoalCreated;
 }
 
 class _AppLocalizationsDelegate

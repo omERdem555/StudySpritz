@@ -283,4 +283,34 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get noReadingGoalHistory => 'Henüz okuma hedefi geçmişi bulunmuyor.';
+
+  @override
+  String get todayGoal => 'Bugünkü Hedef';
+
+  @override
+  String get newGoal => 'Yeni Hedef';
+
+  @override
+  String get editGoal => 'Hedefi Düzenle';
+
+  @override
+  String get goalType => 'Hedef Türü';
+
+  @override
+  String get goal => 'Hedef';
+
+  @override
+  String get createGoal => 'Hedef Oluştur';
+
+  @override
+  String get goalCompletedLabel => 'Hedef tamamlandı';
+
+  @override
+  String get minutes => 'Dakika';
+
+  @override
+  String get pages => 'Sayfa';
+
+  @override
+  String get noGoalCreated => 'Henüz hedef oluşturulmadı.';
 }

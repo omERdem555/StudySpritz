@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../l10n/app_localizations.dart';
 
 import '../../core/services/hive_service.dart';
 import '../../models/reading_goal.dart';
@@ -8,14 +9,21 @@ import '../../repositories/reading_goal_repository.dart';
 class ReadingGoalsCard extends StatelessWidget {
   const ReadingGoalsCard({super.key});
 
-  String _goalName(GoalType type) {
+  String _goalName(
+    BuildContext context,
+    GoalType type,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
     switch (type) {
       case GoalType.minutes:
-        return "Dakika";
+        return l10n.minuteShort;
+
       case GoalType.pages:
-        return "Sayfa";
+        return l10n.page;
+
       case GoalType.words:
-        return "Kelime";
+        return l10n.words;
     }
   }
 
@@ -36,7 +44,7 @@ class ReadingGoalsCard extends StatelessWidget {
   }) async {
     GoalType selectedType =
         currentGoal?.goalType ?? GoalType.minutes;
-
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController(
       text: currentGoal?.targetValue.toString() ?? "20",
     );
@@ -60,8 +68,8 @@ class ReadingGoalsCard extends StatelessWidget {
                   children: [
                     Text(
                       currentGoal == null
-                          ? "Yeni Hedef"
-                          : "Hedefi Düzenle",
+                          ? l10n.newGoal
+                          : l10n.editGoal,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -72,13 +80,13 @@ class ReadingGoalsCard extends StatelessWidget {
 
                     DropdownButtonFormField<GoalType>(
                       value: selectedType,
-                      decoration: const InputDecoration(
-                        labelText: "Hedef Türü",
+                      decoration: InputDecoration(
+                        labelText: l10n.goalType,
                       ),
                       items: GoalType.values.map((e) {
                         return DropdownMenuItem(
                           value: e,
-                          child: Text(_goalName(e)),
+                          child: Text(_goalName(context, e)),
                         );
                       }).toList(),
                       onChanged: (value) {
@@ -94,8 +102,8 @@ class ReadingGoalsCard extends StatelessWidget {
                     TextField(
                       controller: controller,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: "Hedef",
+                      decoration: InputDecoration(
+                        labelText: l10n.goal,
                       ),
                     ),
 
@@ -125,7 +133,7 @@ class ReadingGoalsCard extends StatelessWidget {
                             Navigator.pop(context);
                           }
                         },
-                        child: const Text("Kaydet"),
+                        child: Text(l10n.save),
                       ),
                     ),
                   ],
@@ -157,8 +165,8 @@ class ReadingGoalsCard extends StatelessWidget {
                     CrossAxisAlignment.start,
                 children: [
 
-                  const Text(
-                    "Bugünkü Hedef",
+                  Text(
+                    AppLocalizations.of(context)!.todayGoal,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -167,8 +175,8 @@ class ReadingGoalsCard extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  const Text(
-                    "Henüz hedef oluşturulmadı.",
+                  Text(
+                    AppLocalizations.of(context)!.noGoalCreated,
                   ),
 
                   const SizedBox(height: 18),
@@ -177,7 +185,7 @@ class ReadingGoalsCard extends StatelessWidget {
                     onPressed: () =>
                         _showGoalDialog(context),
                     icon: const Icon(Icons.add),
-                    label: const Text("Hedef Oluştur"),
+                    label: Text(AppLocalizations.of(context)!.createGoal),
                   ),
                 ],
               ),
@@ -200,8 +208,8 @@ class ReadingGoalsCard extends StatelessWidget {
 
                     const SizedBox(width: 8),
 
-                    const Text(
-                      "Bugünkü Hedef",
+                    Text(
+                      AppLocalizations.of(context)!.todayGoal,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -238,21 +246,23 @@ class ReadingGoalsCard extends StatelessWidget {
                 const SizedBox(height: 12),
 
                 Text(
-                  "${goal.currentValue} / ${goal.targetValue} ${_goalName(goal.goalType)}",
+                  "${goal.currentValue} / ${goal.targetValue} ${_goalName(context, goal.goalType)}",
                   style:
                       const TextStyle(fontSize: 15),
                 ),
 
                 if (goal.isCompleted) ...[
                   const SizedBox(height: 12),
-                  const Row(
+                  Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.check_circle,
                         color: Colors.green,
                       ),
-                      SizedBox(width: 8),
-                      Text("Hedef tamamlandı"),
+                      const SizedBox(width: 8),
+                      Text(
+                        AppLocalizations.of(context)!.goalCompletedLabel,
+                      ),
                     ],
                   ),
                 ],

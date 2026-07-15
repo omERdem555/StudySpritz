@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'dart:ui';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:studyspritz/l10n/app_localizations.dart';
 

@@ -191,5 +191,18 @@
 
 "lastRead": "Son Okuma",
 
-"noReadingGoalHistory": "Henüz okuma hedefi geçmişi bulunmuyor."
+"noReadingGoalHistory": "Henüz okuma hedefi geçmişi bulunmuyor.",
+
+"todayGoal": "Bugünkü Hedef",
+"newGoal": "Yeni Hedef",
+"editGoal": "Hedefi Düzenle",
+"goalType": "Hedef Türü",
+"goal": "Hedef",
+"createGoal": "Hedef Oluştur",
+"goalCompletedLabel": "Hedef tamamlandı",
+
+"minutes": "Dakika",
+"pages": "Sayfa",
+
+"noGoalCreated": "Henüz hedef oluşturulmadı."
 }
