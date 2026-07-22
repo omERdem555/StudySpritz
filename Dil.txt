@@ -1,0 +1,49 @@
+FAZ 4.1 — Localization Altyapısı
+Amaç:  Gerçek dil sistemini kurmak.
+
+Değişecek dosyalar:
+main.dart
+pubspec.yaml
+Yeni dosyalar:
+lib/l10n/
+    app_en.arb
+    app_tr.arb
+Burada Flutter'ın resmi localization sistemi kurulacak.
+
+
+
+FAZ 4.2 — Settings ile Bağlama
+Mevcut
+settings.language
+artık gerçekten uygulamanın locale'ini değiştirecek.
+Yani
+English
+↓
+Bookmarks
+Settings
+Statistics
+Delete
+Cancel
+
+olacak.
+
+
+
+FAZ 4.3 — İlk Çeviriler
+Önce en çok görülen ekranlar çevrilir.
+Örneğin:
+Home
+Books
+Bookmarks
+Statistics
+Settings
+Reader
+
+
+
+FAZ 4.4 — Geri Kalan Metinler
+Dialoglar
+SnackBar'lar
+Validation mesajları
+HintText'ler
+Empty state'ler
